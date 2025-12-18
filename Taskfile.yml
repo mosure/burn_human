@@ -1,0 +1,20 @@
+version: '3'
+
+tasks:
+  install-python-modules:
+    desc: Install required Python modules
+    cmds:
+      - pip install numpy
+      - pip install torch
+      - pip install roma
+      - pip install safetensors
+      - pip install anny
+      - pip install pyyaml
+      - pip install pillow
+
+  export-reference:
+    desc: Run the export_reference.py script
+    deps:
+      - task: install-python-modules
+    cmds:
+      - python tool/scripts/export_reference.py --output assets/model/fullbody_default.safetensors --seed 1234
