@@ -7,12 +7,10 @@
 parametric 3d human ([anny](https://arxiv.org/abs/2511.03589)) model, [view the demo](https://mosure.github.io/burn_human).
 
 
-![Alt text](./assets/example.gif)
+![Alt text](./docs/example.gif)
 
 
 ## usage
-
-### bevy
 
 ```rust
 use bevy::prelude::*;
