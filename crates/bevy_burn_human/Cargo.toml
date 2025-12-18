@@ -1,8 +1,11 @@
 [package]
 name = "bevy_burn_human"
+description = "bevy plugin for burn_human morphable models"
 version = "0.1.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+homepage = "https://github.com/mosure/burn_human"
+repository = "https://github.com/mosure/burn_human"
 publish = true
 
 [features]
