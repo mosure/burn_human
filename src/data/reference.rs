@@ -62,13 +62,10 @@ pub struct ReferenceBundle {
     pub cases: Vec<ReferenceCase>,
 }
 
-fn tensor_to_vec<T, const N: usize, F>(t: TensorView, dtype: Dtype, convert: F) -> Result<TensorData<T>>
+fn tensor_to_vec_exact<T, const N: usize, F>(t: TensorView, convert: F) -> Result<TensorData<T>>
 where
     F: Fn([u8; N]) -> T,
 {
-    if t.dtype() != dtype {
-        bail!("expected {dtype:?} tensor, got {:?}", t.dtype());
-    }
     let mut chunks = t.data().chunks_exact(N);
     let data = chunks
         .by_ref()
@@ -88,11 +85,24 @@ where
 }
 
 fn tensor_to_vec_f64(t: TensorView) -> Result<TensorData<f64>> {
-    tensor_to_vec(t, Dtype::F64, f64::from_le_bytes)
+    match t.dtype() {
+        Dtype::F64 => tensor_to_vec_exact(t, f64::from_le_bytes),
+        Dtype::F32 => {
+            let base = tensor_to_vec_exact(t, f32::from_le_bytes)?;
+            Ok(TensorData {
+                shape: base.shape,
+                data: base.data.into_iter().map(|v| v as f64).collect(),
+            })
+        }
+        other => bail!("expected f64 or f32 tensor, got {:?}", other),
+    }
 }
 
 fn tensor_to_vec_i64(t: TensorView) -> Result<TensorData<i64>> {
-    tensor_to_vec(t, Dtype::I64, i64::from_le_bytes)
+    if t.dtype() != Dtype::I64 {
+        bail!("expected I64 tensor, got {:?}", t.dtype());
+    }
+    tensor_to_vec_exact(t, i64::from_le_bytes)
 }
 
 fn load_metadata(meta_path: &Path) -> Result<ReferenceMetadata> {

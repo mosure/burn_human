@@ -45,3 +45,4 @@ criterion = "0.8"
 [[bench]]
 name = "forward"
 harness = false
+path = "bench/forward.rs"
