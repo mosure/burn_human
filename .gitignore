@@ -4,3 +4,4 @@ crates/bevy_burn_human/www/pkg/
 crates/bevy_burn_human/www/assets/
 .cache/
 assets/model/fullbody_default.safetensors
+out/

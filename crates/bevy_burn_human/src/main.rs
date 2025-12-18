@@ -10,12 +10,9 @@ use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use noise::{NoiseFn, OpenSimplex};
 
 #[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::wasm_bindgen;
-
+const TENSOR_BYTES: &[u8] = include_bytes!("../../../assets/model/fullbody_default.safetensors");
 #[cfg(target_arch = "wasm32")]
-const TENSOR_BYTES: &[u8] = include_bytes!("../../assets/model/fullbody_default.safetensors");
-#[cfg(target_arch = "wasm32")]
-const META_BYTES: &[u8] = include_bytes!("../../assets/model/fullbody_default.meta.json");
+const META_BYTES: &[u8] = include_bytes!("../../../assets/model/fullbody_default.meta.json");
 
 #[derive(Component)]
 struct HumanTag;
@@ -49,7 +46,7 @@ struct NoiseRig {
     noise: OpenSimplex,
 }
 
-#[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
+
 pub fn main() {
     #[cfg(target_arch = "wasm32")]
     console_error_panic_hook::set_once();
@@ -74,7 +71,8 @@ pub fn main() {
         .insert_resource(ClearColor(Color::srgb(0.04, 0.05, 0.08)))
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                title: "burn_human demo".to_string(),
+                title: "bevy_burn_human".to_string(),
+                fit_canvas_to_parent: true,
                 ..default()
             }),
             ..default()

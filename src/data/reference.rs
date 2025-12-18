@@ -1,4 +1,4 @@
-use anyhow::{Context, Result, anyhow, bail};
+use anyhow::{Context, Result, bail};
 use safetensors::{SafeTensors, tensor::Dtype, tensor::TensorView};
 use serde::Deserialize;
 use std::path::Path;
@@ -62,26 +62,37 @@ pub struct ReferenceBundle {
     pub cases: Vec<ReferenceCase>,
 }
 
-fn tensor_to_vec_f64(t: TensorView) -> Result<TensorData<f64>> {
-    if t.dtype() != Dtype::F64 {
-        bail!("expected f64 tensor, got {:?}", t.dtype());
+fn tensor_to_vec<T, const N: usize, F>(t: TensorView, dtype: Dtype, convert: F) -> Result<TensorData<T>>
+where
+    F: Fn([u8; N]) -> T,
+{
+    if t.dtype() != dtype {
+        bail!("expected {dtype:?} tensor, got {:?}", t.dtype());
     }
-    let slice: &[f64] = bytemuck::try_cast_slice(t.data()).map_err(|e| anyhow!(e))?;
+    let mut chunks = t.data().chunks_exact(N);
+    let data = chunks
+        .by_ref()
+        .map(|chunk| {
+            let mut bytes = [0u8; N];
+            bytes.copy_from_slice(chunk);
+            convert(bytes)
+        })
+        .collect();
+    if !chunks.remainder().is_empty() {
+        bail!("tensor byte length not divisible by {}", N);
+    }
     Ok(TensorData {
         shape: t.shape().to_vec(),
-        data: slice.to_vec(),
+        data,
     })
 }
 
+fn tensor_to_vec_f64(t: TensorView) -> Result<TensorData<f64>> {
+    tensor_to_vec(t, Dtype::F64, f64::from_le_bytes)
+}
+
 fn tensor_to_vec_i64(t: TensorView) -> Result<TensorData<i64>> {
-    if t.dtype() != Dtype::I64 {
-        bail!("expected i64 tensor, got {:?}", t.dtype());
-    }
-    let slice: &[i64] = bytemuck::try_cast_slice(t.data()).map_err(|e| anyhow!(e))?;
-    Ok(TensorData {
-        shape: t.shape().to_vec(),
-        data: slice.to_vec(),
-    })
+    tensor_to_vec(t, Dtype::I64, i64::from_le_bytes)
 }
 
 fn load_metadata(meta_path: &Path) -> Result<ReferenceMetadata> {
