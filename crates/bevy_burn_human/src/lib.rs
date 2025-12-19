@@ -228,6 +228,10 @@ impl Default for BurnHumanMeshSettings {
 #[derive(Component, Default)]
 pub struct BurnHumanCacheKey(pub u64);
 
+/// Marks that the mesh handle on an entity was allocated by this plugin and can be mutated safely.
+#[derive(Component)]
+struct BurnHumanOwnedMesh;
+
 type HydrateQueryItem<'w> = (
     Entity,
     Option<&'w BurnHumanMeshSettings>,
@@ -236,10 +240,12 @@ type HydrateQueryItem<'w> = (
 );
 
 type MeshUpdateItem<'w> = (
+    Entity,
     &'w BurnHumanInput,
     &'w BurnHumanMeshSettings,
     &'w mut Mesh3d,
     &'w mut BurnHumanCacheKey,
+    Option<&'w BurnHumanOwnedMesh>,
 );
 
 type MeshUpdateFilter = Or<(
@@ -263,17 +269,18 @@ fn hydrate_burn_humans(
             e.insert(BurnHumanCacheKey::default());
         }
         if mesh.is_none() {
-            e.insert(Mesh3d(Handle::<Mesh>::default()));
+            e.insert((Mesh3d(Handle::<Mesh>::default()), BurnHumanOwnedMesh));
         }
     }
 }
 
 fn update_burn_human_meshes(
+    mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     assets: Res<BurnHumanAssets>,
     mut query: Query<MeshUpdateItem<'_>, MeshUpdateFilter>,
 ) {
-    for (input, settings, mut mesh_handle, mut cached) in query.iter_mut() {
+    for (entity, input, settings, mut mesh_handle, mut cached, owned) in query.iter_mut() {
         let key = cache_key(input, settings.compute_normals);
         if cached.0 == key {
             continue;
@@ -290,7 +297,11 @@ fn update_burn_human_meshes(
             settings.compute_normals,
         );
 
-        if let Some(existing) = meshes.get_mut(&mesh_handle.0) {
+        if owned.is_none() {
+            // Take ownership by allocating a fresh mesh asset to avoid mutating shared handles.
+            mesh_handle.0 = meshes.add(new_mesh);
+            commands.entity(entity).insert(BurnHumanOwnedMesh);
+        } else if let Some(existing) = meshes.get_mut(&mesh_handle.0) {
             *existing = new_mesh;
         } else {
             mesh_handle.0 = meshes.add(new_mesh);
