@@ -221,20 +221,20 @@ if (!('encodeInto' in cachedTextEncoder)) {
 
 let WASM_VECTOR_LEN = 0;
 
-function wasm_bindgen_60501b20a8c7db29___convert__closures_____invoke___wasm_bindgen_60501b20a8c7db29___JsValue_____(arg0, arg1, arg2) {
-    wasm.wasm_bindgen_60501b20a8c7db29___convert__closures_____invoke___wasm_bindgen_60501b20a8c7db29___JsValue_____(arg0, arg1, arg2);
+function wasm_bindgen_60501b20a8c7db29___convert__closures_____invoke___web_sys_bff21b01a83441a___features__gen_InputEvent__InputEvent_____(arg0, arg1, arg2) {
+    wasm.wasm_bindgen_60501b20a8c7db29___convert__closures_____invoke___web_sys_bff21b01a83441a___features__gen_InputEvent__InputEvent_____(arg0, arg1, arg2);
 }
 
 function wasm_bindgen_60501b20a8c7db29___convert__closures_____invoke___js_sys_2b5c4a24819c7af9___Array__web_sys_bff21b01a83441a___features__gen_ResizeObserver__ResizeObserver_____(arg0, arg1, arg2, arg3) {
     wasm.wasm_bindgen_60501b20a8c7db29___convert__closures_____invoke___js_sys_2b5c4a24819c7af9___Array__web_sys_bff21b01a83441a___features__gen_ResizeObserver__ResizeObserver_____(arg0, arg1, arg2, arg3);
 }
 
-function wasm_bindgen_60501b20a8c7db29___convert__closures_____invoke___web_sys_bff21b01a83441a___features__gen_InputEvent__InputEvent_____(arg0, arg1, arg2) {
-    wasm.wasm_bindgen_60501b20a8c7db29___convert__closures_____invoke___web_sys_bff21b01a83441a___features__gen_InputEvent__InputEvent_____(arg0, arg1, arg2);
-}
-
 function wasm_bindgen_60501b20a8c7db29___convert__closures_____invoke___js_sys_2b5c4a24819c7af9___Array_____(arg0, arg1, arg2) {
     wasm.wasm_bindgen_60501b20a8c7db29___convert__closures_____invoke___js_sys_2b5c4a24819c7af9___Array_____(arg0, arg1, arg2);
+}
+
+function wasm_bindgen_60501b20a8c7db29___convert__closures_____invoke___wasm_bindgen_60501b20a8c7db29___JsValue_____(arg0, arg1, arg2) {
+    wasm.wasm_bindgen_60501b20a8c7db29___convert__closures_____invoke___wasm_bindgen_60501b20a8c7db29___JsValue_____(arg0, arg1, arg2);
 }
 
 function wasm_bindgen_60501b20a8c7db29___convert__closures_____invoke______(arg0, arg1) {
