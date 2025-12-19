@@ -1,0 +1,63 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>bevy_burn_human</title>
+    <style>
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      .loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin: -15px 0 0 -15px;
+        height: 30px;
+        width: 30px;
+        border: 2px solid #ddd;
+        border-left-color: #009688;
+        border-radius: 30px;
+        -webkit-animation: animation-rotate 950ms cubic-bezier(.64,2,.56,.6) infinite;
+        animation: animation-rotate 950ms cubic-bezier(.64,2,.56,.6) infinite;
+      }
+      .removed {
+        display: none;
+      }
+      @-webkit-keyframes animation-rotate {
+        100% {
+          -webkit-transform: rotate(360deg);
+        }
+      }
+      @keyframes animation-rotate {
+        100% {
+          -webkit-transform: rotate(360deg);
+                  transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <script type="module">
+    import init from './out/bevy_burn_human.js'
+    init()
+    document.querySelector('.loading').style.display = 'none'
+  </script>
+  <script>
+    // disable right-click context menu
+    document.addEventListener('contextmenu', event => event.preventDefault());
+  </script>
+  <style>
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+  <body>
+    <div class="loading"></div>
+  </body>
+</html>
