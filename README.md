@@ -13,6 +13,7 @@ parametric 3d human ([anny](https://arxiv.org/abs/2511.03589)) model, [view the 
 ## features
 
 - [x] parametric 3dmm forward
+- [x] bevy plugin
 - [x] morphs, skeleton, skinning
 - [ ] fitting
 
