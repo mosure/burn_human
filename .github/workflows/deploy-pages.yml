@@ -39,7 +39,7 @@ jobs:
       #   run: cargo install wasm-opt --locked
 
       - name: build wasm artifacts
-        run: cargo build -p bevy_burn_human --target wasm32-unknown-unknown --release
+        run: cargo build -p bevy_burn_human --target wasm32-unknown-unknown --release --no-default-features
 
       # - name: optimize wasm artifacts
       #   run: wasm-opt -O -ol 100 -s 100 -o ./target/wasm32-unknown-unknown/release/bevy_burn_human_opt.wasm ./target/wasm32-unknown-unknown/release/bevy_burn_human.wasm
