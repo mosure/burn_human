@@ -1,6 +1,18 @@
 version: '3'
 
+vars:
+  MCBAISE_CRATE: bevy_mcbaise_fantasmagoria
+  MCBAISE_WASM_TARGET: wasm32-unknown-unknown
+  MCBAISE_WWW_DIR: crates/bevy_Mcbaise_Palee_Regard_Absurdia_Fantasmagoria/www
+  MCBAISE_WASM_PROFILE: wasm-release
+  MCBAISE_PORT: '5173'
+
 tasks:
+  demo:native:
+    desc: Run the bevy_burn_human demo natively
+    cmds:
+      - cargo run -p bevy_burn_human
+
   install-python-modules:
     desc: Install required Python modules
     cmds:
@@ -18,3 +30,39 @@ tasks:
       - task: install-python-modules
     cmds:
       - python tool/scripts/export_reference.py --output assets/model/fullbody_default.safetensors --seed 1234
+
+  mcbaise:native:
+    desc: Run the tube ride demo natively
+    cmds:
+      - cargo run -p {{.MCBAISE_CRATE}}
+
+  mcbaise:wasm:toolchain:
+    desc: Ensure Rust wasm target is installed
+    cmds:
+      - rustup target add {{.MCBAISE_WASM_TARGET}}
+
+  mcbaise:wasm:bindgen:install:
+    desc: Install wasm-bindgen-cli if missing
+    status:
+      - wasm-bindgen --version
+    cmds:
+      - cargo install wasm-bindgen-cli --locked
+
+  mcbaise:wasm:build:
+    desc: Build the tube ride demo for wasm and generate wasm-bindgen package into www/pkg
+    deps:
+      - task: mcbaise:wasm:toolchain
+      - task: mcbaise:wasm:bindgen:install
+    cmds:
+      - cargo build -p {{.MCBAISE_CRATE}} --profile {{.MCBAISE_WASM_PROFILE}} --target {{.MCBAISE_WASM_TARGET}}
+      - wasm-bindgen --target web --no-typescript --out-dir {{.MCBAISE_WWW_DIR}}/pkg --out-name {{.MCBAISE_CRATE}} target/{{.MCBAISE_WASM_TARGET}}/{{.MCBAISE_WASM_PROFILE}}/{{.MCBAISE_CRATE}}.wasm
+
+  mcbaise:wasm:serve:
+    desc: Serve the repo root so /assets is available, then open the web demo URL manually
+    deps:
+      - task: mcbaise:wasm:build
+    cmds:
+      - |
+        echo Serve started. Open:
+        echo http://localhost:{{.MCBAISE_PORT}}/{{.MCBAISE_WWW_DIR}}/
+        python -m http.server {{.MCBAISE_PORT}} || py -m http.server {{.MCBAISE_PORT}}

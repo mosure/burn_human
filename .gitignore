@@ -2,5 +2,7 @@ anny/
 target/
 crates/bevy_burn_human/www/pkg/
 crates/bevy_burn_human/www/assets/
+crates/bevy_Mcbaise_Palee_Regard_Absurdia_Fantasmagoria/www/pkg/
+crates/bevy_Mcbaise_Palee_Regard_Absurdia_Fantasmagoria/www/assets/
 .cache/
 assets/model/fullbody_default.safetensors

@@ -1,12 +1,12 @@
 [package]
 name = "burn_human"
-description = "parametric human mesh pipeline"
+description = "parametric human mesh pipeline (fork)"
 version = "0.1.0"
 edition = "2024"
-authors = ["mosure <mitchell@mosure.me>"]
+authors = ["Dave Horner", "mosure <mitchell@mosure.me>"]
 license = "MIT OR Apache-2.0"
-homepage = "https://github.com/mosure/burn_human"
-repository = "https://github.com/mosure/burn_human"
+homepage = "https://github.com/davehorner/bevy_Mcbaise_Palee_Regard_Absurdia_Fantasmagoria"
+repository = "https://github.com/davehorner/bevy_Mcbaise_Palee_Regard_Absurdia_Fantasmagoria"
 readme = "README.md"
 exclude = [
   ".devcontainer",
@@ -21,9 +21,24 @@ exclude = [
 [workspace]
 members = [
   "crates/bevy_burn_human",
+  "crates/bevy_Mcbaise_Palee_Regard_Absurdia_Fantasmagoria",
   "tool",
 ]
 resolver = "2"
+
+
+[patch.crates-io]
+burn_human = { path = "." }
+bevy_burn_human = { path = "crates/bevy_burn_human" }
+
+
+[profile.wasm-release]
+inherits = "release"
+# Wasm builds can trigger LLVM OOM on some machines at opt-level=3.
+opt-level = 2
+lto = false
+codegen-units = 16
+debug = 0
 
 
 [features]

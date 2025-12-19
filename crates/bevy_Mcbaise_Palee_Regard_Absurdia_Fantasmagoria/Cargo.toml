@@ -1,0 +1,53 @@
+[package]
+name = "bevy_mcbaise_fantasmagoria"
+description = "bevy_Mcbaise_Palee_Regard_Absurdia_Fantasmagoria — Bevy port of a tube-ride visualization"
+version = "0.1.0"
+edition = "2024"
+authors = ["Dave Horner"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/davehorner/bevy_Mcbaise_Palee_Regard_Absurdia_Fantasmagoria"
+repository = "https://github.com/davehorner/bevy_Mcbaise_Palee_Regard_Absurdia_Fantasmagoria"
+publish = true
+exclude = [
+    "www/pkg/**",
+]
+
+[features]
+default = ["native"]
+native = ["bevy/multi_threaded"]
+
+[dependencies]
+bevy = { version = "0.17", default-features = false, features = [
+    "bevy_asset",
+    "bevy_camera",
+    "bevy_core_pipeline",
+    "bevy_gltf",
+    "bevy_image",
+    "bevy_log",
+    "bevy_light",
+    "bevy_mesh",
+    "bevy_pbr",
+    "bevy_render",
+    "bevy_post_process",
+    "bevy_sprite",
+    "bevy_text",
+    "bevy_ui",
+    "bevy_ui_render",
+    "bevy_window",
+    "bevy_winit",
+    "jpeg",
+    "png",
+    "std",
+    "tonemapping_luts",
+    "webgpu",
+    "x11",
+    "zstd_rust",
+] }
+bevy_egui = "0.38"
+bevy_burn_human = "0.1"
+fastrand = "2"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+console_error_panic_hook = "0.1"
+wasm-bindgen = "0.2"

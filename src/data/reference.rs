@@ -104,7 +104,40 @@ fn load_metadata_from_bytes(bytes: &'static [u8]) -> Result<ReferenceMetadata> {
 }
 
 fn load_safetensors_from_bytes(bytes: &'static [u8]) -> Result<SafeTensors<'static>> {
-    SafeTensors::deserialize(bytes).context("deserializing in-memory safetensors")
+    // SAFETY/NOTE:
+    // `include_bytes!()` data (common on wasm) is only guaranteed to be aligned to 1.
+    // `safetensors` uses aligned reads internally; if the input pointer is not sufficiently
+    // aligned, deserialization can fail with `TargetAlignmentGreaterAndInputNotAligned`.
+    // On wasm, we defensively copy to an aligned allocation.
+    #[cfg(target_arch = "wasm32")]
+    {
+        use std::alloc::{Layout, alloc};
+
+        const ALIGN: usize = 8; // enough for u64/f64 headers/data
+        let ptr = bytes.as_ptr() as usize;
+        let aligned = (ptr % ALIGN) == 0;
+        if aligned {
+            return SafeTensors::deserialize(bytes).context("deserializing in-memory safetensors");
+        }
+
+        let len = bytes.len();
+        let layout = Layout::from_size_align(len, ALIGN).expect("valid layout");
+        // Leak the allocation on purpose: SafeTensors<'static> holds references into this buffer.
+        let out_ptr = unsafe { alloc(layout) };
+        if out_ptr.is_null() {
+            anyhow::bail!("allocating aligned safetensors buffer failed");
+        }
+        unsafe {
+            std::ptr::copy_nonoverlapping(bytes.as_ptr(), out_ptr, len);
+            let leaked = std::slice::from_raw_parts(out_ptr, len);
+            SafeTensors::deserialize(leaked).context("deserializing aligned in-memory safetensors")
+        }
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        SafeTensors::deserialize(bytes).context("deserializing in-memory safetensors")
+    }
 }
 
 pub fn load_reference_bundle(

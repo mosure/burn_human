@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <title>MCBAISE • PALE REGARD • ABSURDIA FANTASMAGORIA</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap");
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: system-ui, sans-serif;
+    }
+
+    #root { height: 100%; display: flex; }
+
+    #left, #right {
+      flex: 1;
+      position: relative;
+      min-width: 0;
+    }
+
+    #left {
+      border-right: 2px solid rgba(255,255,255,0.12);
+      background: #000;
+    }
+
+    #playerWrap { position: absolute; inset: 0; background: #000; }
+    #player { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #player iframe { width: 100% !important; height: 100% !important; display: block; }
+
+    #viz { position: absolute; inset: 0; }
+    #bevy-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+    #overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: grid;
+      grid-template-rows: 1fr auto 1fr;
+      align-items: center;
+      justify-items: center;
+      padding: 4vmin;
+    }
+
+    .title {
+      grid-row: 2;
+      text-align: center;
+      font-family: "Baloo 2", system-ui, sans-serif;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      line-height: 0.95;
+      color: #F2B100;
+      text-shadow:
+        0 2px 0 rgba(0,0,0,0.35),
+        0 10px 26px rgba(0,0,0,0.35);
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+      transition: opacity 260ms ease, transform 260ms ease;
+      filter: saturate(1.15);
+    }
+
+    .title.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .title.wobble {
+      animation: wobble 1.35s ease-in-out infinite;
+    }
+
+    @keyframes wobble {
+      0%   { transform: translateY(0) scale(1) skewX(0deg); }
+      25%  { transform: translateY(-1px) scale(1.01) skewX(-0.7deg); }
+      50%  { transform: translateY(0) scale(1) skewX(0.7deg); }
+      75%  { transform: translateY(1px) scale(0.995) skewX(-0.4deg); }
+      100% { transform: translateY(0) scale(1) skewX(0deg); }
+    }
+
+    .caption {
+      grid-row: 3;
+      width: min(92%, 900px);
+      text-align: center;
+      font-size: clamp(16px, 2.2vw, 26px);
+      line-height: 1.25;
+      color: rgba(255,255,255,0.94);
+      text-shadow: 0 2px 10px rgba(0,0,0,0.55);
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.30), rgba(0,0,0,0.12));
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .caption.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .caption.meta {
+      opacity: 0.55;
+      font-style: italic;
+    }
+
+    #controls {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      padding: 8px;
+      pointer-events: auto;
+    }
+
+    #controls button {
+      margin: 4px;
+      padding: 6px;
+      color: #000;
+      background-color: #F2B100;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #controls button:hover {
+      background-color: #D26B11;
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div id="left">
+      <div id="playerWrap">
+        <div id="player"></div>
+      </div>
+    </div>
+
+    <div id="right">
+      <div id="viz">
+        <canvas id="bevy-canvas"></canvas>
+      </div>
+
+      <div id="overlay">
+        <div class="title" id="credit"></div>
+        <div class="caption" id="caption"></div>
+      </div>
+
+      <div id="controls">
+        <button id="btn-colors">Toggle Colors</button>
+        <button id="btn-texture">Toggle Texture</button>
+        <button id="btn-speed-up">Speed Up</button>
+        <button id="btn-speed-down">Slow Down</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const VIDEO_ID = "v2hcW03gcus";
+
+    const creditEl = document.getElementById("credit");
+    const captionEl = document.getElementById("caption");
+
+    // Called from Rust (wasm) to update overlays.
+    window.mcbaise_set_credit = (html, show) => {
+      if (!show) {
+        creditEl.classList.remove("show", "wobble");
+        creditEl.innerHTML = "";
+        return;
+      }
+      creditEl.innerHTML = html;
+      creditEl.classList.add("show", "wobble");
+    };
+
+    window.mcbaise_set_caption = (text, show, isMeta) => {
+      if (!show) {
+        captionEl.classList.remove("show", "meta");
+        captionEl.textContent = "";
+        return;
+      }
+      captionEl.textContent = text;
+      captionEl.classList.add("show");
+      captionEl.classList.toggle("meta", !!isMeta);
+    };
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    // Boot wasm.
+    let wasm = null;
+    async function bootWasm() {
+      const mod = await import('./pkg/bevy_mcbaise_fantasmagoria.js');
+      // wasm-bindgen requires explicit initialization; otherwise exports will exist but call into
+      // an uninitialized internal `wasm` instance.
+      await mod.default();
+      wasm = mod;
+    }
+
+    // YouTube player.
+    let player = null;
+    let playerReady = false;
+    let isPlaying = false;
+    let rafId = null;
+
+    function startLoop() {
+      if (rafId) return;
+      const loop = () => {
+        rafId = requestAnimationFrame(loop);
+        if (!wasm?.set_video_time || !playerReady || !player?.getCurrentTime) return;
+        const t = player.getCurrentTime();
+        wasm.set_video_time(t, !!isPlaying);
+      };
+      loop();
+    }
+
+    function stopLoop() {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+
+    window.onYouTubeIframeAPIReady = () => {
+      player = new YT.Player("player", {
+        videoId: VIDEO_ID,
+        width: "100%",
+        height: "100%",
+        playerVars: { autoplay: 0, controls: 1, rel: 0, modestbranding: 1, playsinline: 1 },
+        events: {
+          onReady: () => {
+            playerReady = true;
+            const t = player.getCurrentTime?.() ?? 0;
+            wasm?.set_video_time?.(t, false);
+          },
+          onStateChange: (e) => {
+            if (e.data === YT.PlayerState.PLAYING) {
+              isPlaying = true;
+              startLoop();
+            } else {
+              isPlaying = false;
+              const t = playerReady ? (player.getCurrentTime?.() ?? 0) : 0;
+              wasm?.set_video_time?.(t, false);
+              stopLoop();
+            }
+          }
+        }
+      });
+    };
+
+    // Hook buttons to wasm exports.
+    function hookControls() {
+      document.getElementById('btn-colors').onclick = () => wasm?.toggle_color_scheme?.();
+      document.getElementById('btn-texture').onclick = () => wasm?.toggle_texture?.();
+      document.getElementById('btn-speed-up').onclick = () => wasm?.speed_up?.();
+      document.getElementById('btn-speed-down').onclick = () => wasm?.slow_down?.();
+    }
+
+    async function main() {
+      await bootWasm();
+      hookControls();
+      await loadScript("https://www.youtube.com/iframe_api");
+    }
+
+    main().catch(err => console.error(err));
+  </script>
+</body>
+</html>

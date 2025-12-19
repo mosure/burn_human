@@ -3,39 +3,57 @@ name: deploy-web
 on:
   workflow_dispatch:
 
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - uses: actions/checkout@v4
-      - uses: brndnmtthws/rust-action@v1
-        with:
-          toolchain: nightly
+      - uses: dtolnay/rust-toolchain@stable
       - name: Add wasm target
         run: rustup target add wasm32-unknown-unknown
       - name: Install wasm-bindgen-cli
-        run: cargo install wasm-bindgen-cli --version 0.2.95 --locked
-      - name: Build wasm demo
-        run: >
-          cargo build -p bevy_burn_human
-          --release
-          --target wasm32-unknown-unknown
-          --no-default-features
-          --features web
+        run: cargo install wasm-bindgen-cli --version 0.2.106 --locked
+      - name: Build wasm demo (tube ride)
+        run: cargo build -p bevy_mcbaise_fantasmagoria --profile wasm-release --target wasm32-unknown-unknown
       - name: Run wasm-bindgen
         run: >
-          wasm-bindgen --target web
-          --out-dir crates/bevy_burn_human/www/pkg
-          target/wasm32-unknown-unknown/release/bevy_burn_human.wasm
+          wasm-bindgen --target web --no-typescript
+          --out-dir crates/bevy_Mcbaise_Palee_Regard_Absurdia_Fantasmagoria/www/pkg
+          --out-name bevy_mcbaise_fantasmagoria
+          target/wasm32-unknown-unknown/wasm-release/bevy_mcbaise_fantasmagoria.wasm
       - name: Copy assets
         run: |
-          mkdir -p crates/bevy_burn_human/www/assets
+          mkdir -p crates/bevy_Mcbaise_Palee_Regard_Absurdia_Fantasmagoria/www/assets
           if compgen -G "assets/*" > /dev/null; then
-            cp -r assets/* crates/bevy_burn_human/www/assets/
+            cp -r assets/* crates/bevy_Mcbaise_Palee_Regard_Absurdia_Fantasmagoria/www/assets/
           fi
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: www
-          publish_dir: crates/bevy_burn_human/www
+          path: crates/bevy_Mcbaise_Palee_Regard_Absurdia_Fantasmagoria/www
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

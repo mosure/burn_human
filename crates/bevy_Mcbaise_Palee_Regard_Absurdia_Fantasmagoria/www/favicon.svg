@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="25%" r="75%">
+      <stop offset="0%" stop-color="#ffb24a"/>
+      <stop offset="65%" stop-color="#ff7a00"/>
+      <stop offset="100%" stop-color="#e85d00"/>
+    </radialGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0.35"/>
+    </filter>
+  </defs>
+
+  <circle cx="32" cy="32" r="30" fill="url(#bg)"/>
+
+  <g filter="url(#soft)">
+    <path
+      d="M 47.5 21.5
+         C 40.5 14.5, 26.5 15.0, 20.5 23.0
+         C 14.5 31.0, 18.0 43.0, 28.5 45.5
+         C 39.0 48.0, 47.5 40.5, 44.0 31.5
+         C 40.5 22.5, 27.5 22.0, 25.0 30.0
+         C 22.5 38.0, 31.5 41.0, 36.5 36.5"
+      fill="none"
+      stroke="#ffffff"
+      stroke-width="6"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      opacity="0.95"
+    />
+    <path
+      d="M 46.0 23.0
+         C 39.5 17.0, 28.5 17.0, 23.5 23.8
+         C 18.8 30.2, 21.2 39.8, 29.7 41.9
+         C 38.2 44.0, 44.2 38.0, 41.6 31.6
+         C 39.0 25.2, 29.6 25.0, 27.8 30.6
+         C 26.0 36.2, 32.2 38.0, 35.6 35.2"
+      fill="none"
+      stroke="#ffffff"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      opacity="0.55"
+    />
+  </g>
+</svg>
