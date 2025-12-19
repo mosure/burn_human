@@ -115,26 +115,13 @@ fn tensor_to_vec_i64(t: TensorView) -> Result<TensorData<i64>> {
     tensor_to_vec_exact(t, i64::from_le_bytes)
 }
 
-fn load_metadata(meta_path: &Path) -> Result<ReferenceMetadata> {
-    let bytes = std::fs::read(meta_path).with_context(|| format!("reading {:?}", meta_path))?;
-    let meta: ReferenceMetadata =
-        serde_json::from_slice(&bytes).with_context(|| format!("parsing {:?}", meta_path))?;
-    Ok(meta)
-}
-
-fn load_safetensors(path: &Path) -> Result<SafeTensors<'static>> {
-    let data = std::fs::read(path).with_context(|| format!("reading {:?}", path))?;
-    let leaked: &'static [u8] = Box::leak(data.into_boxed_slice());
-    SafeTensors::deserialize(leaked).context("deserializing safetensors")
-}
-
-fn load_metadata_from_bytes(bytes: &'static [u8]) -> Result<ReferenceMetadata> {
+fn load_metadata_from_bytes(bytes: &[u8]) -> Result<ReferenceMetadata> {
     let meta: ReferenceMetadata =
         serde_json::from_slice(bytes).context("parsing in-memory metadata bytes")?;
     Ok(meta)
 }
 
-fn load_safetensors_from_bytes(bytes: &'static [u8]) -> Result<SafeTensors<'static>> {
+fn load_safetensors_from_bytes(bytes: &[u8]) -> Result<SafeTensors<'_>> {
     SafeTensors::deserialize(bytes).context("deserializing in-memory safetensors")
 }
 
@@ -144,14 +131,16 @@ pub fn load_reference_bundle(
 ) -> Result<ReferenceBundle> {
     let tensor_path = tensor_path.as_ref();
     let meta_path = meta_path.as_ref();
-    let meta = load_metadata(meta_path)?;
-    let safes = load_safetensors(tensor_path)?;
-    load_reference_bundle_impl(meta, safes)
+    let tensor_bytes =
+        std::fs::read(tensor_path).with_context(|| format!("reading {:?}", tensor_path))?;
+    let meta_bytes =
+        std::fs::read(meta_path).with_context(|| format!("reading {:?}", meta_path))?;
+    load_reference_bundle_from_bytes(&tensor_bytes, &meta_bytes)
 }
 
 pub fn load_reference_bundle_from_bytes(
-    tensor_bytes: &'static [u8],
-    meta_bytes: &'static [u8],
+    tensor_bytes: &[u8],
+    meta_bytes: &[u8],
 ) -> Result<ReferenceBundle> {
     let meta = load_metadata_from_bytes(meta_bytes)?;
     let safes = load_safetensors_from_bytes(tensor_bytes)?;
@@ -160,7 +149,7 @@ pub fn load_reference_bundle_from_bytes(
 
 fn load_reference_bundle_impl(
     meta: ReferenceMetadata,
-    safes: SafeTensors<'static>,
+    safes: SafeTensors<'_>,
 ) -> Result<ReferenceBundle> {
     let static_data = ReferenceStatic {
         faces_quads: tensor_to_vec_i64(

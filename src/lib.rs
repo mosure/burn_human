@@ -66,7 +66,7 @@ impl AnnyReference {
     }
 
     /// Load reference safetensors + metadata from in-memory bytes (useful for wasm).
-    pub fn from_bytes(tensor_bytes: &'static [u8], meta_bytes: &'static [u8]) -> Result<Self> {
+    pub fn from_bytes(tensor_bytes: &[u8], meta_bytes: &[u8]) -> Result<Self> {
         let bundle = load_reference_bundle_from_bytes(tensor_bytes, meta_bytes)?;
         Self::new(bundle)
     }
@@ -288,8 +288,8 @@ impl AnnyBody {
 
     /// Load an inference-only model from reference bytes (for embedded/wasm usage).
     pub fn from_reference_bytes(
-        tensor_bytes: &'static [u8],
-        meta_bytes: &'static [u8],
+        tensor_bytes: &[u8],
+        meta_bytes: &[u8],
     ) -> Result<Self> {
         Ok(Self {
             reference: AnnyReference::from_bytes(tensor_bytes, meta_bytes)?,

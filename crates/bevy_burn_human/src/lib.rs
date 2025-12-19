@@ -3,7 +3,6 @@ use bevy::mesh::{Indices, Mesh, PrimitiveTopology};
 use bevy::prelude::*;
 use burn_human::data::reference::TensorData;
 use burn_human::{AnnyBody, AnnyInput};
-use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -91,7 +90,6 @@ impl Plugin for BurnHumanPlugin {
     fn build(&self, app: &mut App) {
         app.init_asset::<BurnHumanReferenceAsset>()
             .init_asset_loader::<ReferenceAssetLoader>()
-            .insert_resource(BurnHumanMeshCache::default())
             .add_systems(
                 Update,
                 (
@@ -182,9 +180,7 @@ impl AssetLoader for ReferenceAssetLoader {
                 .read_asset_bytes(tensor_path.clone())
                 .await
                 .with_context(|| format!("reading companion {:?}", tensor_path))?;
-            let tensor_static: &'static [u8] = Box::leak(tensor_bytes.into_boxed_slice());
-            let meta_static: &'static [u8] = Box::leak(meta_bytes.into_boxed_slice());
-            let body = AnnyBody::from_reference_bytes(tensor_static, meta_static)?;
+            let body = AnnyBody::from_reference_bytes(&tensor_bytes, &meta_bytes)?;
             Ok(BurnHumanReferenceAsset(Arc::new(body)))
         }
     }
@@ -200,12 +196,6 @@ pub struct BurnHumanAssets {
     pub body: Arc<AnnyBody>,
     pub faces: Arc<TensorData<i64>>,
     pub uvs: Arc<TensorData<f64>>,
-}
-
-/// Cache of generated meshes keyed by the input hash.
-#[derive(Resource, Default)]
-pub struct BurnHumanMeshCache {
-    handles: HashMap<u64, Handle<Mesh>>,
 }
 
 /// Drive the Anny model inside Bevy. Change this component and the mesh updates.
@@ -281,7 +271,6 @@ fn hydrate_burn_humans(
 fn update_burn_human_meshes(
     mut meshes: ResMut<Assets<Mesh>>,
     assets: Res<BurnHumanAssets>,
-    mut cache: ResMut<BurnHumanMeshCache>,
     mut query: Query<MeshUpdateItem<'_>, MeshUpdateFilter>,
 ) {
     for (input, settings, mut mesh_handle, mut cached) in query.iter_mut() {
@@ -290,24 +279,22 @@ fn update_burn_human_meshes(
             continue;
         }
 
-        if let Some(existing) = cache.handles.get(&key) {
-            mesh_handle.0 = existing.clone();
-            cached.0 = key;
-            continue;
-        }
-
         let output = assets
             .body
             .forward(input.as_anny_input())
             .expect("burn_human forward");
-        let handle = meshes.add(build_mesh(
+        let new_mesh = build_mesh(
             &output,
             assets.faces.as_ref(),
             assets.uvs.as_ref(),
             settings.compute_normals,
-        ));
-        cache.handles.insert(key, handle.clone());
-        mesh_handle.0 = handle;
+        );
+
+        if let Some(existing) = meshes.get_mut(&mesh_handle.0) {
+            *existing = new_mesh;
+        } else {
+            mesh_handle.0 = meshes.add(new_mesh);
+        }
         cached.0 = key;
     }
 }
