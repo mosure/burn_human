@@ -1,4 +1,4 @@
-use bevy::asset::RenderAssetUsages;
+use bevy::asset::{AssetLoader, LoadContext, RenderAssetUsages, io::Reader};
 use bevy::mesh::{Indices, Mesh, PrimitiveTopology};
 use bevy::prelude::*;
 use burn_human::data::reference::TensorData;
@@ -7,6 +7,7 @@ use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 use std::path::PathBuf;
 use std::sync::Arc;
+use anyhow::{Context, anyhow};
 
 /// How to load the reference data used by the Bevy plugin.
 #[derive(Clone)]
@@ -20,6 +21,11 @@ pub enum BurnHumanSource {
         meta: &'static [u8],
     },
     Preloaded(Arc<AnnyBody>),
+    /// Load via the Bevy asset pipeline from a meta JSON path; the loader will
+    /// pull the sibling `.safetensors` alongside it.
+    AssetPath(String),
+    /// Load via the Bevy asset pipeline using a prepared handle to the meta JSON asset.
+    Asset(Handle<BurnHumanReferenceAsset>),
 }
 
 impl BurnHumanSource {
@@ -28,6 +34,10 @@ impl BurnHumanSource {
             tensor: PathBuf::from("assets/model/fullbody_default.safetensors"),
             meta: PathBuf::from("assets/model/fullbody_default.meta.json"),
         }
+    }
+
+    pub fn default_asset() -> Self {
+        Self::AssetPath("model/fullbody_default.meta.json".to_string())
     }
 }
 
@@ -38,7 +48,7 @@ pub struct BurnHumanPlugin {
 impl Default for BurnHumanPlugin {
     fn default() -> Self {
         Self {
-            source: BurnHumanSource::default_paths(),
+            source: BurnHumanSource::default_asset(),
         }
     }
 }
@@ -59,30 +69,128 @@ impl BurnHumanPlugin {
             source: BurnHumanSource::Bytes { tensor, meta },
         }
     }
+
+    /// Load reference data through the Bevy asset server from the given meta JSON path.
+    /// The loader fetches the sibling `.safetensors` next to the provided meta file.
+    pub fn from_asset_path(path: impl Into<String>) -> Self {
+        Self {
+            source: BurnHumanSource::AssetPath(path.into()),
+        }
+    }
+
+    /// Load reference data through the Bevy asset server using an explicit handle.
+    pub fn from_asset(handle: Handle<BurnHumanReferenceAsset>) -> Self {
+        Self {
+            source: BurnHumanSource::Asset(handle),
+        }
+    }
 }
 
 /// Plugin that keeps `BurnHumanInput` entities hydrated with a cached `Mesh3d`.
 impl Plugin for BurnHumanPlugin {
     fn build(&self, app: &mut App) {
-        let body = match &self.source {
-            BurnHumanSource::Paths { tensor, meta } => Arc::new(
-                AnnyBody::from_reference_paths(tensor, meta)
-                    .expect("load burn_human reference data"),
-            ),
-            BurnHumanSource::Bytes { tensor, meta } => Arc::new(
-                AnnyBody::from_reference_bytes(tensor, meta)
-                    .expect("load embedded burn_human reference data"),
-            ),
-            BurnHumanSource::Preloaded(body) => body.clone(),
-        };
-        let faces = Arc::new(body.faces_quads().clone());
-        let uvs = Arc::new(body.metadata().static_data.texture_coordinates.clone());
-        app.insert_resource(BurnHumanAssets { body, faces, uvs })
+        app.init_asset::<BurnHumanReferenceAsset>()
+            .init_asset_loader::<ReferenceAssetLoader>()
             .insert_resource(BurnHumanMeshCache::default())
             .add_systems(
                 Update,
-                (hydrate_burn_humans, update_burn_human_meshes).chain(),
+                (
+                    hydrate_reference_asset,
+                    (hydrate_burn_humans, update_burn_human_meshes)
+                        .chain()
+                        .run_if(resource_exists::<BurnHumanAssets>),
+                ),
             );
+
+        match &self.source {
+            BurnHumanSource::Paths { tensor, meta } => {
+                let body = Arc::new(
+                    AnnyBody::from_reference_paths(tensor, meta)
+                        .expect("load burn_human reference data"),
+                );
+                let faces = Arc::new(body.faces_quads().clone());
+                let uvs = Arc::new(body.metadata().static_data.texture_coordinates.clone());
+                app.insert_resource(BurnHumanAssets { body, faces, uvs });
+            }
+            BurnHumanSource::Bytes { tensor, meta } => {
+                let body = Arc::new(
+                    AnnyBody::from_reference_bytes(tensor, meta)
+                        .expect("load embedded burn_human reference data"),
+                );
+                let faces = Arc::new(body.faces_quads().clone());
+                let uvs = Arc::new(body.metadata().static_data.texture_coordinates.clone());
+                app.insert_resource(BurnHumanAssets { body, faces, uvs });
+            }
+            BurnHumanSource::Preloaded(body) => {
+                let faces = Arc::new(body.faces_quads().clone());
+                let uvs = Arc::new(body.metadata().static_data.texture_coordinates.clone());
+                app.insert_resource(BurnHumanAssets {
+                    body: body.clone(),
+                    faces,
+                    uvs,
+                });
+            }
+            BurnHumanSource::AssetPath(path) => {
+                let asset_server = app
+                    .world()
+                    .get_resource::<AssetServer>()
+                    .expect("AssetServer available")
+                    .clone();
+                let handle: Handle<BurnHumanReferenceAsset> = asset_server.load(path.clone());
+                app.insert_resource(BurnHumanAssetHandle(handle));
+            }
+            BurnHumanSource::Asset(handle) => {
+                app.insert_resource(BurnHumanAssetHandle(handle.clone()));
+            }
+        }
+    }
+}
+
+#[derive(Resource, Clone)]
+struct BurnHumanAssetHandle(Handle<BurnHumanReferenceAsset>);
+
+#[derive(Asset, TypePath, Clone)]
+pub struct BurnHumanReferenceAsset(pub Arc<AnnyBody>);
+
+#[derive(Default)]
+struct ReferenceAssetLoader;
+
+impl AssetLoader for ReferenceAssetLoader {
+    type Asset = BurnHumanReferenceAsset;
+    type Settings = ();
+    type Error = anyhow::Error;
+
+    fn load(
+        &self,
+        reader: &mut dyn Reader,
+        _settings: &Self::Settings,
+        load_context: &mut LoadContext<'_>,
+    ) -> impl bevy::tasks::ConditionalSendFuture<Output = Result<Self::Asset, Self::Error>> {
+        async move {
+            let mut meta_bytes: Vec<u8> = Vec::new();
+            reader.read_to_end(&mut meta_bytes).await?;
+            let stem = load_context
+                .path()
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .ok_or_else(|| anyhow!("meta file missing stem"))?;
+            let base = stem.strip_suffix(".meta").unwrap_or(stem);
+            let tensor_path = load_context
+                .path()
+                .with_file_name(format!("{base}.safetensors"));
+            let tensor_bytes: Vec<u8> = load_context
+                .read_asset_bytes(tensor_path.clone())
+                .await
+                .with_context(|| format!("reading companion {:?}", tensor_path))?;
+            let tensor_static: &'static [u8] = Box::leak(tensor_bytes.into_boxed_slice());
+            let meta_static: &'static [u8] = Box::leak(meta_bytes.into_boxed_slice());
+            let body = AnnyBody::from_reference_bytes(tensor_static, meta_static)?;
+            Ok(BurnHumanReferenceAsset(Arc::new(body)))
+        }
+    }
+
+    fn extensions(&self) -> &[&str] {
+        &["meta.json"]
     }
 }
 
@@ -201,6 +309,27 @@ fn update_burn_human_meshes(
         cache.handles.insert(key, handle.clone());
         mesh_handle.0 = handle;
         cached.0 = key;
+    }
+}
+
+fn hydrate_reference_asset(
+    mut commands: Commands,
+    handle: Option<Res<BurnHumanAssetHandle>>,
+    assets: Res<Assets<BurnHumanReferenceAsset>>,
+    existing: Option<Res<BurnHumanAssets>>,
+) {
+    let Some(handle) = handle else { return };
+    if existing.is_some() {
+        return;
+    }
+    if let Some(asset) = assets.get(&handle.0) {
+        let faces = Arc::new(asset.0.faces_quads().clone());
+        let uvs = Arc::new(asset.0.metadata().static_data.texture_coordinates.clone());
+        commands.insert_resource(BurnHumanAssets {
+            body: asset.0.clone(),
+            faces,
+            uvs,
+        });
     }
 }
 

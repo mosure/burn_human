@@ -1,5 +1,6 @@
 anny/
 target/
+crates/bevy_burn_human/assets/
 crates/bevy_burn_human/www/pkg/
 crates/bevy_burn_human/www/assets/
 .cache/

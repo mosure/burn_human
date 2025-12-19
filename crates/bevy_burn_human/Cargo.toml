@@ -1,7 +1,7 @@
 [package]
 name = "bevy_burn_human"
 description = "bevy plugin for burn_human morphable models"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 homepage = "https://github.com/mosure/burn_human"
@@ -45,6 +45,7 @@ bevy_egui = { version = "0.38", default-features = false, features = ["default_f
 bevy_panorbit_camera = "0.33"
 noise = "0.9"
 fastrand = "2"
+anyhow = "1"
 
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]

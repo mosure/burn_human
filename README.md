@@ -65,6 +65,8 @@ python tool/scripts/export_reference.py --output assets/model/fullbody_default.s
 
 The exporter now writes a lighter neutral bundle (`fullbody_default.safetensors` + `fullbody_default.meta.json`) with the heavy blendshape tensors quantized to float16 and unused reference cases removed. Output is deterministic (seeded) and cached assets live under `.cache/anny/`.
 
+Bevy loads the model through the asset server (native and wasm). Keep the files under `assets/model/` so the asset path `model/fullbody_default.meta.json` resolves at runtime.
+
 
 ## run the demo
 ```bash

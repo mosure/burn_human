@@ -2,17 +2,10 @@ use bevy::app::AppExit;
 use bevy::input::{ButtonInput, keyboard::KeyCode};
 use bevy::prelude::*;
 use bevy::prelude::{MessageReader, MessageWriter};
-#[cfg(target_arch = "wasm32")]
-use bevy_burn_human::BurnHumanSource;
 use bevy_burn_human::{BurnHumanAssets, BurnHumanInput, BurnHumanPlugin};
 use bevy_egui::{EguiContexts, EguiPlugin, EguiPrimaryContextPass, egui};
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use noise::{NoiseFn, OpenSimplex};
-
-#[cfg(target_arch = "wasm32")]
-const TENSOR_BYTES: &[u8] = include_bytes!("../../../assets/model/fullbody_default.safetensors");
-#[cfg(target_arch = "wasm32")]
-const META_BYTES: &[u8] = include_bytes!("../../../assets/model/fullbody_default.meta.json");
 
 #[derive(Component)]
 struct HumanTag;
@@ -46,29 +39,22 @@ struct NoiseRig {
     noise: OpenSimplex,
 }
 
+#[derive(Resource, Default)]
+struct SceneSpawned(bool);
+
 
 pub fn main() {
     #[cfg(target_arch = "wasm32")]
     console_error_panic_hook::set_once();
 
-    let burn_plugin = {
-        #[cfg(target_arch = "wasm32")]
-        {
-            BurnHumanPlugin {
-                source: BurnHumanSource::Bytes {
-                    tensor: TENSOR_BYTES,
-                    meta: META_BYTES,
-                },
-            }
-        }
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            BurnHumanPlugin::default()
-        }
-    };
+    // Let Bevy's asset server fetch the files at runtime (native + wasm).
+    run_app(BurnHumanPlugin::default());
+}
 
+fn run_app(burn_plugin: BurnHumanPlugin) {
     App::new()
         .insert_resource(ClearColor(Color::srgb(0.04, 0.05, 0.08)))
+        .insert_resource(SceneSpawned::default())
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "bevy_burn_human".to_string(),
@@ -80,25 +66,41 @@ pub fn main() {
         .add_plugins(EguiPlugin::default())
         .add_plugins(PanOrbitCameraPlugin)
         .add_plugins(burn_plugin)
-        .add_systems(Startup, setup_scene)
         .add_systems(
             PreUpdate,
             (
                 handle_close_requests,
-                apply_random_pose_on_key,
+                apply_random_pose_on_key.run_if(resource_exists::<DemoState>),
                 gate_pan_orbit_during_egui,
-                drive_noise,
-            ),
+                drive_noise
+                    .run_if(resource_exists::<NoiseRig>)
+                    .run_if(resource_exists::<DemoState>),
+            )
+                .run_if(resource_exists::<BurnHumanAssets>),
         )
-        .add_systems(EguiPrimaryContextPass, ui_controls)
+        .add_systems(Update, setup_scene_once.run_if(resource_exists::<BurnHumanAssets>))
+        .add_systems(
+            EguiPrimaryContextPass,
+            ui_controls
+                .run_if(resource_exists::<BurnHumanAssets>)
+                .run_if(resource_exists::<DemoState>),
+        )
+        .add_systems(
+            Update,
+            setup_noise.run_if(resource_exists::<BurnHumanAssets>),
+        )
         .run();
 }
 
-fn setup_scene(
+fn setup_scene_once(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
     assets: Res<BurnHumanAssets>,
+    mut spawned: ResMut<SceneSpawned>,
 ) {
+    if spawned.0 {
+        return;
+    }
     let phenotype_labels = assets.body.metadata().metadata.phenotype_labels.clone();
     let phenotype_values = vec![0.5; phenotype_labels.len()];
     let selected_case = assets
@@ -212,6 +214,16 @@ fn setup_scene(
         Transform::from_xyz(2.8, 1.6, 4.0).looking_at(Vec3::new(0.0, 1.0, 0.0), Vec3::Y),
         PanOrbitCamera::default(),
     ));
+
+    spawned.0 = true;
+}
+
+fn setup_noise(mut commands: Commands, has_noise: Option<Res<NoiseRig>>) {
+    if has_noise.is_none() {
+        commands.insert_resource(NoiseRig {
+            noise: OpenSimplex::new(42),
+        });
+    }
 }
 
 fn ui_controls(
