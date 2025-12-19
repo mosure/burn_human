@@ -48,7 +48,9 @@ jobs:
         run: wasm-bindgen --out-dir ./crates/bevy_burn_human/www/out/ --target web ./target/wasm32-unknown-unknown/release/bevy_burn_human.wasm
 
       - name: copy assets
-        run: mkdir -p ./crates/bevy_burn_human/www/assets && cp -r ./assets/* ./crates/bevy_burn_human/assets/ && cp -r ./crates/bevy_burn_human/assets/* ./crates/bevy_burn_human/www/assets/
+        run: |
+          mkdir -p ./crates/bevy_burn_human/www/assets
+          cp -R ./assets/. ./crates/bevy_burn_human/www/assets/
 
       - name: deploy to github pages
         uses: JamesIves/github-pages-deploy-action@v4
