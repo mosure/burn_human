@@ -1,4 +1,5 @@
 use anyhow::{Context, Result, bail};
+use half::f16;
 use safetensors::{SafeTensors, tensor::Dtype, tensor::TensorView};
 use serde::Deserialize;
 use std::path::Path;
@@ -16,6 +17,8 @@ pub struct ReferenceMetadata {
     pub phenotype_variations: std::collections::HashMap<String, Vec<String>>,
     pub macrodetail_keys: Vec<String>,
     pub phenotype_anchors: std::collections::HashMap<String, Vec<f64>>,
+    #[serde(default)]
+    pub dtype: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -94,7 +97,14 @@ fn tensor_to_vec_f64(t: TensorView) -> Result<TensorData<f64>> {
                 data: base.data.into_iter().map(|v| v as f64).collect(),
             })
         }
-        other => bail!("expected f64 or f32 tensor, got {:?}", other),
+        Dtype::F16 => {
+            let base = tensor_to_vec_exact(t, f16::from_le_bytes)?;
+            Ok(TensorData {
+                shape: base.shape,
+                data: base.data.into_iter().map(|v| v.to_f64()).collect(),
+            })
+        }
+        other => bail!("expected f64, f32, or f16 tensor, got {:?}", other),
     }
 }
 

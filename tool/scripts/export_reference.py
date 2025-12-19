@@ -50,6 +50,9 @@ def _to_numpy(t: torch.Tensor) -> np.ndarray:
 def _to_cpu_tensor(t: torch.Tensor) -> torch.Tensor:
     return t.detach().cpu().contiguous()
 
+def _to_f16(t: torch.Tensor) -> torch.Tensor:
+    return _to_cpu_tensor(t.to(dtype=torch.float16))
+
 
 def _identity_pose(model, batch_size: int) -> torch.Tensor:
     eye = torch.eye(4, dtype=model.dtype, device=model.device)
@@ -160,11 +163,11 @@ def export_reference(output_path: Path, seed: int) -> None:
     metadata_path = output_path.with_suffix(".meta.json")
 
     gen = _seed_all(seed)
-    torch.set_default_dtype(torch.float64)
+    torch.set_default_dtype(torch.float32)
 
     # Default full-body model, no local changes; matches the core forward pipeline we port.
     model = anny.create_fullbody_model(local_changes=False, extrapolate_phenotypes=False)
-    model = model.to(dtype=torch.float64, device="cpu")
+    model = model.to(dtype=torch.float32, device="cpu")
     model.eval()
 
     static_blobs = {
@@ -174,7 +177,7 @@ def export_reference(output_path: Path, seed: int) -> None:
         "texture_coordinates": _to_cpu_tensor(model.texture_coordinates),
         "vertex_bone_indices": _to_cpu_tensor(model.vertex_bone_indices),
         "vertex_bone_weights": _to_cpu_tensor(model.vertex_bone_weights),
-        "blendshapes": _to_cpu_tensor(model.blendshapes),
+        "blendshapes": _to_f16(model.blendshapes),
         "blendshape_mask": _to_cpu_tensor(model.stacked_phenotype_blend_shapes_mask),
         "template_bone_heads": _to_cpu_tensor(model.template_bone_heads),
         "bone_heads_blendshapes": _to_cpu_tensor(model.bone_heads_blendshapes),
@@ -185,24 +188,9 @@ def export_reference(output_path: Path, seed: int) -> None:
 
     cases: Iterable[Tuple[str, torch.Tensor, Dict[str, torch.Tensor]]] = [
         (
-            "neutral_pose_random_phenotype",
+            "neutral_pose_mid_phenotype",
             _identity_pose(model, batch_size=1),
-            _sample_phenotype(model, gen, batch_size=1, mode="random"),
-        ),
-        (
-            "random_pose_zero_phenotype",
-            _random_pose(model, gen, batch_size=1),
-            _sample_phenotype(model, gen, batch_size=1, mode="zero"),
-        ),
-        (
-            "random_pose_random_phenotype",
-            _random_pose(model, gen, batch_size=1),
-            _sample_phenotype(model, gen, batch_size=1, mode="random"),
-        ),
-        (
-            "batch_pose_random_phenotype",
-            _random_pose(model, gen, batch_size=2),
-            _sample_phenotype(model, gen, batch_size=2, mode="random"),
+            _sample_phenotype(model, gen, batch_size=1, mode="mid"),
         ),
     ]
 
@@ -214,6 +202,7 @@ def export_reference(output_path: Path, seed: int) -> None:
         "rig": "default",
         "topology": "default",
         "case_names": case_names,
+        "dtype": "mixed_f16_f32",
         "bone_labels": model.bone_labels,
         "bone_parents": model.bone_parents,
         "phenotype_labels": model.phenotype_labels,

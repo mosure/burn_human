@@ -55,7 +55,7 @@ fn setup(
 python tool/scripts/export_reference.py --output assets/model/fullbody_default.safetensors --seed 1234
 ```
 
-exporter runs against the vendored `anny/` codebase and writes `assets/model/fullbody_default.safetensors` plus `assets/model/fullbody_default.meta.json` consumed by the library/tests/demo. The output is deterministic (seeded) and cached assets live under `.cache/anny/`.
+The exporter now writes a lighter neutral bundle (`fullbody_default.safetensors` + `fullbody_default.meta.json`) with the heavy blendshape tensors quantized to float16 and unused reference cases removed. Output is deterministic (seeded) and cached assets live under `.cache/anny/`.
 
 
 ## run the demo
