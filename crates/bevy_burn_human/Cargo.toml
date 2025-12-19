@@ -40,7 +40,7 @@ bevy = { version = "0.17", default-features = false, features = [
     "x11",
     "zstd_rust",
 ] }
-burn_human = { version = "0.1", path = "../../" }
+burn_human = { version = "0.2", path = "../../" }
 bevy_egui = { version = "0.38", default-features = false, features = ["default_fonts", "render"] }
 bevy_panorbit_camera = "0.33"
 noise = "0.9"
