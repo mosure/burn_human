@@ -659,48 +659,61 @@ fn drive_noise(
     let phenotype_len = assets.body.metadata().metadata.phenotype_labels.len();
     state.phenotype_noise_baseline.resize(phenotype_len, 0.5);
     state.phenotype_values.resize(phenotype_len, 0.5);
-    let phen_labels = assets.body.metadata().metadata.phenotype_labels.clone();
-    let phen_baseline = state.phenotype_noise_baseline.clone();
     let noise_amp = state.noise_amp as f64;
     let phen_amp = state.phenotype_noise_amp as f64;
-    for (i, value) in state.phenotype_values.iter_mut().enumerate() {
-        let label = phen_labels.get(i).map(|s| s.as_str()).unwrap_or("");
-        let (freq, amp_hint) = match label {
-            "gender" => (0.5, 0.25),
-            "muscle" | "weight" => (0.7, 0.22),
-            "height" => (0.6, 0.18),
-            "proportions" => (0.8, 0.22),
-            _ => (0.6, 0.2),
-        };
-        let n = noise.noise.get([t * freq, (200.0 + i as f64) * 0.11]);
-        let amp = amp_hint * noise_amp * phen_amp;
-        let base = *phen_baseline.get(i).unwrap_or(&0.5);
-        *value = (base + n * amp).clamp(0.0, 1.0);
+    let phen_noise_active = noise_amp > 0.0 && phen_amp > 0.0;
+    if phen_noise_active {
+        let phen_labels = assets.body.metadata().metadata.phenotype_labels.clone();
+        let phen_baseline = state.phenotype_noise_baseline.clone();
+        for (i, value) in state.phenotype_values.iter_mut().enumerate() {
+            let label = phen_labels.get(i).map(|s| s.as_str()).unwrap_or("");
+            let (freq, amp_hint) = match label {
+                "gender" => (0.5, 0.25),
+                "muscle" | "weight" => (0.7, 0.22),
+                "height" => (0.6, 0.18),
+                "proportions" => (0.8, 0.22),
+                _ => (0.6, 0.2),
+            };
+            let n = noise.noise.get([t * freq, (200.0 + i as f64) * 0.11]);
+            let amp = amp_hint * noise_amp * phen_amp;
+            let base = *phen_baseline.get(i).unwrap_or(&0.5);
+            *value = (base + n * amp).clamp(0.0, 1.0);
+        }
+    } else {
+        state.phenotype_noise_baseline = state.phenotype_values.clone();
     }
 
     let bone_count = state.bone_euler_deg.len();
     state.bone_noise_baseline.resize(bone_count, [0.0; 3]);
-    let bone_baseline = state.bone_noise_baseline.clone();
-    let noise_amp_f32 = state.noise_amp;
     let bone_labels = assets.body.metadata().metadata.bone_labels.clone();
     let pose_scales = PoseNoiseScales::from(&*state);
-    for (idx, bone) in state.bone_euler_deg.iter_mut().enumerate() {
+    let noise_amp_f32 = state.noise_amp;
+    for idx in 0..bone_count {
+        let baseline_val = state.bone_noise_baseline.get(idx).copied().unwrap_or([0.0; 3]);
         if idx == 0 {
-            *bone = [0.0; 3];
+            state.bone_euler_deg[idx] = [0.0; 3];
+            state.bone_noise_baseline[idx] = [0.0; 3];
             continue;
         }
-        let base = bone_baseline.get(idx).copied().unwrap_or([0.0; 3]);
-        let nx = noise.noise.get([t * 0.35, idx as f64 * 0.17]);
-        let ny = noise.noise.get([t * 0.45 + 97.0, idx as f64 * 0.23]);
-        let nz = noise.noise.get([t * 0.55 + 197.0, idx as f64 * 0.13]);
         let group_amp = bone_labels
             .get(idx)
             .map(|name| pose_noise_scale_for_bone(name, &pose_scales))
             .unwrap_or(pose_scales.other);
         let amp = group_amp * noise_amp_f32;
-        bone[0] = (base[0] + (nx as f32) * amp).clamp(-90.0, 90.0);
-        bone[1] = (base[1] + (ny as f32) * amp).clamp(-90.0, 90.0);
-        bone[2] = (base[2] + (nz as f32) * amp).clamp(-90.0, 90.0);
+        if amp <= f32::EPSILON {
+            let current = state.bone_euler_deg.get(idx).copied().unwrap_or([0.0; 3]);
+            state.bone_noise_baseline[idx] = current;
+            continue;
+        }
+        let nx = noise.noise.get([t * 0.35, idx as f64 * 0.17]);
+        let ny = noise.noise.get([t * 0.45 + 97.0, idx as f64 * 0.23]);
+        let nz = noise.noise.get([t * 0.55 + 197.0, idx as f64 * 0.13]);
+        let new_bone = [
+            (baseline_val[0] + (nx as f32) * amp).clamp(-90.0, 90.0),
+            (baseline_val[1] + (ny as f32) * amp).clamp(-90.0, 90.0),
+            (baseline_val[2] + (nz as f32) * amp).clamp(-90.0, 90.0),
+        ];
+        state.bone_euler_deg[idx] = new_bone;
     }
 
     input.case_name = None;
