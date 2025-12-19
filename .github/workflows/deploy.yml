@@ -26,6 +26,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python deps (asset export)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy roma safetensors pyyaml pillow anny
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Export reference assets
+        run: python tool/scripts/export_reference.py --output assets/model/fullbody_default.safetensors --seed 1234
+
       - uses: dtolnay/rust-toolchain@stable
       - name: Add wasm target
         run: rustup target add wasm32-unknown-unknown
