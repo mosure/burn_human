@@ -10,6 +10,13 @@ parametric 3d human ([anny](https://arxiv.org/abs/2511.03589)) model, [view the 
 ![Alt text](./docs/example.gif)
 
 
+## features
+
+- [x] parametric 3dmm forward
+- [x] morphs, skeleton, skinning
+- [ ] fitting
+
+
 ## usage
 
 ```rust
