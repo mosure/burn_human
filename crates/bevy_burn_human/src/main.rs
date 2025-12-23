@@ -2,7 +2,9 @@ use bevy::app::AppExit;
 use bevy::input::{ButtonInput, keyboard::KeyCode};
 use bevy::prelude::*;
 use bevy::prelude::{MessageReader, MessageWriter};
-use bevy_burn_human::{BurnHumanAssets, BurnHumanInput, BurnHumanPlugin};
+use bevy_burn_human::{
+    BurnHumanAssets, BurnHumanInput, BurnHumanMeshMode, BurnHumanPlugin, BurnHumanRenderMode,
+};
 use bevy_egui::{EguiContexts, EguiPlugin, EguiPrimaryContextPass, egui};
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use noise::{NoiseFn, OpenSimplex};
@@ -195,6 +197,7 @@ fn setup_scene_once(
             phenotype_inputs: Some(phenotype_values),
             ..Default::default()
         },
+        BurnHumanRenderMode(BurnHumanMeshMode::SkinnedMesh),
         MeshMaterial3d(materials.add(StandardMaterial {
             base_color: Color::srgb(0.72, 0.7, 0.68),
             metallic: 0.0,
@@ -227,12 +230,16 @@ fn setup_noise(mut commands: Commands, has_noise: Option<Res<NoiseRig>>) {
 }
 
 fn ui_controls(
+    mut commands: Commands,
     mut contexts: EguiContexts,
     assets: Res<BurnHumanAssets>,
     mut state: ResMut<DemoState>,
-    mut query: Query<&mut BurnHumanInput, With<HumanTag>>,
+    mut query: Query<
+        (Entity, &mut BurnHumanInput, Option<&mut BurnHumanRenderMode>),
+        With<HumanTag>,
+    >,
 ) {
-    let mut input = if let Ok(i) = query.single_mut() {
+    let (entity, mut input, render_mode) = if let Ok(i) = query.single_mut() {
         i
     } else {
         return;
@@ -242,6 +249,41 @@ fn ui_controls(
 
     egui::Window::new("burn_human controls").show(ctx, |ui| {
         ui.label("Reference data exported from the bundled Python Anny model.");
+        ui.separator();
+        let current_mode = render_mode
+            .as_ref()
+            .map(|m| m.0)
+            .unwrap_or(BurnHumanMeshMode::SkinnedMesh);
+        let mut selected_mode = current_mode;
+        ui.horizontal(|ui| {
+            ui.label("Render mode");
+            egui::ComboBox::from_id_salt("burn_human_render_mode")
+                .selected_text(match selected_mode {
+                    BurnHumanMeshMode::SkinnedMesh => "Skinned (GPU)",
+                    BurnHumanMeshMode::BakedMesh => "Baked (CPU)",
+                })
+                .show_ui(ui, |ui| {
+                    ui.selectable_value(
+                        &mut selected_mode,
+                        BurnHumanMeshMode::SkinnedMesh,
+                        "Skinned (GPU)",
+                    );
+                    ui.selectable_value(
+                        &mut selected_mode,
+                        BurnHumanMeshMode::BakedMesh,
+                        "Baked (CPU)",
+                    );
+                });
+        });
+        if selected_mode != current_mode {
+            if let Some(mut mode) = render_mode {
+                mode.0 = selected_mode;
+            } else {
+                commands
+                    .entity(entity)
+                    .insert(BurnHumanRenderMode(selected_mode));
+            }
+        }
         ui.separator();
         ui.checkbox(&mut state.use_reference_case, "Use reference case");
         if state.use_reference_case {

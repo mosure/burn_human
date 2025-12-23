@@ -1,7 +1,7 @@
 [package]
 name = "bevy_burn_human"
 description = "bevy plugin for burn_human morphable models"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 homepage = "https://github.com/mosure/burn_human"
@@ -40,7 +40,7 @@ bevy = { version = "0.17", default-features = false, features = [
     "x11",
     "zstd_rust",
 ] }
-burn_human = { version = "0.2", path = "../../" }
+burn_human = { version = "0.3", path = "../../" }
 bevy_egui = { version = "0.38", default-features = false, features = ["default_fonts", "render"] }
 bevy_panorbit_camera = "0.33"
 noise = "0.9"
