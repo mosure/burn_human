@@ -138,14 +138,13 @@ fn update_bevy_inputs(app: &mut App, entities: &[Entity], phase: f64) {
     let dy = phase.cos() * 0.03;
     let world = app.world_mut();
     for &entity in entities {
-        if let Some(mut input) = world.get_mut::<BurnHumanInput>(entity) {
-            if let Some(pose) = input.pose_parameters.as_mut() {
-                if pose.len() >= 12 {
-                    pose[3] = dx;
-                    pose[7] = dy;
-                    pose[11] = 0.0;
-                }
-            }
+        if let Some(mut input) = world.get_mut::<BurnHumanInput>(entity)
+            && let Some(pose) = input.pose_parameters.as_mut()
+            && pose.len() >= 12
+        {
+            pose[3] = dx;
+            pose[7] = dy;
+            pose[11] = 0.0;
         }
     }
 }
@@ -254,7 +253,7 @@ fn compute_normals_from_quads(
     }
     normals
         .into_iter()
-        .map(|n| normalize3(n))
+        .map(normalize3)
         .map(|n| [n[0] as f32, n[1] as f32, n[2] as f32])
         .collect()
 }
@@ -269,8 +268,8 @@ fn bone_poses_to_f32(bone_poses: &TensorData<f64>) -> Vec<[f32; 16]> {
     for j in 0..bones {
         let idx = j * 16;
         let mut mat = [0.0f32; 16];
-        for k in 0..16 {
-            mat[k] = bone_poses.data[idx + k] as f32;
+        for (k, value) in mat.iter_mut().enumerate() {
+            *value = bone_poses.data[idx + k] as f32;
         }
         out.push(mat);
     }
