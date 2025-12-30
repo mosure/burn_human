@@ -20,6 +20,7 @@ jobs:
           toolchain: ${{ matrix.toolchain }}
 
       - name: copy assets
+        shell: bash
         run: |
           mkdir -p ./crates/bevy_burn_human/assets
           cp -R ./assets/. ./crates/bevy_burn_human/assets/
