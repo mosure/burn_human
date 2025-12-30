@@ -18,5 +18,11 @@ jobs:
       - uses: brndnmtthws/rust-action@v1
         with:
           toolchain: ${{ matrix.toolchain }}
+
+      - name: copy assets
+        run: |
+          mkdir -p ./crates/bevy_burn_human/assets
+          cp -R ./assets/. ./crates/bevy_burn_human/assets/
+
       - name: Cargo test
         run: cargo test --all
