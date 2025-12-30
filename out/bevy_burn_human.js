@@ -221,20 +221,20 @@ if (!('encodeInto' in cachedTextEncoder)) {
 
 let WASM_VECTOR_LEN = 0;
 
-function wasm_bindgen_b10341a32dc2c606___convert__closures_____invoke___web_sys_233a2b317d6bc3d1___features__gen_InputEvent__InputEvent_____(arg0, arg1, arg2) {
-    wasm.wasm_bindgen_b10341a32dc2c606___convert__closures_____invoke___web_sys_233a2b317d6bc3d1___features__gen_InputEvent__InputEvent_____(arg0, arg1, arg2);
-}
-
 function wasm_bindgen_b10341a32dc2c606___convert__closures_____invoke___js_sys_4e253167d46eca5c___Array_____(arg0, arg1, arg2) {
     wasm.wasm_bindgen_b10341a32dc2c606___convert__closures_____invoke___js_sys_4e253167d46eca5c___Array_____(arg0, arg1, arg2);
 }
 
-function wasm_bindgen_b10341a32dc2c606___convert__closures_____invoke___wasm_bindgen_b10341a32dc2c606___JsValue_____(arg0, arg1, arg2) {
-    wasm.wasm_bindgen_b10341a32dc2c606___convert__closures_____invoke___wasm_bindgen_b10341a32dc2c606___JsValue_____(arg0, arg1, arg2);
+function wasm_bindgen_b10341a32dc2c606___convert__closures_____invoke___web_sys_233a2b317d6bc3d1___features__gen_InputEvent__InputEvent_____(arg0, arg1, arg2) {
+    wasm.wasm_bindgen_b10341a32dc2c606___convert__closures_____invoke___web_sys_233a2b317d6bc3d1___features__gen_InputEvent__InputEvent_____(arg0, arg1, arg2);
 }
 
 function wasm_bindgen_b10341a32dc2c606___convert__closures_____invoke___js_sys_4e253167d46eca5c___Array__web_sys_233a2b317d6bc3d1___features__gen_ResizeObserver__ResizeObserver_____(arg0, arg1, arg2, arg3) {
     wasm.wasm_bindgen_b10341a32dc2c606___convert__closures_____invoke___js_sys_4e253167d46eca5c___Array__web_sys_233a2b317d6bc3d1___features__gen_ResizeObserver__ResizeObserver_____(arg0, arg1, arg2, arg3);
+}
+
+function wasm_bindgen_b10341a32dc2c606___convert__closures_____invoke___wasm_bindgen_b10341a32dc2c606___JsValue_____(arg0, arg1, arg2) {
+    wasm.wasm_bindgen_b10341a32dc2c606___convert__closures_____invoke___wasm_bindgen_b10341a32dc2c606___JsValue_____(arg0, arg1, arg2);
 }
 
 function wasm_bindgen_b10341a32dc2c606___convert__closures_____invoke______(arg0, arg1) {
