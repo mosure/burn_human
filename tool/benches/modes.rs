@@ -23,7 +23,7 @@ struct BenchData {
 }
 
 fn load_body() -> AnnyBody {
-    let base = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let base = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..");
     let tensor = base.join("assets").join("model").join("fullbody_default.safetensors");
     let meta = base.join("assets").join("model").join("fullbody_default.meta.json");
     AnnyBody::from_reference_paths(tensor, meta).expect("load reference")
@@ -200,13 +200,13 @@ fn tensor_to_vec3(data: &TensorData<f64>) -> Vec<[f64; 3]> {
     match data.shape.as_slice() {
         [n, 3] => data
             .data
-            .chunks_exact(3)
+            .as_chunks::<3>().0.iter()
             .take(*n)
             .map(|c| [c[0], c[1], c[2]])
             .collect(),
         [b, n, 3] if *b >= 1 => data
             .data
-            .chunks_exact(3)
+            .as_chunks::<3>().0.iter()
             .take(*n)
             .map(|c| [c[0], c[1], c[2]])
             .collect(),
@@ -218,7 +218,7 @@ fn triangulate_quads(quads: &TensorData<i64>) -> Vec<u32> {
     assert_eq!(quads.shape.len(), 2, "faces tensor should be [F,4]");
     assert_eq!(quads.shape[1], 4, "faces tensor should be [F,4]");
     let mut indices = Vec::with_capacity(quads.shape[0] * 6);
-    for face in quads.data.chunks_exact(4) {
+    for face in quads.data.as_chunks::<4>().0.iter() {
         let (a, b, c, d) = (
             face[0] as u32,
             face[1] as u32,
@@ -235,7 +235,7 @@ fn compute_normals_from_quads(
     quads: &TensorData<i64>,
 ) -> Vec<[f32; 3]> {
     let mut normals = vec![[0.0f64; 3]; positions.len()];
-    for face in quads.data.chunks_exact(4) {
+    for face in quads.data.as_chunks::<4>().0.iter() {
         let a = face[0] as usize;
         let b = face[1] as usize;
         let c = face[2] as usize;

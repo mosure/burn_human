@@ -69,16 +69,9 @@ fn tensor_to_vec_exact<T, const N: usize, F>(t: TensorView, convert: F) -> Resul
 where
     F: Fn([u8; N]) -> T,
 {
-    let mut chunks = t.data().chunks_exact(N);
-    let data = chunks
-        .by_ref()
-        .map(|chunk| {
-            let mut bytes = [0u8; N];
-            bytes.copy_from_slice(chunk);
-            convert(bytes)
-        })
-        .collect();
-    if !chunks.remainder().is_empty() {
+    let (chunks, remainder) = t.data().as_chunks::<N>();
+    let data = chunks.iter().copied().map(convert).collect();
+    if !remainder.is_empty() {
         bail!("tensor byte length not divisible by {}", N);
     }
     Ok(TensorData {

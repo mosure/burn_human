@@ -199,7 +199,7 @@ struct BurnHumanAssetHandle(Handle<BurnHumanReferenceAsset>);
 #[derive(Asset, TypePath, Clone)]
 pub struct BurnHumanReferenceAsset(pub Arc<AnnyBody>);
 
-#[derive(Default)]
+#[derive(Default, TypePath)]
 struct ReferenceAssetLoader;
 
 impl AssetLoader for ReferenceAssetLoader {
@@ -218,13 +218,16 @@ impl AssetLoader for ReferenceAssetLoader {
             reader.read_to_end(&mut meta_bytes).await?;
             let stem = load_context
                 .path()
+                .path()
                 .file_stem()
                 .and_then(|s| s.to_str())
                 .ok_or_else(|| anyhow!("meta file missing stem"))?;
             let base = stem.strip_suffix(".meta").unwrap_or(stem);
             let tensor_path = load_context
                 .path()
-                .with_file_name(format!("{base}.safetensors"));
+                .parent()
+                .ok_or_else(|| anyhow!("meta file missing parent path"))?
+                .resolve_str(&format!("{base}.safetensors"))?;
             let tensor_bytes: Vec<u8> = load_context
                 .read_asset_bytes(tensor_path.clone())
                 .await
@@ -442,7 +445,7 @@ fn update_burn_humans(
                     // Take ownership by allocating a fresh mesh asset to avoid mutating shared handles.
                     mesh_handle.0 = meshes.add(new_mesh);
                     commands.entity(entity).insert(BurnHumanOwnedMesh);
-                } else if let Some(existing) = meshes.get_mut(&mesh_handle.0) {
+                } else if let Some(mut existing) = meshes.get_mut(&mesh_handle.0) {
                     *existing = new_mesh;
                 } else {
                     mesh_handle.0 = meshes.add(new_mesh);
@@ -476,7 +479,7 @@ fn update_burn_humans(
                     if owned.is_none() {
                         mesh_handle.0 = meshes.add(new_mesh);
                         commands.entity(entity).insert(BurnHumanOwnedMesh);
-                    } else if let Some(existing) = meshes.get_mut(&mesh_handle.0) {
+                    } else if let Some(mut existing) = meshes.get_mut(&mesh_handle.0) {
                         *existing = new_mesh;
                     } else {
                         mesh_handle.0 = meshes.add(new_mesh);
@@ -517,7 +520,7 @@ fn update_burn_humans(
                             let inverse_bindposes =
                                 inverse_bindposes_from_rest(phenotype.rest_bone_poses)
                                     .expect("burn_human bindposes");
-                            if let Some(existing) =
+                            if let Some(mut existing) =
                                 inverse_bindposes_assets.get_mut(&skinned_mesh.inverse_bindposes)
                             {
                                 *existing = SkinnedMeshInverseBindposes::from(inverse_bindposes);
@@ -913,14 +916,14 @@ fn tensor_to_vec3(data: &TensorData<f64>) -> Vec<Vec3> {
     match data.shape.as_slice() {
         [n, 3] => data
             .data
-            .chunks_exact(3)
+            .as_chunks::<3>().0.iter()
             .take(*n)
             .map(|c| Vec3::new(c[0] as f32, c[1] as f32, c[2] as f32))
             .collect(),
         // batched shape [B,N,3]; take the first batch (current demo renders one body)
         [b, n, 3] if *b >= 1 => data
             .data
-            .chunks_exact(3)
+            .as_chunks::<3>().0.iter()
             .take(*n)
             .map(|c| Vec3::new(c[0] as f32, c[1] as f32, c[2] as f32))
             .collect(),
@@ -934,7 +937,7 @@ fn to_position_attribute(points: &[Vec3]) -> Vec<[f32; 3]> {
 
 fn tensor_to_uv_attribute(data: &TensorData<f64>, vertex_count: usize) -> Option<Vec<[f32; 2]>> {
     let to_uvs = |n: usize, data: &[f64]| -> Vec<[f32; 2]> {
-        data.chunks_exact(2)
+        data.as_chunks::<2>().0.iter()
             .take(n.min(vertex_count))
             .map(|c| [c[0] as f32, c[1] as f32])
             .collect()
@@ -1044,7 +1047,7 @@ fn triangulate_quads(quads: &TensorData<i64>) -> Vec<u32> {
     assert_eq!(quads.shape.len(), 2, "faces tensor should be [F,4]");
     assert_eq!(quads.shape[1], 4, "faces tensor should be [F,4]");
     let mut indices = Vec::with_capacity(quads.shape[0] * 6);
-    for face in quads.data.chunks_exact(4) {
+    for face in quads.data.as_chunks::<4>().0.iter() {
         let (a, b, c, d) = (
             face[0] as u32,
             face[1] as u32,
@@ -1058,7 +1061,7 @@ fn triangulate_quads(quads: &TensorData<i64>) -> Vec<u32> {
 
 fn compute_normals_from_quads(positions: &[Vec3], quads: &TensorData<i64>) -> Vec<[f32; 3]> {
     let mut normals = vec![Vec3::ZERO; positions.len()];
-    for face in quads.data.chunks_exact(4) {
+    for face in quads.data.as_chunks::<4>().0.iter() {
         let a = face[0] as usize;
         let b = face[1] as usize;
         let c = face[2] as usize;

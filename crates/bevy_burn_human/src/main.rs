@@ -140,7 +140,7 @@ fn setup_scene_once(
         noise: OpenSimplex::new(42),
     });
 
-    commands.insert_resource(AmbientLight {
+    commands.insert_resource(GlobalAmbientLight {
         color: Color::srgb(0.85, 0.85, 0.9),
         brightness: 1.05,
         affects_lightmapped_meshes: true,
@@ -149,7 +149,7 @@ fn setup_scene_once(
     commands.spawn((
         DirectionalLight {
             illuminance: 3_000.0,
-            shadows_enabled: false,
+            shadow_maps_enabled: false,
             color: Color::srgb(0.97, 0.97, 1.0),
             ..default()
         },
@@ -158,7 +158,7 @@ fn setup_scene_once(
     commands.spawn((
         DirectionalLight {
             illuminance: 1_800.0,
-            shadows_enabled: false,
+            shadow_maps_enabled: false,
             color: Color::srgb(0.9, 0.94, 1.0),
             ..default()
         },
@@ -168,7 +168,7 @@ fn setup_scene_once(
     commands.spawn((
         PointLight {
             intensity: 620.0,
-            shadows_enabled: false,
+            shadow_maps_enabled: false,
             range: 18.0,
             color: Color::srgb(0.94, 0.95, 0.99),
             ..default()
@@ -434,8 +434,9 @@ fn ui_controls(
 
 fn gate_pan_orbit_during_egui(mut contexts: EguiContexts, mut query: Query<&mut PanOrbitCamera>) {
     let Ok(ctx) = contexts.ctx_mut() else { return };
-    let block =
-        ctx.is_pointer_over_area() || ctx.wants_pointer_input() || ctx.wants_keyboard_input();
+    let block = ctx.is_pointer_over_egui()
+        || ctx.egui_wants_pointer_input()
+        || ctx.egui_wants_keyboard_input();
     for mut cam in query.iter_mut() {
         cam.enabled = !block;
     }

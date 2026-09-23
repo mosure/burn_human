@@ -1,19 +1,20 @@
 [package]
 name = "bevy_burn_human"
 description = "bevy plugin for burn_human morphable models"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 homepage = "https://github.com/mosure/burn_human"
 repository = "https://github.com/mosure/burn_human"
 publish = true
+exclude = ["www"]
 
 [features]
 default = ["native"]
 native = ["bevy/multi_threaded"]
 
 [dependencies]
-bevy = { version = "0.17", default-features = false, features = [
+bevy = { version = "0.19.1", default-features = false, features = [
     "bevy_asset",
     "bevy_camera",
     "bevy_core_pipeline",
@@ -40,9 +41,9 @@ bevy = { version = "0.17", default-features = false, features = [
     "x11",
     "zstd_rust",
 ] }
-burn_human = { version = "0.3", path = "../../" }
-bevy_egui = { version = "0.38", default-features = false, features = ["default_fonts", "render"] }
-bevy_panorbit_camera = "0.33"
+burn_human = { version = "0.4", path = "../../" }
+bevy_egui = { version = "0.42", default-features = false, features = ["default_fonts", "render"] }
+bevy_panorbit_camera = "0.35.1"
 noise = "0.9"
 fastrand = "2"
 anyhow = "1"

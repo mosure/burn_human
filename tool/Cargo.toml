@@ -1,7 +1,7 @@
 [package]
 name = "burn_human_tool"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 publish = false
 
 [[bin]]
@@ -10,3 +10,13 @@ path = "src/bin/import.rs"
 
 [dependencies]
 burn_human = { path = ".." }
+
+[dev-dependencies]
+bevy = { version = "0.19.1", default-features = false }
+bevy_burn_human = { path = "../crates/bevy_burn_human" }
+criterion = "0.8"
+
+[[bench]]
+name = "modes"
+harness = false
+path = "benches/modes.rs"
