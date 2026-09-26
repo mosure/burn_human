@@ -3,7 +3,7 @@
     "crate": "burn_human_inference",
     "version": "0.1.2",
     "files": 14,
-    "compressed_bytes": 55168,
+    "compressed_bytes": 55157,
     "contains_weights_or_build_artifacts": false,
     "dry_run": "passed"
   },
@@ -11,7 +11,7 @@
     "crate": "burn_gemx",
     "version": "0.1.1",
     "files": 26,
-    "compressed_bytes": 77988,
+    "compressed_bytes": 77978,
     "contains_weights_or_build_artifacts": false,
     "dry_run": "passed"
   },
@@ -19,7 +19,7 @@
     "crate": "bevy_burn_human",
     "version": "0.5.2",
     "files": 18,
-    "compressed_bytes": 101890,
+    "compressed_bytes": 102251,
     "contains_weights_or_build_artifacts": false,
     "dry_run": "passed"
   }

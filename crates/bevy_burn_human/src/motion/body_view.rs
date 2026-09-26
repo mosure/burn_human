@@ -12,6 +12,8 @@ pub(super) struct BodyDisplay {
     mesh: Option<Handle<Mesh>>,
     surface: Option<Surface>,
     transform: Transform,
+    center: Vec3,
+    radius: f32,
 }
 impl Default for BodyDisplay {
     fn default() -> Self {
@@ -22,6 +24,8 @@ impl Default for BodyDisplay {
             mesh: None,
             surface: None,
             transform: Transform::default(),
+            center: Vec3::Y * 0.9,
+            radius: 1.3,
         }
     }
 }
@@ -47,7 +51,7 @@ pub(super) fn update(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut actors: Query<(&mut Visibility, &mut Transform), With<SomaActor>>,
     mut anny: Query<&mut Visibility, (With<MotionActor>, Without<SomaActor>)>,
-    mut cameras: Query<&mut bevy_panorbit_camera::PanOrbitCamera>,
+    mut cameras: Query<(&mut bevy_panorbit_camera::PanOrbitCamera, &Projection)>,
 ) {
     let pending = runtime.0.lock().unwrap().body.surface.take();
     if let Some(surface) = pending {
@@ -67,6 +71,8 @@ pub(super) fn update(
         let center = (low + high) * 0.5;
         display.transform = Transform::from_rotation(rotation)
             .with_translation(Vec3::new(-center.x, -low.y, -center.z));
+        display.center = Vec3::Y * (high.y - low.y) * 0.5;
+        display.radius = ((high - low).length() * 0.5).max(0.1);
         if let Some(handle) = &display.mesh {
             if let Some(mut current) = meshes.get_mut(handle) {
                 *current = mesh;
@@ -109,9 +115,22 @@ pub(super) fn update(
     }
     if display.frame_view {
         display.frame_view = false;
-        for mut camera in &mut cameras {
-            camera.target_focus = Vec3::Y * 0.9;
-            camera.target_radius = 4.0;
+        for (mut camera, projection) in &mut cameras {
+            camera.target_focus = display.center;
+            // Fit the evaluated body after scale, identity or pose changes.
+            let radius = display.radius * 1.12;
+            camera.target_radius = match projection {
+                Projection::Perspective(p) => {
+                    let vertical = p.fov * 0.5;
+                    let horizontal = (vertical.tan() * p.aspect_ratio).atan();
+                    radius / vertical.min(horizontal).max(0.01).sin()
+                }
+                Projection::Orthographic(p) => {
+                    // PanOrbit uses radius as the orthographic projection scale.
+                    2.0 * radius * p.scale / p.area.size().min_element().max(0.01)
+                }
+                _ => camera.target_radius,
+            };
             camera.force_update = true;
         }
     }

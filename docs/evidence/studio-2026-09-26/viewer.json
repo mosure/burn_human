@@ -39,6 +39,9 @@
     "Browser: 800x600 window scroll reaches image controls and export",
     "Browser: missing WebGPU shows actionable startup failure",
     "Native motion JSON imports and plays in the rebuilt WASM viewer",
-    "Native Anny tab: stacked editor leaves body visible at 1280x720; shape slider updates GPU-skinned mesh"
+    "Native Anny tab: stacked editor leaves body visible at 1280x720; shape slider updates GPU-skinned mesh",
+    "Browser: Motion -> Anny -> SOMA restores the full-size studio panel",
+    "Browser: SOMA scale 1.5 with F frames the evaluated body with margin",
+    "Browser: live PCA component and LeftArm length edits update the mesh and are preserved in exported identity JSON"
   ]
 }

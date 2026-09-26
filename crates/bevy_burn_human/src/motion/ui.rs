@@ -105,6 +105,8 @@ pub(super) fn controls(
     drop(shared);
     super::body_ui::sync(&mut state.body, &runtime);
     egui::Window::new("burn_human studio")
+        // The compact Anny header must not overwrite the other modes' window size.
+        .id(egui::Id::new(("human_studio", state.is_manual_tab())))
         .default_width(360.0)
         .default_height(780.0)
         .max_height(if state.is_manual_tab() {

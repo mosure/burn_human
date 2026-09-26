@@ -108,6 +108,13 @@ or visual-quality scores; see [viewer.json](viewer.json).
 - Anny: shape sliders update the GPU-skinned body; its editor stays below the
   compact mode/camera panel, leaving the subject visible at 1280 × 720. See
   [native controls](native-anny-controls.png).
+- Mode switching restores the full studio panel after leaving Anny. Body
+  framing uses evaluated bounds, including scale and identity edits; scale
+  1.5 remains fully visible after pressing F. See
+  [restored panel](browser-restored-panel.png) and
+  [scaled body framing](browser-scaled-body-framing.png).
+- Live identity and bone-length edits update the body and survive JSON export:
+  [edited body](browser-shaped-body.png), [identity export](browser-shaped-body.json).
 
 Local validation passed **33 unit/integration tests**, workspace Clippy with
 all model tools and warnings denied, the native viewer and release WASM
