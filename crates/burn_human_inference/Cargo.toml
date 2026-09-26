@@ -1,6 +1,6 @@
 [package]
 name = "burn_human_inference"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 description = "Verified bounded Burnpack transport and portable model tensor utilities"
@@ -41,3 +41,7 @@ required-features = ["tools"]
 name = "quant-parity"
 path = "src/bin/quant_parity.rs"
 required-features = ["tools", "wgpu"]
+
+[dev-dependencies]
+pollster = "0.4"
+tempfile = "3"

@@ -11,3 +11,5 @@ pub mod mhr;
 pub use model::{BindConvention, IdentityParameters, PreparedIdentity, Soma, SomaOutput, SomaPose};
 pub const MODEL_REVISION: &str = "104578ed58857f6faa7592fb83d0a2dad43c36fa";
 pub const SOURCE_REVISION: &str = "cc1f3967755f8e36d187d2e26114633dbd651cd5";
+
+pub mod pretrained;

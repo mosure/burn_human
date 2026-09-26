@@ -125,7 +125,7 @@ def main():
     writer=ExportWriter(args.out)
     h,w,provenance=vitpose(args,writer) if args.kind=="vitpose" else sam_body(args,writer)
     writer.asset("LICENSE",(args.assets/"LICENSE").read_bytes())
-    writer.asset("THIRD-PARTY-LICENSES",(pathlib.Path(__file__).resolve().parents[2]/"crates/burn_gem/LICENSE").read_bytes())
+    writer.asset("THIRD-PARTY-LICENSES",(pathlib.Path(__file__).resolve().parents[2]/"crates/burn_gemx/LICENSE").read_bytes())
     writer.asset("ATTRIBUTIONS.md",(args.upstream/"ATTRIBUTIONS.md").read_bytes())
     writer.json("provenance.json",dict(revision=REVISION,source_revision=SOURCE,**provenance))
     writer.finish(model=f"nvidia/GEM-X:{args.kind}",model_revision=REVISION,source_revision=SOURCE,converter="export_gem_vision.py:v1",license="See metadata/LICENSE and upstream model-specific license notices",config=dict(kind=args.kind,height=h,width=w,layers=32,hidden=1280,heads=20,patch=16))

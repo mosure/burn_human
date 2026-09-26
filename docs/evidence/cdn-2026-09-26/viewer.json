@@ -1,0 +1,11 @@
+{
+  "scope": "Default public SOMA catalog URL intercepted to the local HTTP mirror; not public deployment evidence",
+  "requested_origin": "https://aberration.technology/model",
+  "mirror": "http://127.0.0.1:8887",
+  "manifest_url": "https://aberration.technology/model/soma-x/v1/body/manifest.json",
+  "requests": 82,
+  "part_requests": 80,
+  "all_status_200": true,
+  "observed": "Ready status, evaluated SOMA mesh, rig controls and pose export visible",
+  "screenshot": "viewer-soma-cdn.png"
+}

@@ -1,0 +1,67 @@
+{
+  "ardy": {
+    "source": ".cache/ardy-bundle",
+    "sha256": "b7905f24ed6b9c9a3fa08c622312a1ad7f843ce4fa818632c592d3ad0041ef5d",
+    "assets": {
+      "metadata/LICENSE": ".cache/upstream/ardy/LICENSE",
+      "metadata/ATTRIBUTIONS.MD": ".cache/upstream/ardy/ATTRIBUTIONS.MD"
+    },
+    "bundle": "ardy/core-rp-20fps-h40/v1"
+  },
+  "llama": {
+    "source": ".cache/ardy-text-bundle",
+    "sha256": "3d1f90a846046723facf548ca6490c7f4402ff140e4529082312d477c0652449",
+    "assets": {
+      "metadata/LLM2VEC-LICENSE": ".cache/ardy-onnx/LICENSES/MIT-LLM2Vec.txt"
+    },
+    "bundle": "llama/ardy-llm2vec-8b/v1"
+  },
+  "soma": {
+    "source": ".cache/soma-bundle-v2",
+    "sha256": "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7",
+    "assets": {},
+    "bundle": "soma-x/v1/body"
+  },
+  "mhr": {
+    "source": ".cache/mhr-bundle",
+    "sha256": "c7d6e4fc479b8ca68ab1ba6736923bcd93d9f61252c3009ace1ebef6bb5eff65",
+    "assets": {},
+    "bundle": "soma-x/v1/mhr"
+  },
+  "transfer": {
+    "source": ".cache/mhr-soma-transfer-bundle",
+    "sha256": "0eaabd1e7fd976c37c9f99e609c2d713b814f56497c2c903b854a7d1d3abb6f8",
+    "assets": {},
+    "bundle": "soma-x/v1/transfer"
+  },
+  "vitpose": {
+    "source": ".cache/vitpose-bundle",
+    "sha256": "fb27cd7a46d4800c9941bb69b0070754b619f0a516d4b59233e32ee2cc865eef",
+    "assets": {
+      "metadata/THIRD-PARTY-LICENSES": "crates/burn_gemx/LICENSE",
+      "metadata/ATTRIBUTIONS.md": ".cache/upstream/GEM-X/ATTRIBUTIONS.md"
+    },
+    "bundle": "gemx/v1/vitpose"
+  },
+  "sam_vision": {
+    "source": ".cache/sam-vision-bundle",
+    "sha256": "ec2403d45c2aa690565b556ebfa37762d317085c4d43f3ee00f27318ac7b415b",
+    "assets": {
+      "metadata/THIRD-PARTY-LICENSES": "crates/burn_gemx/LICENSE",
+      "metadata/ATTRIBUTIONS.md": ".cache/upstream/GEM-X/ATTRIBUTIONS.md"
+    },
+    "bundle": "gemx/v1/sam-vision"
+  },
+  "sam_decoder": {
+    "source": ".cache/sam-decoder-bundle",
+    "sha256": "35c5b33c1041f9950af97def56335e7d3929eec6a6ce6180989b8423fb3f4b3e",
+    "assets": {},
+    "bundle": "gemx/v1/sam-decoder"
+  },
+  "denoiser": {
+    "source": ".cache/gem-denoiser-bundle",
+    "sha256": "8849a57736ee9c5119a1598a5a931b8d0f6892f93eba340765553ac78b89b2f3",
+    "assets": {},
+    "bundle": "gemx/v1/denoiser"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "unit_integration_tests": 29,
+  "clippy": "workspace/all-targets/all-model-tools/-D warnings passed",
+  "wasm": "all four model validators and Bevy viewer built",
+  "package_dry_runs": 8,
+  "wgpu_versions": [
+    "29.0.4"
+  ],
+  "patches": false,
+  "staged_files_verified": 2603,
+  "staging_reproduction": "Rust packer exactly reproduced SHA256SUMS and catalog after layout regrouping",
+  "upload_checksum_inventory_sha256": "eb881d93da4afe7cd46414d195bf8d502f3b6c94527007bc25230c908b8f7296",
+  "cargo_lock_sha256": "edfcee4b3e34cb140da318fa3c3b7f5a263da29ac12aafac9aa444499968d285",
+  "public_cdn": "awaiting upload; all manifest HEAD requests returned 403 before upload"
+}

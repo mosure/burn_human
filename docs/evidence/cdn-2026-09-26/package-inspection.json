@@ -1,0 +1,50 @@
+[
+  {
+    "crate": "burn_human",
+    "version": "0.5.1",
+    "files": 26,
+    "archive_bytes": 61882
+  },
+  {
+    "crate": "bevy_burn_human",
+    "version": "0.5.1",
+    "files": 16,
+    "archive_bytes": 96412
+  },
+  {
+    "crate": "burn_human_inference",
+    "version": "0.1.1",
+    "files": 14,
+    "archive_bytes": 54593
+  },
+  {
+    "crate": "burn_ardy",
+    "version": "0.1.1",
+    "files": 21,
+    "archive_bytes": 65208
+  },
+  {
+    "crate": "burn_llama",
+    "version": "0.1.0",
+    "files": 16,
+    "archive_bytes": 55041
+  },
+  {
+    "crate": "burn_soma",
+    "version": "0.1.1",
+    "files": 17,
+    "archive_bytes": 61556
+  },
+  {
+    "crate": "burn_mhr",
+    "version": "0.1.1",
+    "files": 10,
+    "archive_bytes": 50800
+  },
+  {
+    "crate": "burn_gemx",
+    "version": "0.1.0",
+    "files": 26,
+    "archive_bytes": 77460
+  }
+]

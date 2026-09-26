@@ -24,6 +24,7 @@ impl ModelSource {
             let mut source = source;
             if source.base.starts_with("https://") || source.base.starts_with("http://") {
                 source.cache = std::env::var_os("XDG_CACHE_HOME")
+                    .or_else(|| std::env::var_os("LOCALAPPDATA"))
                     .map(std::path::PathBuf::from)
                     .or_else(|| {
                         std::env::var_os("HOME").map(|p| std::path::PathBuf::from(p).join(".cache"))

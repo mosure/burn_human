@@ -1,0 +1,503 @@
+{
+  "browser": "153.0.8010.12",
+  "reports": [
+    {
+      "run": "cold_cache",
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell",
+        "device": "",
+        "description": "",
+        "fallback": false
+      },
+      "result": {
+        "adapter": "",
+        "artifacts": {
+          "denoiser": {
+            "base": "http://127.0.0.1:8887/gemx/v1/denoiser",
+            "sha256": "8849a57736ee9c5119a1598a5a931b8d0f6892f93eba340765553ac78b89b2f3"
+          },
+          "mhr": {
+            "base": "http://127.0.0.1:8887/gemx/v1/../../soma-x/v1/mhr",
+            "sha256": "c7d6e4fc479b8ca68ab1ba6736923bcd93d9f61252c3009ace1ebef6bb5eff65"
+          },
+          "sam_decoder": {
+            "base": "http://127.0.0.1:8887/gemx/v1/sam-decoder",
+            "sha256": "35c5b33c1041f9950af97def56335e7d3929eec6a6ce6180989b8423fb3f4b3e"
+          },
+          "sam_vision": {
+            "base": "http://127.0.0.1:8887/gemx/v1/sam-vision",
+            "sha256": "66fc185473d361d1934fbec7d427a3be4602bc410bec6427b4a7e3d48c18c90b"
+          },
+          "soma": {
+            "base": "http://127.0.0.1:8887/gemx/v1/../../soma-x/v1/body",
+            "sha256": "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7"
+          },
+          "transfer": {
+            "base": "http://127.0.0.1:8887/gemx/v1/../../soma-x/v1/transfer",
+            "sha256": "0eaabd1e7fd976c37c9f99e609c2d713b814f56497c2c903b854a7d1d3abb6f8"
+          },
+          "vitpose": {
+            "base": "http://127.0.0.1:8887/gemx/v1/vitpose",
+            "sha256": "d868f3d06eb7ff2d7acf014c430b1b3a8b6bee269bc407e78a97127d77349e1d"
+          }
+        },
+        "backend": "browser-webgpu-f32",
+        "inference": {
+          "joints": {
+            "actual": [
+              0.37204471230506897,
+              0.0751943588256836,
+              4.68259334564209
+            ],
+            "coordinate": 2,
+            "expected": [
+              0.37216266989707947,
+              0.07550235092639923,
+              4.682929039001465
+            ],
+            "index": 68,
+            "max": 0.000335693359375,
+            "rmse": 0.0001668008207781279
+          },
+          "keypoints": {
+            "actual": [
+              1111.3671875,
+              1245.46875,
+              0.4469239413738251
+            ],
+            "coordinate": 2,
+            "expected": [
+              1111.3671875,
+              1245.46875,
+              0.44300201535224915
+            ],
+            "index": 74,
+            "max": 0.003921926021575928,
+            "rmse": 0.00041231773041340656
+          },
+          "timings": {
+            "body_features": 1.984,
+            "gem": 0.2749,
+            "keypoints": 0.3035,
+            "soma": 0.0152
+          },
+          "vertices": {
+            "actual": [
+              0.10262683033943176,
+              0.21535524725914001,
+              5.110118389129639
+            ],
+            "coordinate": 0,
+            "expected": [
+              0.10223616659641266,
+              0.2152051329612732,
+              5.110263824462891
+            ],
+            "index": 15226,
+            "max": 0.000390663743019104,
+            "rmse": 0.00015149870008556056
+          }
+        },
+        "load_seconds": 126.786,
+        "passed": true,
+        "performance": {
+          "body_features": 1.984,
+          "gem": 0.2749,
+          "keypoints": 0.3035,
+          "soma": 0.0152
+        },
+        "reconstruction": {
+          "joints": {
+            "actual": [
+              -0.40511685609817505,
+              -0.7033392190933228,
+              5.025332927703857
+            ],
+            "coordinate": 2,
+            "expected": [
+              -0.40511754155158997,
+              -0.7033390998840332,
+              5.02533483505249
+            ],
+            "index": 9,
+            "max": 1.9073486328125e-06,
+            "rmse": 4.058243650037124e-07
+          },
+          "vertices": {
+            "actual": [
+              -0.39557570219039917,
+              -0.7076022624969482,
+              4.932872772216797
+            ],
+            "coordinate": 2,
+            "expected": [
+              -0.39556849002838135,
+              -0.707599401473999,
+              4.932865142822266
+            ],
+            "index": 10015,
+            "max": 7.62939453125e-06,
+            "rmse": 4.8608607017606e-07
+          }
+        },
+        "warm_seconds_by_stage": [
+          {
+            "body_features": 0.3857,
+            "gem": 0.0169,
+            "keypoints": 0.1036,
+            "soma": 0.0133
+          },
+          {
+            "body_features": 0.3764,
+            "gem": 0.0174,
+            "keypoints": 0.1222,
+            "soma": 0.0135
+          },
+          {
+            "body_features": 0.3683,
+            "gem": 0.0217,
+            "keypoints": 0.104,
+            "soma": 0.013
+          }
+        ],
+        "wasm_linear_memory_peak_bytes": 1434648576
+      },
+      "part_requests": 1866,
+      "expected_parts": 1866,
+      "corrupted_url": null
+    },
+    {
+      "run": "warm_cache",
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell",
+        "device": "",
+        "description": "",
+        "fallback": false
+      },
+      "result": {
+        "adapter": "",
+        "artifacts": {
+          "denoiser": {
+            "base": "http://127.0.0.1:8887/gemx/v1/denoiser",
+            "sha256": "8849a57736ee9c5119a1598a5a931b8d0f6892f93eba340765553ac78b89b2f3"
+          },
+          "mhr": {
+            "base": "http://127.0.0.1:8887/gemx/v1/../../soma-x/v1/mhr",
+            "sha256": "c7d6e4fc479b8ca68ab1ba6736923bcd93d9f61252c3009ace1ebef6bb5eff65"
+          },
+          "sam_decoder": {
+            "base": "http://127.0.0.1:8887/gemx/v1/sam-decoder",
+            "sha256": "35c5b33c1041f9950af97def56335e7d3929eec6a6ce6180989b8423fb3f4b3e"
+          },
+          "sam_vision": {
+            "base": "http://127.0.0.1:8887/gemx/v1/sam-vision",
+            "sha256": "66fc185473d361d1934fbec7d427a3be4602bc410bec6427b4a7e3d48c18c90b"
+          },
+          "soma": {
+            "base": "http://127.0.0.1:8887/gemx/v1/../../soma-x/v1/body",
+            "sha256": "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7"
+          },
+          "transfer": {
+            "base": "http://127.0.0.1:8887/gemx/v1/../../soma-x/v1/transfer",
+            "sha256": "0eaabd1e7fd976c37c9f99e609c2d713b814f56497c2c903b854a7d1d3abb6f8"
+          },
+          "vitpose": {
+            "base": "http://127.0.0.1:8887/gemx/v1/vitpose",
+            "sha256": "d868f3d06eb7ff2d7acf014c430b1b3a8b6bee269bc407e78a97127d77349e1d"
+          }
+        },
+        "backend": "browser-webgpu-f32",
+        "inference": {
+          "joints": {
+            "actual": [
+              0.37204471230506897,
+              0.0751943588256836,
+              4.68259334564209
+            ],
+            "coordinate": 2,
+            "expected": [
+              0.37216266989707947,
+              0.07550235092639923,
+              4.682929039001465
+            ],
+            "index": 68,
+            "max": 0.000335693359375,
+            "rmse": 0.0001668008207781279
+          },
+          "keypoints": {
+            "actual": [
+              1111.3671875,
+              1245.46875,
+              0.4469239413738251
+            ],
+            "coordinate": 2,
+            "expected": [
+              1111.3671875,
+              1245.46875,
+              0.44300201535224915
+            ],
+            "index": 74,
+            "max": 0.003921926021575928,
+            "rmse": 0.00041231773041340656
+          },
+          "timings": {
+            "body_features": 1.0682,
+            "gem": 0.1327,
+            "keypoints": 0.3008,
+            "soma": 0.0142
+          },
+          "vertices": {
+            "actual": [
+              0.10262683033943176,
+              0.21535524725914001,
+              5.110118389129639
+            ],
+            "coordinate": 0,
+            "expected": [
+              0.10223616659641266,
+              0.2152051329612732,
+              5.110263824462891
+            ],
+            "index": 15226,
+            "max": 0.000390663743019104,
+            "rmse": 0.00015149870008556056
+          }
+        },
+        "load_seconds": 88.9899,
+        "passed": true,
+        "performance": {
+          "body_features": 1.0682,
+          "gem": 0.1327,
+          "keypoints": 0.3008,
+          "soma": 0.0142
+        },
+        "reconstruction": {
+          "joints": {
+            "actual": [
+              -0.40511685609817505,
+              -0.7033392190933228,
+              5.025332927703857
+            ],
+            "coordinate": 2,
+            "expected": [
+              -0.40511754155158997,
+              -0.7033390998840332,
+              5.02533483505249
+            ],
+            "index": 9,
+            "max": 1.9073486328125e-06,
+            "rmse": 4.058243650037124e-07
+          },
+          "vertices": {
+            "actual": [
+              -0.39557570219039917,
+              -0.7076022624969482,
+              4.932872772216797
+            ],
+            "coordinate": 2,
+            "expected": [
+              -0.39556849002838135,
+              -0.707599401473999,
+              4.932865142822266
+            ],
+            "index": 10015,
+            "max": 7.62939453125e-06,
+            "rmse": 4.8608607017606e-07
+          }
+        },
+        "warm_seconds_by_stage": [
+          {
+            "body_features": 0.3744,
+            "gem": 0.0182,
+            "keypoints": 0.1086,
+            "soma": 0.0155
+          },
+          {
+            "body_features": 0.3996,
+            "gem": 0.0188,
+            "keypoints": 0.1265,
+            "soma": 0.0143
+          },
+          {
+            "body_features": 0.3724,
+            "gem": 0.021,
+            "keypoints": 0.1126,
+            "soma": 0.0141
+          }
+        ],
+        "wasm_linear_memory_peak_bytes": 1434648576
+      },
+      "part_requests": 0,
+      "expected_parts": 1866,
+      "corrupted_url": null
+    },
+    {
+      "run": "corrupt_cache",
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell",
+        "device": "",
+        "description": "",
+        "fallback": false
+      },
+      "result": {
+        "adapter": "",
+        "artifacts": {
+          "denoiser": {
+            "base": "http://127.0.0.1:8887/gemx/v1/denoiser",
+            "sha256": "8849a57736ee9c5119a1598a5a931b8d0f6892f93eba340765553ac78b89b2f3"
+          },
+          "mhr": {
+            "base": "http://127.0.0.1:8887/gemx/v1/../../soma-x/v1/mhr",
+            "sha256": "c7d6e4fc479b8ca68ab1ba6736923bcd93d9f61252c3009ace1ebef6bb5eff65"
+          },
+          "sam_decoder": {
+            "base": "http://127.0.0.1:8887/gemx/v1/sam-decoder",
+            "sha256": "35c5b33c1041f9950af97def56335e7d3929eec6a6ce6180989b8423fb3f4b3e"
+          },
+          "sam_vision": {
+            "base": "http://127.0.0.1:8887/gemx/v1/sam-vision",
+            "sha256": "66fc185473d361d1934fbec7d427a3be4602bc410bec6427b4a7e3d48c18c90b"
+          },
+          "soma": {
+            "base": "http://127.0.0.1:8887/gemx/v1/../../soma-x/v1/body",
+            "sha256": "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7"
+          },
+          "transfer": {
+            "base": "http://127.0.0.1:8887/gemx/v1/../../soma-x/v1/transfer",
+            "sha256": "0eaabd1e7fd976c37c9f99e609c2d713b814f56497c2c903b854a7d1d3abb6f8"
+          },
+          "vitpose": {
+            "base": "http://127.0.0.1:8887/gemx/v1/vitpose",
+            "sha256": "d868f3d06eb7ff2d7acf014c430b1b3a8b6bee269bc407e78a97127d77349e1d"
+          }
+        },
+        "backend": "browser-webgpu-f32",
+        "inference": {
+          "joints": {
+            "actual": [
+              0.37204471230506897,
+              0.0751943588256836,
+              4.68259334564209
+            ],
+            "coordinate": 2,
+            "expected": [
+              0.37216266989707947,
+              0.07550235092639923,
+              4.682929039001465
+            ],
+            "index": 68,
+            "max": 0.000335693359375,
+            "rmse": 0.0001668008207781279
+          },
+          "keypoints": {
+            "actual": [
+              1111.3671875,
+              1245.46875,
+              0.4469239413738251
+            ],
+            "coordinate": 2,
+            "expected": [
+              1111.3671875,
+              1245.46875,
+              0.44300201535224915
+            ],
+            "index": 74,
+            "max": 0.003921926021575928,
+            "rmse": 0.00041231773041340656
+          },
+          "timings": {
+            "body_features": 1.0352999999999999,
+            "gem": 0.1315,
+            "keypoints": 0.2821,
+            "soma": 0.0134
+          },
+          "vertices": {
+            "actual": [
+              0.10262683033943176,
+              0.21535524725914001,
+              5.110118389129639
+            ],
+            "coordinate": 0,
+            "expected": [
+              0.10223616659641266,
+              0.2152051329612732,
+              5.110263824462891
+            ],
+            "index": 15226,
+            "max": 0.000390663743019104,
+            "rmse": 0.00015149870008556056
+          }
+        },
+        "load_seconds": 88.0595,
+        "passed": true,
+        "performance": {
+          "body_features": 1.0352999999999999,
+          "gem": 0.1315,
+          "keypoints": 0.2821,
+          "soma": 0.0134
+        },
+        "reconstruction": {
+          "joints": {
+            "actual": [
+              -0.40511685609817505,
+              -0.7033392190933228,
+              5.025332927703857
+            ],
+            "coordinate": 2,
+            "expected": [
+              -0.40511754155158997,
+              -0.7033390998840332,
+              5.02533483505249
+            ],
+            "index": 9,
+            "max": 1.9073486328125e-06,
+            "rmse": 4.058243650037124e-07
+          },
+          "vertices": {
+            "actual": [
+              -0.39557570219039917,
+              -0.7076022624969482,
+              4.932872772216797
+            ],
+            "coordinate": 2,
+            "expected": [
+              -0.39556849002838135,
+              -0.707599401473999,
+              4.932865142822266
+            ],
+            "index": 10015,
+            "max": 7.62939453125e-06,
+            "rmse": 4.8608607017606e-07
+          }
+        },
+        "warm_seconds_by_stage": [
+          {
+            "body_features": 0.3729,
+            "gem": 0.0128,
+            "keypoints": 0.1109,
+            "soma": 0.0131
+          },
+          {
+            "body_features": 0.3913,
+            "gem": 0.0138,
+            "keypoints": 0.1017,
+            "soma": 0.013
+          },
+          {
+            "body_features": 0.3653,
+            "gem": 0.0143,
+            "keypoints": 0.1079,
+            "soma": 0.0125
+          }
+        ],
+        "wasm_linear_memory_peak_bytes": 1434648576
+      },
+      "part_requests": 1,
+      "expected_parts": 1866,
+      "corrupted_url": "http://127.0.0.1:8887/gemx/v1/vitpose/parts/5fec04ad34f0d3aef42f7fcc952c1798ef4dc8c45977eeb647e0bedf02b8f372.bin"
+    }
+  ]
+}

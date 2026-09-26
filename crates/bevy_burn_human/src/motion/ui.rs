@@ -30,18 +30,14 @@ impl Default for MotionUi {
         Self {
             request: MotionRequest::default(),
             place_waypoints: false,
-            bundle: if cfg!(target_arch = "wasm32") {
-                String::new()
-            } else {
-                ".cache/ardy-bundle".into()
-            },
-            digest: String::new(),
-            text_bundle: if cfg!(target_arch = "wasm32") {
-                String::new()
-            } else {
-                ".cache/ardy-text-bundle".into()
-            },
-            text_digest: String::new(),
+            bundle: burn_ardy::pretrained::DEFAULT
+                .at_root(burn_ardy::pretrained::CDN_ROOT)
+                .base,
+            digest: burn_ardy::pretrained::DEFAULT.sha256.into(),
+            text_bundle: burn_llama::pretrained::DEFAULT
+                .at_root(burn_llama::pretrained::CDN_ROOT)
+                .base,
+            text_digest: burn_llama::pretrained::DEFAULT.sha256.into(),
             embedding: String::new(),
             clip: String::new(),
             image: String::new(),
@@ -213,7 +209,7 @@ fn model_controls(
     ui.collapsing("Model and text encoder", |ui| {
         ui.label("Model bundle URL or native directory");
         ui.text_edit_singleline(&mut state.bundle);
-        ui.label("Pinned manifest digest (optional)");
+        ui.label("Manifest SHA-256");
         ui.text_edit_singleline(&mut state.digest);
         if ui
             .add_enabled(
@@ -228,7 +224,7 @@ fn model_controls(
         ui.separator();
         ui.label("Llama text bundle URL or native directory");
         ui.text_edit_singleline(&mut state.text_bundle);
-        ui.label("Text manifest digest (optional)");
+        ui.label("Text manifest SHA-256");
         ui.text_edit_singleline(&mut state.text_digest);
         if ui
             .add_enabled(

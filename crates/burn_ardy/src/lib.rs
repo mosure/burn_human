@@ -14,3 +14,6 @@ pub mod weights;
 
 pub use config::ArdyConfig;
 pub use network::Ardy;
+
+#[cfg(feature = "transport")]
+pub mod pretrained;

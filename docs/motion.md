@@ -10,12 +10,12 @@ pose inference server is required.
 |---|---|
 | `burn_human_motion` | Motion/rig/condition contracts, SOMA animation interchange, sealed artifact manifests |
 | `burn_human_inference` | Bounded Burnpack packing, authenticated transport/cache, tensor inventory and precision handling |
-| `burn_ardy_text` | Llama 3 / LLM2Vec tokenizer, paged vocabulary, 32-layer text encoder and pooling |
+| `burn_llama` | Llama 3 / LLM2Vec tokenizer, paged vocabulary, 32-layer text encoder and pooling |
 | `burn_ardy` | Core27 tokenizer, DDIM/CFG, autoregressive history and trajectory conditioning |
 | `burn_human::motion` | Bind-aware Core27 to Anny retargeting, phenotype proportions and coordinate conversion |
 | `burn_soma` | Native PCA identity, skeleton fitting, procedural twists, correctives and batched GPU skinning; optional MHR adapter |
 | `burn_mhr` | MHR identity/expression, scale-aware FK, correctives and GPU skinning |
-| `burn_gem` | ViTPose, SAM image/body features, GEM prediction, camera decoding and fitted SOMA reconstruction |
+| `burn_gemx` | ViTPose, SAM image/body features, GEM prediction, camera decoding and fitted SOMA reconstruction |
 | `bevy_burn_human::motion` | Shared graphics device, async loading/inference, motion/waypoint, body and image controls |
 
 ARDY generates its trained Core27 representation and drives Anny. SOMA is a
@@ -51,6 +51,9 @@ tensor names, and writes deterministic Burnpack objects split into physical
 parts. Keep the original model license. No model weights are committed here.
 
 ## Burnpack, CDN and cache contract
+
+See [CDN release and model-owned loading APIs](cdn.md) for the published crate names,
+immutable upload tree, default URLs and cold/warm/corruption qualification commands.
 
 The model-neutral loader follows the bounded part-only strategy reviewed in
 `burn_image`. It uses the published Burn 0.21 / Bevy 0.19 dependency graph, with
@@ -108,7 +111,7 @@ hf download TREEIndustries/Llama-3-ARDY-Text-Encoder-ONNX \
 python tool/scripts/export_ardy_text.py .cache/ardy-onnx .cache/ardy-text-raw
 cargo run -p burn_human_inference --features tools --bin human-model-pack -- \
   .cache/ardy-text-raw .cache/ardy-text-bundle
-cargo run -p burn_ardy_text --features tools --bin text-encode -- \
+cargo run -p burn_llama --features tools --bin text-encode -- \
   .cache/ardy-text-bundle embedding.json 'walk forward calmly'
 ```
 
@@ -125,7 +128,7 @@ to the motion requests below. Models are loaded once and embeddings, clips,
 requests and measured times are written to a new output directory:
 
 ```sh
-cargo run -p burn_ardy_text --features tools --bin ardy-text-run -- \
+cargo run -p burn_llama --features tools --bin ardy-text-run -- \
   .cache/ardy-text-bundle .cache/ardy-bundle requests.json generated
 ```
 
@@ -288,7 +291,7 @@ python tool/scripts/gem_suite.py --out .cache/gem-suite.json \
   --vitpose .cache/vitpose-bundle --sam-vision .cache/sam-vision-bundle \
   --sam-decoder .cache/sam-decoder-bundle --denoiser .cache/gem-denoiser-bundle \
   --mhr .cache/mhr-bundle --soma .cache/soma-bundle --transfer .cache/mhr-soma-transfer-bundle
-cargo run -p burn_gem --features tools --bin gem-pose -- \
+cargo run -p burn_gemx --features tools --bin gem-pose -- \
   .cache/gem-suite.json person.png crop-camera.json pose-estimate.json
 ```
 
@@ -306,7 +309,7 @@ Run model-free contracts and Anny retargeting tests with:
 
 ```sh
 cargo test -p burn_human -p burn_human_motion -p burn_human_inference \
-  -p burn_ardy -p burn_ardy_text -p burn_soma -p burn_mhr -p burn_gem \
+  -p burn_ardy -p burn_llama -p burn_soma -p burn_mhr -p burn_gemx \
   --features burn_ardy/transport,burn_soma/mhr --lib --tests
 python tool/scripts/test_soma_animation.py
 cargo check -p bevy_burn_human --target wasm32-unknown-unknown --no-default-features
@@ -324,11 +327,11 @@ small CI test because joint-only checks cannot detect incorrect twist skinning.
 ```sh
 cargo run -p burn_soma --features tools --bin soma-validate -- \
   .cache/soma-bundle .cache/soma-raw/reference.json soma-native.json
-cargo run -p burn_gem --features tools --bin gem-validate -- \
+cargo run -p burn_gemx --features tools --bin gem-validate -- \
   .cache/gem-suite.json person.png gem-reference.json gem-native.json
-cargo build -p burn_gem --lib --target wasm32-unknown-unknown --features web-validation
+cargo build -p burn_gemx --lib --target wasm32-unknown-unknown --features web-validation
 wasm-bindgen --target web --out-dir .cache/gem-web \
-  target/wasm32-unknown-unknown/debug/burn_gem.wasm
+  target/wasm32-unknown-unknown/debug/burn_gemx.wasm
 python -m http.server 8080 --bind 127.0.0.1
 ```
 

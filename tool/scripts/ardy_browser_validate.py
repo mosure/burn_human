@@ -69,7 +69,7 @@ async def main():
                             return (await fetch(new URL('manifest.json',base))).json();
                         }));
                     }
-                    return [(await fetch(bundle.replace(/\\/$/,'')+'/manifest.json')).json()];
+                    return [await (await fetch(bundle.replace(/\\/$/,'')+'/manifest.json')).json()];
                 }""", args.suite)
                 # CacheStorage keys include each bundle's URL, even if two
                 # distinct models happen to have byte-identical zero tensors.

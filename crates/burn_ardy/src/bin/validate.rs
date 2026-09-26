@@ -4,22 +4,24 @@ use burn::{
     backend::{NdArray, Wgpu, wgpu::WgpuDevice},
     prelude::Backend,
 };
+use burn_ardy::transport::ModelSource;
 use burn_ardy::{
     Ardy,
     validation::{Fixture, validate},
 };
-use burn_human_motion::artifacts::{DirectoryReader, Manifest};
-use std::{path::PathBuf, time::Instant};
+use std::time::Instant;
 
 async fn run<B: Backend>(
-    base: PathBuf,
+    base: String,
     fixture: Fixture,
     device: B::Device,
     backend: &str,
 ) -> Result<()> {
-    let manifest = Manifest::from_bytes(&std::fs::read(base.join("manifest.json"))?, None)?;
+    let manifest = ModelSource::new(base.clone()).manifest(None).await?;
     let start = Instant::now();
-    let model = Ardy::<B>::load(&manifest, &mut DirectoryReader(base), &device, |_, _| {}).await?;
+    let mut artifact = burn_ardy::pretrained::DEFAULT.at_base(base);
+    artifact.sha256 = manifest.content_sha256.clone();
+    let model = Ardy::<B>::load_artifact(&artifact, &device, |_, _| {}).await?;
     let report = validate(
         &model,
         &manifest,
@@ -33,23 +35,23 @@ async fn run<B: Backend>(
     Ok(())
 }
 fn main() -> Result<()> {
-    let args: Vec<_> = std::env::args_os().skip(1).collect();
+    let args: Vec<_> = std::env::args().skip(1).collect();
     ensure!(
         args.len() == 3,
-        "usage: ardy-validate BUNDLE_DIRECTORY REFERENCE_SAFETENSORS wgpu|ndarray"
+        "usage: ardy-validate BUNDLE_URL_OR_DIRECTORY REFERENCE_SAFETENSORS wgpu|ndarray"
     );
-    let base = PathBuf::from(&args[0]);
+    let base = args[0].clone();
     let fixture = Fixture {
         data: std::fs::read(&args[1])?,
     };
-    match args[2].to_str() {
-        Some("wgpu") => pollster::block_on(run::<Wgpu>(
+    match args[2].as_str() {
+        "wgpu" => pollster::block_on(run::<Wgpu>(
             base,
             fixture,
             WgpuDevice::default(),
             "wgpu-f32",
         )),
-        Some("ndarray") => pollster::block_on(run::<NdArray>(
+        "ndarray" => pollster::block_on(run::<NdArray>(
             base,
             fixture,
             Default::default(),

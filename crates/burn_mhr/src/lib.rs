@@ -317,3 +317,5 @@ impl<B: Backend> Mhr<B> {
         })
     }
 }
+
+pub mod pretrained;

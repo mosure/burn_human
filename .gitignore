@@ -6,3 +6,5 @@ crates/bevy_burn_human/www/assets/
 .cache/
 out/
 tool/scripts/__pycache__/
+
+/.artifacts/

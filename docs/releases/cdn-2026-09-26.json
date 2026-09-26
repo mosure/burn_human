@@ -1,0 +1,99 @@
+{
+  "cdn_root": "https://aberration.technology/model",
+  "deployment": "prepared; public CDN download validation awaits upload",
+  "entries": {
+    "ardy": {
+      "bundle": "ardy/core-rp-20fps-h40/v1",
+      "bytes": 765068032,
+      "model": "nvidia/ARDY-Core-RP-20FPS-Horizon40",
+      "model_revision": "abe6c43beb28c867c950acb824b9c4ef3d63fb76",
+      "parts": 59,
+      "sha256": "6e03294854771ca3ed6641251c77ab75bd2542d778c02886ea795d8d77655cd8",
+      "source_revision": "693f74d13b3d04a0a22ce127ee79c929dd89756b"
+    },
+    "denoiser": {
+      "bundle": "gemx/v1/denoiser",
+      "bytes": 178119284,
+      "model": "nvidia/GEM-X:denoiser",
+      "model_revision": "5ccf5ca3746c3620aa4016114f069a5f6ae399cd",
+      "parts": 264,
+      "sha256": "8849a57736ee9c5119a1598a5a931b8d0f6892f93eba340765553ac78b89b2f3",
+      "source_revision": "32992550dba114c62243fb55e361311972dce8f9"
+    },
+    "llama": {
+      "bundle": "llama/ardy-llm2vec-8b/v1",
+      "bytes": 5413420032,
+      "model": "TREEIndustries/Llama-3-ARDY-Text-Encoder-ONNX",
+      "model_revision": "7aa52a05d54c2fd9177366aeb3f88e9e7f3c5766",
+      "parts": 636,
+      "sha256": "09280ebcf02184708cff1a9f982b901166b433e504ff343f02c037cc52d8ee16",
+      "source_revision": "7aa52a05d54c2fd9177366aeb3f88e9e7f3c5766"
+    },
+    "mhr": {
+      "bundle": "soma-x/v1/mhr",
+      "bytes": 709453924,
+      "model": "facebookresearch/MHR:SOMA-X-lod1",
+      "model_revision": "104578ed58857f6faa7592fb83d0a2dad43c36fa",
+      "parts": 48,
+      "sha256": "c7d6e4fc479b8ca68ab1ba6736923bcd93d9f61252c3009ace1ebef6bb5eff65",
+      "source_revision": "104578ed58857f6faa7592fb83d0a2dad43c36fa"
+    },
+    "sam_decoder": {
+      "bundle": "gemx/v1/sam-decoder",
+      "bytes": 209695712,
+      "model": "nvidia/GEM-X:sam-decoder",
+      "model_revision": "5ccf5ca3746c3620aa4016114f069a5f6ae399cd",
+      "parts": 229,
+      "sha256": "35c5b33c1041f9950af97def56335e7d3929eec6a6ce6180989b8423fb3f4b3e",
+      "source_revision": "32992550dba114c62243fb55e361311972dce8f9"
+    },
+    "sam_vision": {
+      "bundle": "gemx/v1/sam-vision",
+      "bytes": 3362924288,
+      "model": "nvidia/GEM-X:sam-body",
+      "model_revision": "5ccf5ca3746c3620aa4016114f069a5f6ae399cd",
+      "parts": 615,
+      "sha256": "66fc185473d361d1934fbec7d427a3be4602bc410bec6427b4a7e3d48c18c90b",
+      "source_revision": "32992550dba114c62243fb55e361311972dce8f9"
+    },
+    "soma": {
+      "bundle": "soma-x/v1/body",
+      "bytes": 62159860,
+      "model": "nvidia/SOMA-X",
+      "model_revision": "104578ed58857f6faa7592fb83d0a2dad43c36fa",
+      "parts": 80,
+      "sha256": "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7",
+      "source_revision": "cc1f3967755f8e36d187d2e26114633dbd651cd5"
+    },
+    "transfer": {
+      "bundle": "soma-x/v1/transfer",
+      "bytes": 861904,
+      "model": "nvidia/SOMA-X:MHR-transfer",
+      "model_revision": "104578ed58857f6faa7592fb83d0a2dad43c36fa",
+      "parts": 8,
+      "sha256": "0eaabd1e7fd976c37c9f99e609c2d713b814f56497c2c903b854a7d1d3abb6f8",
+      "source_revision": "cc1f3967755f8e36d187d2e26114633dbd651cd5"
+    },
+    "vitpose": {
+      "bundle": "gemx/v1/vitpose",
+      "bytes": 3387959860,
+      "model": "nvidia/GEM-X:vitpose",
+      "model_revision": "5ccf5ca3746c3620aa4016114f069a5f6ae399cd",
+      "parts": 622,
+      "sha256": "d868f3d06eb7ff2d7acf014c430b1b3a8b6bee269bc407e78a97127d77349e1d",
+      "source_revision": "32992550dba114c62243fb55e361311972dce8f9"
+    }
+  },
+  "schema_version": 1,
+  "suite": {
+    "bundle": "gemx/v1",
+    "sha256": "c21010ed4da582e66fb975ecb2a775f4f0c3a28a7816e89f0275d468c0205952"
+  },
+  "transport": {
+    "direct_weight_files": false,
+    "object_limit_bytes": 67108864,
+    "part_limit_bytes": 25000000,
+    "part_target_bytes": 20971520
+  },
+  "verified": "every part, logical Burnpack, tensor inventory/shape/dtype/SHA256/finiteness and metadata"
+}

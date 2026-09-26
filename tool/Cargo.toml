@@ -10,6 +10,12 @@ path = "src/bin/import.rs"
 
 [dependencies]
 burn_human = { path = ".." }
+burn_human_inference = { path = "../crates/burn_human_inference", features = ["transport"] }
+burn_human_motion = { path = "../crates/burn_human_motion" }
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+pollster = "0.4"
 
 [dev-dependencies]
 bevy = { version = "0.19.1", default-features = false }

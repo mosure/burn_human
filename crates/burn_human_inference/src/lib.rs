@@ -1,5 +1,7 @@
 //! Shared, model-neutral loading and tensor operations. No Bevy or model policy.
 #[cfg(feature = "transport")]
+pub mod pretrained;
+#[cfg(feature = "transport")]
 pub mod transport;
 pub mod weights;
 

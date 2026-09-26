@@ -1,0 +1,695 @@
+{
+  "browser": "153.0.8010.12",
+  "reports": [
+    {
+      "run": "cold_cache",
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell",
+        "device": "",
+        "description": "",
+        "fallback": false
+      },
+      "result": {
+        "adapter": "",
+        "backend": "browser-webgpu-f32",
+        "load_seconds": 1.2759,
+        "manifest": "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7",
+        "performance": [
+          {
+            "batch": 1,
+            "median_frames_per_second": 87.71929824561403,
+            "warm_seconds": [
+              0.0114,
+              0.0114,
+              0.0114,
+              0.0116,
+              0.0136
+            ]
+          },
+          {
+            "batch": 8,
+            "median_frames_per_second": 490.79754601227,
+            "warm_seconds": [
+              0.016,
+              0.0161,
+              0.0163,
+              0.0166,
+              0.0194
+            ]
+          },
+          {
+            "batch": 32,
+            "median_frames_per_second": 1454.5454545454547,
+            "warm_seconds": [
+              0.0219,
+              0.022,
+              0.022,
+              0.0222,
+              0.0254
+            ]
+          }
+        ],
+        "records": [
+          {
+            "bind_max": 4.76837158203125e-07,
+            "identity_seconds": 0.1402,
+            "name": "neutral",
+            "performance": [
+              {
+                "batch": 1,
+                "median_frames_per_second": 86.95652173913044,
+                "warm_seconds": [
+                  0.0115,
+                  0.0115,
+                  0.0115,
+                  0.0115,
+                  0.0154
+                ]
+              },
+              {
+                "batch": 8,
+                "median_frames_per_second": 487.80487804878044,
+                "warm_seconds": [
+                  0.0164,
+                  0.0164,
+                  0.0164,
+                  0.0165,
+                  0.018
+                ]
+              },
+              {
+                "batch": 32,
+                "median_frames_per_second": 1434.9775784753363,
+                "warm_seconds": [
+                  0.0222,
+                  0.0222,
+                  0.0223,
+                  0.0224,
+                  0.0255
+                ]
+              }
+            ],
+            "rest_max_m": 8.344650268554688e-07,
+            "transform_max": 5.364418029785156e-07,
+            "vertex_max_m": 9.5367431640625e-07
+          },
+          {
+            "bind_max": 4.76837158203125e-07,
+            "identity_seconds": 0.007,
+            "name": "shape_pose",
+            "performance": [
+              {
+                "batch": 1,
+                "median_frames_per_second": 87.71929824561403,
+                "warm_seconds": [
+                  0.0114,
+                  0.0114,
+                  0.0114,
+                  0.0116,
+                  0.0136
+                ]
+              },
+              {
+                "batch": 8,
+                "median_frames_per_second": 490.79754601227,
+                "warm_seconds": [
+                  0.016,
+                  0.0161,
+                  0.0163,
+                  0.0166,
+                  0.0194
+                ]
+              },
+              {
+                "batch": 32,
+                "median_frames_per_second": 1454.5454545454547,
+                "warm_seconds": [
+                  0.0219,
+                  0.022,
+                  0.022,
+                  0.0222,
+                  0.0254
+                ]
+              }
+            ],
+            "rest_max_m": 7.152557373046875e-07,
+            "transform_max": 8.344650268554688e-07,
+            "vertex_max_m": 1.430511474609375e-06
+          },
+          {
+            "bind_max": 8.940696716308594e-07,
+            "identity_seconds": 0.0064,
+            "name": "scales_correctives",
+            "performance": [
+              {
+                "batch": 1,
+                "median_frames_per_second": 87.71929824561403,
+                "warm_seconds": [
+                  0.0112,
+                  0.0114,
+                  0.0114,
+                  0.0115,
+                  0.0116
+                ]
+              },
+              {
+                "batch": 8,
+                "median_frames_per_second": 506.3291139240506,
+                "warm_seconds": [
+                  0.0156,
+                  0.0157,
+                  0.0158,
+                  0.0159,
+                  0.0182
+                ]
+              },
+              {
+                "batch": 32,
+                "median_frames_per_second": 1447.9638009049772,
+                "warm_seconds": [
+                  0.0218,
+                  0.0219,
+                  0.0221,
+                  0.0222,
+                  0.0244
+                ]
+              }
+            ],
+            "rest_max_m": 1.2516975402832031e-06,
+            "transform_max": 1.1920928955078125e-06,
+            "vertex_max_m": 1.7881393432617188e-06
+          },
+          {
+            "bind_max": 4.76837158203125e-07,
+            "identity_seconds": 0.0076,
+            "name": "no_correctives",
+            "performance": [
+              {
+                "batch": 1,
+                "median_frames_per_second": 434.7826086956522,
+                "warm_seconds": [
+                  0.0014,
+                  0.0023,
+                  0.0023,
+                  0.0024,
+                  0.0024
+                ]
+              },
+              {
+                "batch": 8,
+                "median_frames_per_second": 3076.923076923077,
+                "warm_seconds": [
+                  0.0025,
+                  0.0025,
+                  0.0026,
+                  0.0026,
+                  0.0026
+                ]
+              },
+              {
+                "batch": 32,
+                "median_frames_per_second": 7272.727272727272,
+                "warm_seconds": [
+                  0.0043,
+                  0.0043,
+                  0.0044,
+                  0.0045,
+                  0.0045
+                ]
+              }
+            ],
+            "rest_max_m": 8.344650268554688e-07,
+            "transform_max": 5.960464477539062e-07,
+            "vertex_max_m": 9.5367431640625e-07
+          }
+        ],
+        "reference": "Official SOMA-X Torch, identity fit + canonical rebind + aligned twist + sparse correctives + LBS",
+        "wasm_linear_memory_peak_bytes": 137822208
+      },
+      "part_requests": 80,
+      "expected_parts": 80,
+      "corrupted_url": null
+    },
+    {
+      "run": "warm_cache",
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell",
+        "device": "",
+        "description": "",
+        "fallback": false
+      },
+      "result": {
+        "adapter": "",
+        "backend": "browser-webgpu-f32",
+        "load_seconds": 0.7799,
+        "manifest": "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7",
+        "performance": [
+          {
+            "batch": 1,
+            "median_frames_per_second": 84.03361344537815,
+            "warm_seconds": [
+              0.0112,
+              0.0112,
+              0.0119,
+              0.0122,
+              0.0123
+            ]
+          },
+          {
+            "batch": 8,
+            "median_frames_per_second": 496.8944099378882,
+            "warm_seconds": [
+              0.0156,
+              0.0158,
+              0.0161,
+              0.0186,
+              0.022
+            ]
+          },
+          {
+            "batch": 32,
+            "median_frames_per_second": 1447.9638009049772,
+            "warm_seconds": [
+              0.0213,
+              0.022,
+              0.0221,
+              0.0223,
+              0.0252
+            ]
+          }
+        ],
+        "records": [
+          {
+            "bind_max": 4.76837158203125e-07,
+            "identity_seconds": 0.1091,
+            "name": "neutral",
+            "performance": [
+              {
+                "batch": 1,
+                "median_frames_per_second": 86.95652173913044,
+                "warm_seconds": [
+                  0.0113,
+                  0.0114,
+                  0.0115,
+                  0.0115,
+                  0.0144
+                ]
+              },
+              {
+                "batch": 8,
+                "median_frames_per_second": 509.55414012738856,
+                "warm_seconds": [
+                  0.0154,
+                  0.0155,
+                  0.0157,
+                  0.0159,
+                  0.0187
+                ]
+              },
+              {
+                "batch": 32,
+                "median_frames_per_second": 1447.9638009049772,
+                "warm_seconds": [
+                  0.0216,
+                  0.0218,
+                  0.0221,
+                  0.0223,
+                  0.0231
+                ]
+              }
+            ],
+            "rest_max_m": 8.344650268554688e-07,
+            "transform_max": 5.364418029785156e-07,
+            "vertex_max_m": 9.5367431640625e-07
+          },
+          {
+            "bind_max": 4.76837158203125e-07,
+            "identity_seconds": 0.0059,
+            "name": "shape_pose",
+            "performance": [
+              {
+                "batch": 1,
+                "median_frames_per_second": 84.03361344537815,
+                "warm_seconds": [
+                  0.0112,
+                  0.0112,
+                  0.0119,
+                  0.0122,
+                  0.0123
+                ]
+              },
+              {
+                "batch": 8,
+                "median_frames_per_second": 496.8944099378882,
+                "warm_seconds": [
+                  0.0156,
+                  0.0158,
+                  0.0161,
+                  0.0186,
+                  0.022
+                ]
+              },
+              {
+                "batch": 32,
+                "median_frames_per_second": 1447.9638009049772,
+                "warm_seconds": [
+                  0.0213,
+                  0.022,
+                  0.0221,
+                  0.0223,
+                  0.0252
+                ]
+              }
+            ],
+            "rest_max_m": 7.152557373046875e-07,
+            "transform_max": 8.344650268554688e-07,
+            "vertex_max_m": 1.430511474609375e-06
+          },
+          {
+            "bind_max": 8.940696716308594e-07,
+            "identity_seconds": 0.0068,
+            "name": "scales_correctives",
+            "performance": [
+              {
+                "batch": 1,
+                "median_frames_per_second": 90.09009009009009,
+                "warm_seconds": [
+                  0.011,
+                  0.0111,
+                  0.0111,
+                  0.0112,
+                  0.0122
+                ]
+              },
+              {
+                "batch": 8,
+                "median_frames_per_second": 516.1290322580645,
+                "warm_seconds": [
+                  0.0153,
+                  0.0154,
+                  0.0155,
+                  0.0158,
+                  0.0186
+                ]
+              },
+              {
+                "batch": 32,
+                "median_frames_per_second": 1290.3225806451612,
+                "warm_seconds": [
+                  0.0225,
+                  0.0226,
+                  0.0248,
+                  0.0249,
+                  0.0251
+                ]
+              }
+            ],
+            "rest_max_m": 1.2516975402832031e-06,
+            "transform_max": 1.1920928955078125e-06,
+            "vertex_max_m": 1.7881393432617188e-06
+          },
+          {
+            "bind_max": 4.76837158203125e-07,
+            "identity_seconds": 0.0063,
+            "name": "no_correctives",
+            "performance": [
+              {
+                "batch": 1,
+                "median_frames_per_second": 400,
+                "warm_seconds": [
+                  0.0024,
+                  0.0024,
+                  0.0025,
+                  0.0025,
+                  0.0025
+                ]
+              },
+              {
+                "batch": 8,
+                "median_frames_per_second": 3076.923076923077,
+                "warm_seconds": [
+                  0.0025,
+                  0.0026,
+                  0.0026,
+                  0.0026,
+                  0.0027
+                ]
+              },
+              {
+                "batch": 32,
+                "median_frames_per_second": 7272.727272727272,
+                "warm_seconds": [
+                  0.0042,
+                  0.0043,
+                  0.0044,
+                  0.0044,
+                  0.0044
+                ]
+              }
+            ],
+            "rest_max_m": 8.344650268554688e-07,
+            "transform_max": 5.960464477539062e-07,
+            "vertex_max_m": 9.5367431640625e-07
+          }
+        ],
+        "reference": "Official SOMA-X Torch, identity fit + canonical rebind + aligned twist + sparse correctives + LBS",
+        "wasm_linear_memory_peak_bytes": 137822208
+      },
+      "part_requests": 0,
+      "expected_parts": 80,
+      "corrupted_url": null
+    },
+    {
+      "run": "corrupt_cache",
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell",
+        "device": "",
+        "description": "",
+        "fallback": false
+      },
+      "result": {
+        "adapter": "",
+        "backend": "browser-webgpu-f32",
+        "load_seconds": 0.7929,
+        "manifest": "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7",
+        "performance": [
+          {
+            "batch": 1,
+            "median_frames_per_second": 87.71929824561403,
+            "warm_seconds": [
+              0.011,
+              0.0113,
+              0.0114,
+              0.0116,
+              0.0144
+            ]
+          },
+          {
+            "batch": 8,
+            "median_frames_per_second": 506.3291139240506,
+            "warm_seconds": [
+              0.0155,
+              0.0155,
+              0.0158,
+              0.0167,
+              0.0188
+            ]
+          },
+          {
+            "batch": 32,
+            "median_frames_per_second": 1447.9638009049772,
+            "warm_seconds": [
+              0.0217,
+              0.0219,
+              0.0221,
+              0.0251,
+              0.0252
+            ]
+          }
+        ],
+        "records": [
+          {
+            "bind_max": 4.76837158203125e-07,
+            "identity_seconds": 0.1138,
+            "name": "neutral",
+            "performance": [
+              {
+                "batch": 1,
+                "median_frames_per_second": 84.03361344537815,
+                "warm_seconds": [
+                  0.0108,
+                  0.0109,
+                  0.0119,
+                  0.012,
+                  0.0142
+                ]
+              },
+              {
+                "batch": 8,
+                "median_frames_per_second": 496.8944099378882,
+                "warm_seconds": [
+                  0.0159,
+                  0.016,
+                  0.0161,
+                  0.0169,
+                  0.0233
+                ]
+              },
+              {
+                "batch": 32,
+                "median_frames_per_second": 1447.9638009049772,
+                "warm_seconds": [
+                  0.0219,
+                  0.022,
+                  0.0221,
+                  0.0223,
+                  0.0254
+                ]
+              }
+            ],
+            "rest_max_m": 8.344650268554688e-07,
+            "transform_max": 5.364418029785156e-07,
+            "vertex_max_m": 9.5367431640625e-07
+          },
+          {
+            "bind_max": 4.76837158203125e-07,
+            "identity_seconds": 0.0061,
+            "name": "shape_pose",
+            "performance": [
+              {
+                "batch": 1,
+                "median_frames_per_second": 87.71929824561403,
+                "warm_seconds": [
+                  0.011,
+                  0.0113,
+                  0.0114,
+                  0.0116,
+                  0.0144
+                ]
+              },
+              {
+                "batch": 8,
+                "median_frames_per_second": 506.3291139240506,
+                "warm_seconds": [
+                  0.0155,
+                  0.0155,
+                  0.0158,
+                  0.0167,
+                  0.0188
+                ]
+              },
+              {
+                "batch": 32,
+                "median_frames_per_second": 1447.9638009049772,
+                "warm_seconds": [
+                  0.0217,
+                  0.0219,
+                  0.0221,
+                  0.0251,
+                  0.0252
+                ]
+              }
+            ],
+            "rest_max_m": 7.152557373046875e-07,
+            "transform_max": 8.344650268554688e-07,
+            "vertex_max_m": 1.430511474609375e-06
+          },
+          {
+            "bind_max": 8.940696716308594e-07,
+            "identity_seconds": 0.0065,
+            "name": "scales_correctives",
+            "performance": [
+              {
+                "batch": 1,
+                "median_frames_per_second": 90.09009009009009,
+                "warm_seconds": [
+                  0.0111,
+                  0.0111,
+                  0.0111,
+                  0.0112,
+                  0.0112
+                ]
+              },
+              {
+                "batch": 8,
+                "median_frames_per_second": 462.4277456647399,
+                "warm_seconds": [
+                  0.016,
+                  0.017,
+                  0.0173,
+                  0.0176,
+                  0.0182
+                ]
+              },
+              {
+                "batch": 32,
+                "median_frames_per_second": 1422.2222222222222,
+                "warm_seconds": [
+                  0.0222,
+                  0.0223,
+                  0.0225,
+                  0.0257,
+                  0.0266
+                ]
+              }
+            ],
+            "rest_max_m": 1.2516975402832031e-06,
+            "transform_max": 1.1920928955078125e-06,
+            "vertex_max_m": 1.7881393432617188e-06
+          },
+          {
+            "bind_max": 4.76837158203125e-07,
+            "identity_seconds": 0.0081,
+            "name": "no_correctives",
+            "performance": [
+              {
+                "batch": 1,
+                "median_frames_per_second": 303.03030303030306,
+                "warm_seconds": [
+                  0.0009,
+                  0.001,
+                  0.0033,
+                  0.0035,
+                  0.0048
+                ]
+              },
+              {
+                "batch": 8,
+                "median_frames_per_second": 2285.714285714286,
+                "warm_seconds": [
+                  0.0032,
+                  0.0034,
+                  0.0035,
+                  0.0036,
+                  0.005
+                ]
+              },
+              {
+                "batch": 32,
+                "median_frames_per_second": 5161.290322580645,
+                "warm_seconds": [
+                  0.0057,
+                  0.0061,
+                  0.0062,
+                  0.0065,
+                  0.0076
+                ]
+              }
+            ],
+            "rest_max_m": 8.344650268554688e-07,
+            "transform_max": 5.960464477539062e-07,
+            "vertex_max_m": 9.5367431640625e-07
+          }
+        ],
+        "reference": "Official SOMA-X Torch, identity fit + canonical rebind + aligned twist + sparse correctives + LBS",
+        "wasm_linear_memory_peak_bytes": 137822208
+      },
+      "part_requests": 1,
+      "expected_parts": 80,
+      "corrupted_url": "http://127.0.0.1:8887/soma-x/v1/body/parts/024a68bd482c16b00d714c9f7163a592d028b75f9567ba087ca9bf721a40bd4c.bin"
+    }
+  ]
+}

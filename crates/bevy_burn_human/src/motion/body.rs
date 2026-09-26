@@ -2,8 +2,7 @@
 use super::{MotionRuntime, MotionStatus, runtime::spawn_job};
 use anyhow::{Result, ensure};
 use burn::backend::Wgpu;
-use burn_ardy::transport::ModelSource;
-use burn_gem::{
+use burn_gemx::{
     camera::{Camera, Crop},
     pipeline::{Pipeline, PipelineArtifacts, PoseEstimate},
 };
@@ -48,11 +47,9 @@ pub(super) fn load_soma(runtime: &MotionRuntime, base: String, digest: String) {
     drop(state);
     let shared = runtime.0.clone();
     spawn_job(runtime.clone(), move || async move {
-        let mut source = ModelSource::cached(base);
-        let m = source
-            .manifest((!digest.trim().is_empty()).then_some(digest.trim()))
-            .await?;
-        let soma = Soma::load(&m, &mut source, &device, |i, n| {
+        let mut artifact = burn_soma::pretrained::DEFAULT.at_base(base);
+        artifact.sha256 = digest.trim().into();
+        let soma = Soma::load_artifact(&artifact, &device, |i, n| {
             shared.lock().unwrap().status = MotionStatus::Working(format!("SOMA weights {i}/{n}"))
         })
         .await?;

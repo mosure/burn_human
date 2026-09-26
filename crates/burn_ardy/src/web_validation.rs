@@ -20,10 +20,12 @@ pub async fn validate_webgpu(
     async fn run(base: String, reference: String, digest: String) -> anyhow::Result<String> {
         let device = WgpuDevice::default();
         let setup = init_setup_async::<WebGpu>(&device, Default::default()).await;
-        let mut source = ModelSource::new(base);
+        let source = ModelSource::new(base.clone());
         let manifest = source.manifest(Some(&digest)).await?;
         let start = web_time::Instant::now();
-        let model = Ardy::<Wgpu>::load(&manifest, &mut source, &device, |_, _| {}).await?;
+        let mut artifact = crate::pretrained::DEFAULT.at_base(base);
+        artifact.sha256 = digest;
+        let model = Ardy::<Wgpu>::load_artifact(&artifact, &device, |_, _| {}).await?;
         let load_seconds = start.elapsed().as_secs_f64();
         let fixture = Fixture {
             data: read_bounded(&reference, 4 * 1024 * 1024).await?,

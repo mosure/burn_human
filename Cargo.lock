@@ -619,7 +619,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_burn_human"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "anyhow",
  "bevy",
@@ -627,10 +627,10 @@ dependencies = [
  "bevy_panorbit_camera",
  "burn",
  "burn_ardy",
- "burn_ardy_text",
- "burn_gem",
+ "burn_gemx",
  "burn_human",
  "burn_human_motion",
+ "burn_llama",
  "burn_soma",
  "console_error_panic_hook",
  "fastrand",
@@ -2504,7 +2504,7 @@ dependencies = [
 
 [[package]]
 name = "burn_ardy"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "burn",
@@ -2526,28 +2526,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "burn_ardy_text"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "burn",
- "burn_ardy",
- "burn_human_inference",
- "burn_human_motion",
- "console_error_panic_hook",
- "getrandom 0.3.4",
- "half",
- "pollster",
- "serde",
- "serde_json",
- "tokenizers",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-time",
-]
-
-[[package]]
-name = "burn_gem"
+name = "burn_gemx"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -2570,7 +2549,7 @@ dependencies = [
 
 [[package]]
 name = "burn_human"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "anyhow",
  "burn",
@@ -2586,7 +2565,7 @@ dependencies = [
 
 [[package]]
 name = "burn_human_inference"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "burn",
@@ -2598,6 +2577,7 @@ dependencies = [
  "pollster",
  "serde",
  "serde_json",
+ "tempfile",
  "ureq 3.4.2",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -2619,15 +2599,42 @@ dependencies = [
 name = "burn_human_tool"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bevy",
  "bevy_burn_human",
  "burn_human",
+ "burn_human_inference",
+ "burn_human_motion",
  "criterion",
+ "pollster",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "burn_llama"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "burn",
+ "burn_ardy",
+ "burn_human_inference",
+ "burn_human_motion",
+ "console_error_panic_hook",
+ "getrandom 0.3.4",
+ "half",
+ "pollster",
+ "serde",
+ "serde_json",
+ "tokenizers",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-time",
 ]
 
 [[package]]
 name = "burn_mhr"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "burn",
@@ -2643,7 +2650,7 @@ dependencies = [
 
 [[package]]
 name = "burn_soma"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "burn",

@@ -11,15 +11,15 @@ are not included in the repository or Cargo packages.
 | SOMA-X | [source](https://github.com/NVlabs/SOMA-X/tree/cc1f3967755f8e36d187d2e26114633dbd651cd5), [assets](https://huggingface.co/nvidia/SOMA-X/tree/104578ed58857f6faa7592fb83d0a2dad43c36fa) | NVIDIA Apache-2.0 source and downloaded asset LICENSE; body-model-specific notices also apply |
 | MHR | [source](https://github.com/facebookresearch/MHR); SOMA-X's LOD1 checkpoint SHA-256 `352e271a6c42729c68554ceaea0c955e866970160c31e35506d782dc0f7377bc` | Meta Apache-2.0; license/notice retained in `crates/burn_mhr` |
 | GEM-X | [source](https://github.com/NVlabs/GEM-X/tree/32992550dba114c62243fb55e361311972dce8f9), [checkpoint](https://huggingface.co/nvidia/GEM-X/tree/5ccf5ca3746c3620aa4016114f069a5f6ae399cd) | NVIDIA code Apache-2.0; preserve downloaded model LICENSE and upstream model terms. The source README additionally references the NVIDIA Open Model License for associated models. |
-| DINOv3 | [source](https://github.com/facebookresearch/dinov3/tree/6876159a11b4df116f30f667f8c9888617df0751) | Meta DINOv3 License, retained in `crates/burn_gem/LICENSE` |
-| SAM 3D Body | [source](https://github.com/facebookresearch/sam-3d-body/tree/b5c765a0d89d789985e186d396315e7590887b94) | Meta SAM License, retained in `crates/burn_gem/LICENSE` and SAM bundle metadata |
+| DINOv3 | [source](https://github.com/facebookresearch/dinov3/tree/6876159a11b4df116f30f667f8c9888617df0751) | Meta DINOv3 License, retained in `crates/burn_gemx/LICENSE` |
+| SAM 3D Body | [source](https://github.com/facebookresearch/sam-3d-body/tree/b5c765a0d89d789985e186d396315e7590887b94) | Meta SAM License, retained in `crates/burn_gemx/LICENSE` and SAM bundle metadata |
 
 **Built with Meta Llama 3.** Meta Llama 3: Copyright © Meta Platforms, Inc.
 All Rights Reserved. The local text encoder uses the merged public checkpoint;
 its tokenizer and model bytes are authenticated during conversion/loading.
 No gated model access is required beyond the terms of the selected public export.
 
-`burn_gem` uses a combined license file because its SAM/DINO ports are covered
+`burn_gemx` uses a combined license file because its SAM/DINO ports are covered
 by their respective upstream terms. Its `NOTICE` identifies the implementation
 files and its `ATTRIBUTIONS.md` retains GEM-X's third-party notices, including
 rotation-conversion attribution. These components are not represented as wholly

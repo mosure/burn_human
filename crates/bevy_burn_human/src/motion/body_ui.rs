@@ -6,7 +6,7 @@ use super::{
     ui::MotionUi,
 };
 use bevy_egui::egui;
-use burn_gem::camera::{Camera, Crop};
+use burn_gemx::camera::{Camera, Crop};
 use burn_soma::{IdentityParameters, SomaPose};
 
 pub(super) struct BodyUi {
@@ -27,17 +27,11 @@ pub(super) struct BodyUi {
 impl Default for BodyUi {
     fn default() -> Self {
         Self {
-            soma_bundle: if cfg!(target_arch = "wasm32") {
-                String::new()
-            } else {
-                ".cache/soma-bundle-v2".into()
-            },
-            soma_digest: String::new(),
-            gem_suite: if cfg!(target_arch = "wasm32") {
-                String::new()
-            } else {
-                ".cache/gem-suite.json".into()
-            },
+            soma_bundle: burn_soma::pretrained::DEFAULT
+                .at_root(burn_soma::pretrained::CDN_ROOT)
+                .base,
+            soma_digest: burn_soma::pretrained::DEFAULT.sha256.into(),
+            gem_suite: burn_gemx::pretrained::SUITE_URL.into(),
             identity: BodyIdentity::Native(IdentityParameters::default()),
             pose: SomaPose::default(),
             joint: 0,
@@ -106,7 +100,7 @@ pub(super) fn soma(
     ui.collapsing("SOMA model", |ui| {
         ui.label("Bundle directory or URL");
         ui.text_edit_singleline(&mut state.soma_bundle);
-        ui.label("Manifest digest (optional)");
+        ui.label("Manifest SHA-256");
         ui.text_edit_singleline(&mut state.soma_digest);
         if ui
             .add_enabled(

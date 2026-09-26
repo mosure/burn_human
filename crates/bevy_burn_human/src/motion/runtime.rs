@@ -10,14 +10,11 @@ use burn::backend::{
     Wgpu,
     wgpu::{WgpuDevice, WgpuSetup, init_device},
 };
-use burn_ardy::{
-    Ardy,
-    transport::{ModelSource, read_bounded},
-};
-use burn_ardy_text::TextEncoder;
+use burn_ardy::{Ardy, transport::read_bounded};
 use burn_human_motion::{
     ImageCondition, MotionClip, MotionRequest, TextEmbedding, soma::SomaAnimation,
 };
+use burn_llama::TextEncoder;
 use std::sync::{
     Arc, Mutex,
     atomic::{AtomicBool, Ordering},
@@ -150,15 +147,9 @@ pub(super) fn load(runtime: &MotionRuntime, base: String, digest: String) {
     drop(state);
     let shared = runtime.0.clone();
     spawn_job(runtime.clone(), move || async move {
-        let mut source = ModelSource::cached(base);
-        let manifest = source
-            .manifest(if digest.trim().is_empty() {
-                None
-            } else {
-                Some(digest.trim())
-            })
-            .await?;
-        let model = Ardy::load(&manifest, &mut source, &device, |i, n| {
+        let mut artifact = burn_ardy::pretrained::DEFAULT.at_base(base);
+        artifact.sha256 = digest.trim().into();
+        let model = Ardy::load_artifact(&artifact, &device, |i, n| {
             shared.lock().unwrap().status = MotionStatus::Loading(i, n)
         })
         .await?;
@@ -403,11 +394,9 @@ pub(super) fn load_text(runtime: &MotionRuntime, base: String, digest: String) {
     drop(state);
     let shared = runtime.0.clone();
     spawn_job(runtime.clone(), move || async move {
-        let source = ModelSource::cached(base);
-        let manifest = source
-            .manifest((!digest.trim().is_empty()).then_some(digest.trim()))
-            .await?;
-        let encoder = TextEncoder::load(manifest, source, &device, |i, n| {
+        let mut artifact = burn_llama::pretrained::DEFAULT.at_base(base);
+        artifact.sha256 = digest.trim().into();
+        let encoder = TextEncoder::load_artifact(&artifact, &device, |i, n| {
             shared.lock().unwrap().status =
                 MotionStatus::Working(format!("Loading Llama weights {i}/{n}"));
         })

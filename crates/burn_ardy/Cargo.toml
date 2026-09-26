@@ -1,25 +1,26 @@
 [package]
 name = "burn_ardy"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "ARDY Core motion inference on Burn, native WGPU and WebGPU"
 license = "Apache-2.0"
 repository = "https://github.com/mosure/burn_human"
+readme = "README.md"
 
 [lib]
 crate-type = ["rlib", "cdylib"]
 
 [features]
-default = ["ndarray"]
+default = ["ndarray", "transport"]
 ndarray = ["burn/ndarray"]
 wgpu = ["burn/wgpu"]
-tools = ["validation", "dep:memmap2", "dep:pollster"]
+tools = ["transport", "validation", "dep:memmap2", "dep:pollster"]
 validation = ["dep:safetensors", "dep:web-time"]
 web-validation = ["validation", "transport", "wgpu", "dep:console_error_panic_hook", "dep:wasm-bindgen", "dep:wasm-bindgen-futures"]
 transport = ["dep:burn_human_inference", "burn_human_inference/transport"]
 
 [dependencies]
-burn_human_inference = { path = "../burn_human_inference", version = "0.1.0", optional = true }
+burn_human_inference = { path = "../burn_human_inference", version = "0.1.1", optional = true }
 anyhow = "1"
 burn = { version = "0.21", default-features = false, features = ["std"] }
 burn-store = { version = "0.21", default-features = false, features = ["std", "burnpack"] }
