@@ -13,9 +13,6 @@ export async function select_motion_file(accept, limit) {
     input.click();
   });
 }
-export function download_motion_clip(bytes) {
-  download_motion_artifact(bytes,'motion.json');
-}
 export function download_motion_artifact(bytes,name) {
   const url=URL.createObjectURL(new Blob([new Uint8Array(bytes)],{type:'application/json'}));
   const link=document.createElement('a');link.href=url;link.download=name;link.click();

@@ -1,63 +1,39 @@
-<html>
+<!doctype html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>bevy_burn_human</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>burn_human · Motion, bodies and image pose</title>
     <style>
-      body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-      }
-      .loading {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin: -15px 0 0 -15px;
-        height: 30px;
-        width: 30px;
-        border: 2px solid #ddd;
-        border-left-color: #009688;
-        border-radius: 30px;
-        -webkit-animation: animation-rotate 950ms cubic-bezier(.64,2,.56,.6) infinite;
-        animation: animation-rotate 950ms cubic-bezier(.64,2,.56,.6) infinite;
-      }
-      .removed {
-        display: none;
-      }
-      @-webkit-keyframes animation-rotate {
-        100% {
-          -webkit-transform: rotate(360deg);
-        }
-      }
-      @keyframes animation-rotate {
-        100% {
-          -webkit-transform: rotate(360deg);
-                  transform: rotate(360deg);
-        }
-      }
+      html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #0a0d14; color: #e4e9f2; font: 16px/1.5 system-ui, sans-serif; }
+      canvas { display: block; width: 100%; height: 100%; outline: none; }
+      #loading { position: absolute; inset: 0; display: grid; place-content: center; padding: 32px; text-align: center; }
+      #loading p { max-width: 540px; color: #b8c6dc; }
+      #spinner { margin: 0 auto 16px; width: 28px; height: 28px; border: 2px solid #334155; border-top-color: #74bee8; border-radius: 50%; animation: spin 1s linear infinite; }
+      @keyframes spin { to { transform: rotate(360deg); } }
     </style>
   </head>
-  <script type="module">
-    import init from './out/bevy_burn_human.js'
-    init()
-    document.querySelector('.loading').style.display = 'none'
-  </script>
-  <script>
-    // disable right-click context menu
-    document.addEventListener('contextmenu', event => event.preventDefault());
-  </script>
-  <style>
-    body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-    }
-  </style>
   <body>
-    <div class="loading"></div>
+    <div id="loading" role="status" aria-live="polite">
+      <div id="spinner"></div>
+      <strong id="title">Preparing the human studio</strong>
+      <p id="detail">Explore text-driven motion, editable bodies and image-to-pose inference. Model weights download when you choose to load them.</p>
+    </div>
+    <script type="module">
+      try {
+        if (!navigator.gpu) throw new Error('This browser does not expose WebGPU. Open the studio in a WebGPU-enabled browser, or run the native Bevy application.');
+        const { default: init } = await import('./out/bevy_burn_human.js');
+        await init();
+        document.getElementById('loading').remove();
+      } catch (error) {
+        document.getElementById('spinner').style.display = 'none';
+        document.getElementById('title').textContent = 'The studio could not start';
+        document.getElementById('detail').textContent = error.message || String(error);
+        console.error(error);
+      }
+      document.addEventListener('contextmenu', event => {
+        if (event.target instanceof HTMLCanvasElement) event.preventDefault();
+      });
+    </script>
   </body>
 </html>
