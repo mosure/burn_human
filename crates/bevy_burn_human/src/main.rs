@@ -53,11 +53,29 @@ pub fn main() {
     run_app(BurnHumanPlugin::default());
 }
 
+// Support `cargo run -p bevy_burn_human` and direct execution from the repo.
+// Packaged applications may keep assets next to the executable or set BEVY_ASSET_ROOT.
+fn studio_assets() -> bevy::asset::AssetPlugin {
+    #[allow(unused_mut)]
+    let mut plugin = bevy::asset::AssetPlugin {
+        meta_check: bevy::asset::AssetMetaCheck::Never,
+        ..default()
+    };
+    #[cfg(not(target_arch = "wasm32"))]
+    if std::env::var_os("BEVY_ASSET_ROOT").is_none()
+        && std::path::Path::new("assets/model/fullbody_default.meta.json").is_file()
+        && let Ok(path) = std::fs::canonicalize("assets")
+    {
+        plugin.file_path = path.to_string_lossy().into_owned();
+    }
+    plugin
+}
+
 fn run_app(burn_plugin: BurnHumanPlugin) {
     App::new()
         .insert_resource(ClearColor(Color::srgb(0.04, 0.05, 0.08)))
         .insert_resource(SceneSpawned::default())
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
+        .add_plugins(DefaultPlugins.set(studio_assets()).set(WindowPlugin {
             primary_window: Some(Window {
                 title: "bevy_burn_human".to_string(),
                 fit_canvas_to_parent: true,
@@ -69,14 +87,14 @@ fn run_app(burn_plugin: BurnHumanPlugin) {
         .add_plugins(PanOrbitCameraPlugin)
         .add_plugins(burn_plugin)
         .add_plugins(HumanMotionPlugin)
+        .add_systems(Startup, setup_stage)
+        .add_systems(PreUpdate, handle_close_requests)
         .add_systems(
             PreUpdate,
             (
-                handle_close_requests,
                 apply_random_pose_on_key
                     .run_if(resource_exists::<DemoState>)
                     .run_if(manual_pose),
-                gate_pan_orbit_during_egui,
                 drive_noise
                     .run_if(manual_pose)
                     .run_if(resource_exists::<NoiseRig>)
@@ -91,7 +109,7 @@ fn run_app(burn_plugin: BurnHumanPlugin) {
         .add_systems(
             EguiPrimaryContextPass,
             ui_controls
-                .run_if(manual_pose)
+                .run_if(|motion: Res<MotionUi>| motion.is_manual_tab())
                 .run_if(resource_exists::<BurnHumanAssets>)
                 .run_if(resource_exists::<DemoState>),
         )
@@ -126,7 +144,7 @@ fn setup_scene_once(
         phenotype_labels,
         phenotype_values: phenotype_values.clone(),
         phenotype_noise_baseline: phenotype_values.clone(),
-        use_reference_case: true,
+        use_reference_case: false,
         selected_case,
         selected_bone: 0,
         bone_euler_deg: vec![[0.0; 3]; bone_count],
@@ -148,6 +166,39 @@ fn setup_scene_once(
         noise: OpenSimplex::new(42),
     });
 
+    commands.spawn((
+        BurnHumanInput {
+            case_name: assets
+                .body
+                .metadata()
+                .metadata
+                .case_names
+                .get(selected_case)
+                .cloned(),
+            phenotype_inputs: Some(phenotype_values),
+            ..Default::default()
+        },
+        BurnHumanRenderMode(BurnHumanMeshMode::SkinnedMesh),
+        MeshMaterial3d(materials.add(StandardMaterial {
+            base_color: Color::srgb(0.72, 0.7, 0.68),
+            metallic: 0.0,
+            reflectance: 0.5,
+            perceptual_roughness: 0.55,
+            ..default()
+        })),
+        Transform::from_rotation(Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2))
+            .with_translation(Vec3::Y)
+            .with_scale(Vec3::splat(1.15)),
+        Visibility::default(),
+        Name::new("burn_human"),
+        HumanTag,
+        MotionActor,
+    ));
+
+    spawned.0 = true;
+}
+
+fn setup_stage(mut commands: Commands) {
     commands.insert_resource(GlobalAmbientLight {
         color: Color::srgb(0.85, 0.85, 0.9),
         brightness: 1.05,
@@ -194,35 +245,6 @@ fn setup_scene_once(
     ));
 
     commands.spawn((
-        BurnHumanInput {
-            case_name: assets
-                .body
-                .metadata()
-                .metadata
-                .case_names
-                .get(selected_case)
-                .cloned(),
-            phenotype_inputs: Some(phenotype_values),
-            ..Default::default()
-        },
-        BurnHumanRenderMode(BurnHumanMeshMode::SkinnedMesh),
-        MeshMaterial3d(materials.add(StandardMaterial {
-            base_color: Color::srgb(0.72, 0.7, 0.68),
-            metallic: 0.0,
-            reflectance: 0.5,
-            perceptual_roughness: 0.55,
-            ..default()
-        })),
-        Transform::from_rotation(Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2))
-            .with_translation(Vec3::Y)
-            .with_scale(Vec3::splat(1.15)),
-        Visibility::default(),
-        Name::new("burn_human"),
-        HumanTag,
-        MotionActor,
-    ));
-
-    commands.spawn((
         Camera3d::default(),
         Transform::from_xyz(2.8, 1.6, 4.0).looking_at(Vec3::new(0.0, 1.0, 0.0), Vec3::Y),
         PanOrbitCamera {
@@ -230,8 +252,6 @@ fn setup_scene_once(
             ..default()
         },
     ));
-
-    spawned.0 = true;
 }
 
 fn setup_noise(mut commands: Commands, has_noise: Option<Res<NoiseRig>>) {
@@ -267,11 +287,13 @@ fn ui_controls(
     transform.translation = Vec3::Y;
     transform.scale = Vec3::splat(1.15);
 
-    egui::Window::new("burn_human controls")
-        .default_pos([400.0, 12.0])
-        .default_open(false)
+    egui::Window::new("Anny body & pose")
+        .default_pos([12.0, 226.0])
+        .default_width(360.0)
+        .max_height((ctx.content_rect().height() - 250.0).max(160.0))
+        .vscroll(true)
         .show(ctx, |ui| {
-            ui.label("Reference data exported from the bundled Python Anny model.");
+            ui.label("Shape and pose the bundled Anny body. Press R to try a random pose.");
             ui.separator();
             let current_mode = render_mode
                 .as_ref()
@@ -308,7 +330,7 @@ fn ui_controls(
                 }
             }
             ui.separator();
-            ui.checkbox(&mut state.use_reference_case, "Use reference case");
+            ui.checkbox(&mut state.use_reference_case, "Use bundled reference pose");
             if state.use_reference_case {
                 if let Some((idx, name)) = pick_single_sample_case(&mut state, &assets) {
                     state.selected_case = idx;
@@ -323,7 +345,7 @@ fn ui_controls(
                 input.blendshape_delta = None;
             } else {
                 input.case_name = None;
-                ui.label("Phenotype sliders (drive blendshapes via mask).");
+                ui.label("Body shape");
                 for idx in 0..state.phenotype_values.len() {
                     let label = state.phenotype_labels.get(idx).cloned().unwrap_or_default();
                     if let Some(value) = state.phenotype_values.get_mut(idx) {
@@ -355,63 +377,65 @@ fn ui_controls(
                 state.phenotype_noise_baseline = state.phenotype_values.clone();
                 state.bone_noise_baseline = state.bone_euler_deg.clone();
             }
-            ui.add(
-                egui::Slider::new(&mut state.noise_amp, 0.0..=2.0)
-                    .text("global noise")
-                    .logarithmic(false),
-            );
-            ui.add(
-                egui::Slider::new(&mut state.phenotype_noise_amp, 0.0..=4.0)
-                    .text("phenotype noise")
-                    .logarithmic(false),
-            );
-            ui.separator();
-            ui.label("Pose noise (deg, per group)");
-            ui.add(
-                egui::Slider::new(&mut state.upper_leg_noise_amp, 0.0..=50.0)
-                    .text("upper leg")
-                    .logarithmic(false),
-            );
-            ui.add(
-                egui::Slider::new(&mut state.lower_leg_noise_amp, 0.0..=50.0)
-                    .text("lower leg")
-                    .logarithmic(false),
-            );
-            ui.add(
-                egui::Slider::new(&mut state.upper_arm_noise_amp, 0.0..=50.0)
-                    .text("upper arm")
-                    .logarithmic(false),
-            );
-            ui.add(
-                egui::Slider::new(&mut state.lower_arm_noise_amp, 0.0..=50.0)
-                    .text("lower arm")
-                    .logarithmic(false),
-            );
-            ui.add(
-                egui::Slider::new(&mut state.wrist_noise_amp, 0.0..=50.0)
-                    .text("wrist")
-                    .logarithmic(false),
-            );
-            ui.add(
-                egui::Slider::new(&mut state.hand_noise_amp, 0.0..=50.0)
-                    .text("hand/fingers")
-                    .logarithmic(false),
-            );
-            ui.add(
-                egui::Slider::new(&mut state.spine_noise_amp, 0.0..=50.0)
-                    .text("spine")
-                    .logarithmic(false),
-            );
-            ui.add(
-                egui::Slider::new(&mut state.other_pose_noise_amp, 0.0..=50.0)
-                    .text("other pose")
-                    .logarithmic(false),
-            );
-            ui.add(
-                egui::Slider::new(&mut state.time_scale, 0.25..=3.0)
-                    .text("time scale")
-                    .logarithmic(false),
-            );
+            ui.collapsing("Procedural motion settings", |ui| {
+                ui.add(
+                    egui::Slider::new(&mut state.noise_amp, 0.0..=2.0)
+                        .text("global noise")
+                        .logarithmic(false),
+                );
+                ui.add(
+                    egui::Slider::new(&mut state.phenotype_noise_amp, 0.0..=4.0)
+                        .text("phenotype noise")
+                        .logarithmic(false),
+                );
+                ui.separator();
+                ui.label("Pose noise (deg, per group)");
+                ui.add(
+                    egui::Slider::new(&mut state.upper_leg_noise_amp, 0.0..=50.0)
+                        .text("upper leg")
+                        .logarithmic(false),
+                );
+                ui.add(
+                    egui::Slider::new(&mut state.lower_leg_noise_amp, 0.0..=50.0)
+                        .text("lower leg")
+                        .logarithmic(false),
+                );
+                ui.add(
+                    egui::Slider::new(&mut state.upper_arm_noise_amp, 0.0..=50.0)
+                        .text("upper arm")
+                        .logarithmic(false),
+                );
+                ui.add(
+                    egui::Slider::new(&mut state.lower_arm_noise_amp, 0.0..=50.0)
+                        .text("lower arm")
+                        .logarithmic(false),
+                );
+                ui.add(
+                    egui::Slider::new(&mut state.wrist_noise_amp, 0.0..=50.0)
+                        .text("wrist")
+                        .logarithmic(false),
+                );
+                ui.add(
+                    egui::Slider::new(&mut state.hand_noise_amp, 0.0..=50.0)
+                        .text("hand/fingers")
+                        .logarithmic(false),
+                );
+                ui.add(
+                    egui::Slider::new(&mut state.spine_noise_amp, 0.0..=50.0)
+                        .text("spine")
+                        .logarithmic(false),
+                );
+                ui.add(
+                    egui::Slider::new(&mut state.other_pose_noise_amp, 0.0..=50.0)
+                        .text("other pose")
+                        .logarithmic(false),
+                );
+                ui.add(
+                    egui::Slider::new(&mut state.time_scale, 0.25..=3.0)
+                        .text("time scale")
+                        .logarithmic(false),
+                );
+            });
             ui.separator();
             ui.label("Bone orientation (degrees)");
             egui::ComboBox::from_id_salt("bone_select")
@@ -455,23 +479,8 @@ fn ui_controls(
         });
 }
 
-fn gate_pan_orbit_during_egui(
-    mut contexts: EguiContexts,
-    motion: Res<MotionUi>,
-    mut query: Query<&mut PanOrbitCamera>,
-) {
-    let Ok(ctx) = contexts.ctx_mut() else { return };
-    let block = motion.place_waypoints
-        || ctx.is_pointer_over_egui()
-        || ctx.egui_wants_pointer_input()
-        || ctx.egui_wants_keyboard_input();
-    for mut cam in query.iter_mut() {
-        cam.enabled = !block;
-    }
-}
-
 fn manual_pose(playback: Res<MotionPlayback>, motion: Res<MotionUi>) -> bool {
-    !playback.active && motion.is_motion_tab()
+    !playback.active && (motion.is_motion_tab() || motion.is_manual_tab())
 }
 
 fn apply_random_pose_on_key(

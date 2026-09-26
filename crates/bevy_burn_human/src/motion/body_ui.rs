@@ -23,6 +23,9 @@ pub(super) struct BodyUi {
     pub camera: Camera,
     pub image_size: [u32; 2],
     pub export_path: String,
+    live: bool,
+    submitted: String,
+    joint_filter: String,
 }
 impl Default for BodyUi {
     fn default() -> Self {
@@ -48,6 +51,9 @@ impl Default for BodyUi {
             },
             image_size: [0; 2],
             export_path: "pose.json".into(),
+            live: true,
+            submitted: String::new(),
+            joint_filter: String::new(),
         }
     }
 }
@@ -66,6 +72,7 @@ pub(super) fn sync(state: &mut BodyUi, runtime: &MotionRuntime) {
         state.joint = 0;
         state.component = 0;
         state.scale = 0;
+        state.submitted = controls_key(state);
     }
     if let Some(image) = &shared.image {
         let dims = [image.width, image.height];
@@ -91,13 +98,24 @@ pub(super) fn soma(
     display: &mut BodyDisplay,
 ) {
     let shared = runtime.0.lock().unwrap();
-    let loaded = shared.body.soma.is_some() || shared.body.gem.is_some();
+    let loaded = !shared.body.joint_names.is_empty();
     let names = shared.body.joint_names.clone();
     let scales = shared.body.scale_names.clone();
     drop(shared);
     ui.label("SOMA identity and rig");
     ui.small("Shape, bone lengths, hands, procedural twists and mesh correctives.");
-    ui.collapsing("SOMA model", |ui| {
+    if !loaded
+        && ui
+            .add_enabled(!busy, egui::Button::new("Load SOMA body"))
+            .clicked()
+    {
+        body::load_soma(
+            runtime,
+            state.soma_bundle.clone(),
+            state.soma_digest.clone(),
+        );
+    }
+    ui.collapsing("Advanced SOMA source", |ui| {
         ui.label("Bundle directory or URL");
         ui.text_edit_singleline(&mut state.soma_bundle);
         ui.label("Manifest SHA-256");
@@ -134,6 +152,15 @@ pub(super) fn soma(
             state.scale = 0;
         }
     }
+    let native = matches!(state.identity, BodyIdentity::Native(_));
+    ui.horizontal(|ui| {
+        for preset in ["T pose", "Relaxed", "Wave"] {
+            if ui.button(preset).clicked() {
+                state.pose = pose_preset(preset, &names, native);
+            }
+        }
+    });
+    ui.checkbox(&mut state.live, "Live preview");
     let (coeff, scales_values, global, native) = match &mut state.identity {
         BodyIdentity::Native(p) => (
             &mut p.coefficients,
@@ -193,11 +220,20 @@ pub(super) fn soma(
     ui.separator();
     if !names.is_empty() {
         state.joint = state.joint.min(names.len() - 1);
+        ui.add(
+            egui::TextEdit::singleline(&mut state.joint_filter)
+                .hint_text("Find a joint: hand, head, leg…"),
+        );
         egui::ComboBox::from_id_salt("soma_joint")
             .selected_text(&names[state.joint])
             .show_ui(ui, |ui| {
                 for (i, name) in names.iter().enumerate() {
-                    ui.selectable_value(&mut state.joint, i, name);
+                    if name
+                        .to_lowercase()
+                        .contains(&state.joint_filter.to_lowercase())
+                    {
+                        ui.selectable_value(&mut state.joint, i, name);
+                    }
                 }
             });
         for (axis, label) in ["X rotation °", "Y rotation °", "Z rotation °"]
@@ -207,6 +243,7 @@ pub(super) fn soma(
             let mut degrees = state.pose.rotations[state.joint][axis].to_degrees();
             if ui
                 .add(egui::Slider::new(&mut degrees, -180.0..=180.0).text(*label))
+                .on_hover_text("Rotation-vector component in the joint's local frame; these are not Euler angles.")
                 .changed()
             {
                 state.pose.rotations[state.joint][axis] = degrees.to_radians();
@@ -229,11 +266,43 @@ pub(super) fn soma(
             .add_enabled(!busy, egui::Button::new("Apply body controls"))
             .clicked()
         {
+            state.submitted = controls_key(state);
             body::apply(runtime, state.identity.clone(), state.pose.clone());
         }
     });
     ui.small("Rotation sliders are axis-angle components in the SOMA joint convention.");
+    let key = controls_key(state);
+    if state.live && !busy && state.submitted != key {
+        state.submitted = key;
+        body::apply(runtime, state.identity.clone(), state.pose.clone());
+    }
     export(ui, state, runtime, busy);
+}
+
+fn controls_key(state: &BodyUi) -> String {
+    serde_json::to_string(&(&state.identity, &state.pose)).unwrap_or_default()
+}
+
+fn pose_preset(preset: &str, names: &[String], correctives: bool) -> SomaPose {
+    let mut pose = SomaPose {
+        apply_correctives: correctives,
+        ..Default::default()
+    };
+    let rotations: &[(&str, f32)] = match preset {
+        "Relaxed" => &[("LeftArm", -65.0), ("RightArm", 65.0)],
+        "Wave" => &[
+            ("LeftArm", -65.0),
+            ("RightArm", -25.0),
+            ("RightForeArm", -65.0),
+        ],
+        _ => &[],
+    };
+    for (name, degrees) in rotations {
+        if let Some(i) = names.iter().position(|n| n == name) {
+            pose.rotations[i][2] = degrees.to_radians();
+        }
+    }
+    pose
 }
 pub(super) fn image(
     ui: &mut egui::Ui,
@@ -245,6 +314,18 @@ pub(super) fn image(
     let shared = runtime.0.lock().unwrap();
     let loaded = shared.body.gem.is_some();
     let has_image = shared.image.is_some();
+    let current_estimate =
+        shared
+            .body
+            .estimate_input
+            .as_ref()
+            .is_some_and(|(revision, crop, camera)| {
+                *revision == state.image_revision
+                    && crop.center == state.body.crop.center
+                    && crop.size == state.body.crop.size
+                    && camera.focal == state.body.camera.focal
+                    && camera.center == state.body.camera.center
+            });
     let keypoints = shared
         .body
         .estimate
@@ -253,7 +334,17 @@ pub(super) fn image(
     drop(shared);
     ui.label("Image to SOMA pose");
     ui.small("Choose one person, adjust the crop, and estimate their pose locally.");
-    ui.collapsing("GEM-X models", |ui| {
+    if !loaded
+        && ui
+            .add_enabled(!busy, egui::Button::new("Load image pose models"))
+            .clicked()
+    {
+        body::load_gem(runtime, state.body.gem_suite.clone());
+    }
+    if loaded {
+        ui.colored_label(egui::Color32::LIGHT_GREEN, "Image pose models ready");
+    }
+    ui.collapsing("Advanced GEM-X source", |ui| {
         ui.label("Model suite JSON (file or URL)");
         ui.text_edit_singleline(&mut state.body.gem_suite);
         if ui
@@ -271,23 +362,29 @@ pub(super) fn image(
             "Vision, body decoder and SOMA weights load on demand."
         });
     });
-    #[cfg(target_arch = "wasm32")]
     if ui
         .add_enabled(!busy, egui::Button::new("Choose image…"))
         .clicked()
     {
         runtime::pick(runtime, InputKind::Image);
     }
-    ui.text_edit_singleline(&mut state.image);
-    if ui
-        .add_enabled(
-            !busy && !state.image.is_empty(),
-            egui::Button::new("Load image"),
-        )
-        .clicked()
-    {
-        runtime::import(runtime, state.image.clone(), InputKind::Image);
-    }
+    ui.small(
+        "PNG / JPEG · up to 8 MiB and 4096 × 4096 pixels. Select a full-body photo of one person.",
+    );
+    ui.collapsing("Load image from URL or path", |ui| {
+        ui.add(
+            egui::TextEdit::singleline(&mut state.image).hint_text("Image URL or native file path"),
+        );
+        if ui
+            .add_enabled(
+                !busy && !state.image.is_empty(),
+                egui::Button::new("Load image"),
+            )
+            .clicked()
+        {
+            runtime::import(runtime, state.image.clone(), InputKind::Image);
+        }
+    });
     if let Some(texture) = &state.image_preview {
         let response = ui.add(
             egui::Image::new(texture)
@@ -317,7 +414,7 @@ pub(super) fn image(
             egui::Stroke::new(2.0, egui::Color32::GOLD),
             egui::StrokeKind::Inside,
         );
-        if let Some(points) = keypoints {
+        if current_estimate && let Some(points) = keypoints {
             for p in points {
                 if p[2] > 0.5 {
                     painter.circle_filled(
@@ -331,7 +428,11 @@ pub(super) fn image(
         ui.small("Drag in the image to center the person crop.");
     }
     ui.add(egui::Slider::new(&mut state.body.crop.size, 16.0..=4096.0).text("Crop size (px)"));
-    ui.collapsing("Camera", |ui| {
+    if has_image && ui.button("Reset crop and image camera").clicked() {
+        state.body.image_size = [0; 2];
+        sync(&mut state.body, runtime);
+    }
+    ui.collapsing("Image camera calibration", |ui| {
         let mut focal = state.body.camera.focal[0];
         if ui
             .add(
@@ -355,14 +456,18 @@ pub(super) fn image(
     {
         body::estimate(runtime, state.body.crop, state.body.camera);
     }
+    if has_image && !current_estimate {
+        ui.small("Estimate again after changing the image, crop or camera.");
+    }
     ui.checkbox(&mut display.visible, "Show estimated SOMA body");
     ui.checkbox(&mut display.skeleton, "Show skeleton");
+    if ui.button("Frame estimated body").clicked() {
+        display.frame_view = true;
+    }
     ui.small("Open SOMA controls to adjust the inferred identity and joints.");
-    export(ui, &mut state.body, runtime, busy);
+    export(ui, &mut state.body, runtime, busy || !current_estimate);
 }
 fn export(ui: &mut egui::Ui, state: &mut BodyUi, runtime: &MotionRuntime, busy: bool) {
-    #[cfg(not(target_arch = "wasm32"))]
-    ui.text_edit_singleline(&mut state.export_path);
     if ui
         .add_enabled(!busy, egui::Button::new("Export pose and identity"))
         .clicked()

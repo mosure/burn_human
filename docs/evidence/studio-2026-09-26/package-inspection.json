@@ -1,0 +1,26 @@
+[
+  {
+    "crate": "burn_human_inference",
+    "version": "0.1.2",
+    "files": 14,
+    "compressed_bytes": 55168,
+    "contains_weights_or_build_artifacts": false,
+    "dry_run": "passed"
+  },
+  {
+    "crate": "burn_gemx",
+    "version": "0.1.1",
+    "files": 26,
+    "compressed_bytes": 77988,
+    "contains_weights_or_build_artifacts": false,
+    "dry_run": "passed"
+  },
+  {
+    "crate": "bevy_burn_human",
+    "version": "0.5.2",
+    "files": 18,
+    "compressed_bytes": 101890,
+    "contains_weights_or_build_artifacts": false,
+    "dry_run": "passed"
+  }
+]

@@ -1,0 +1,44 @@
+{
+  "platforms": {
+    "native": "Linux X11, hardware NVIDIA Vulkan, 1280x720 window",
+    "browser": "Chromium 153.0.8010.12, NVIDIA Blackwell WebGPU, 1500x1050 and 800x600 viewports"
+  },
+  "model_source": "https://aberration.technology/model",
+  "http_interception": false,
+  "observed_browser_model_responses": 2333,
+  "browser_model_http_errors": 0,
+  "native_motion": {
+    "prompt": "A person walks forward.",
+    "preset": "Turn",
+    "seed": 42,
+    "diffusion_steps": 10,
+    "frames": 120,
+    "fps": 20,
+    "export": {
+      "bytes": 177140,
+      "sha256": "4c1f848aaaa5cf71c816079fa8c87005dfb60b191d0bc7f783c7595068688fa0"
+    }
+  },
+  "browser_image_pose": {
+    "input": {
+      "bytes": 3552241,
+      "sha256": "c11c50b69b8d84873e157d61a50ad74929cc53280de6740c9e9161cc42ea5f7f"
+    },
+    "export": {
+      "bytes": 12112,
+      "sha256": "ec6286ad5f5cdf56ff80634d2129148fbf43e05d98f61b7ee47d08b09a1543b5"
+    }
+  },
+  "manual_checks": [
+    "Native and browser: model loading, shared Bevy GPU inference and displayed results",
+    "Native: PNG file picker, SOMA live Wave preset, JSON Save As dialog, text encoding and ARDY generation",
+    "Browser: prompt editing, action presets, timed world-space waypoint dragging, path presets and camera orbit/pan",
+    "Browser: GEM-X PNG picker, image crop drag, keypoint overlay, inferred SOMA rig and pose export",
+    "Browser: changed crop hides old keypoints and disables export until re-estimation",
+    "Browser: inferred MHR identity switches to native SOMA, T pose/Wave live previews",
+    "Browser: 800x600 window scroll reaches image controls and export",
+    "Browser: missing WebGPU shows actionable startup failure",
+    "Native motion JSON imports and plays in the rebuilt WASM viewer",
+    "Native Anny tab: stacked editor leaves body visible at 1280x720; shape slider updates GPU-skinned mesh"
+  ]
+}

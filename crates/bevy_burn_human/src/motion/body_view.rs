@@ -28,10 +28,20 @@ impl Default for BodyDisplay {
 #[derive(Component)]
 pub(super) struct SomaActor;
 
+#[derive(Default, Reflect, GizmoConfigGroup)]
+pub(super) struct RigGizmos;
+
+pub(super) fn configure_gizmos(mut store: ResMut<GizmoConfigStore>) {
+    let (config, _) = store.config_mut::<RigGizmos>();
+    config.depth_bias = -1.0;
+    config.line.width = 1.5;
+}
+
 #[allow(clippy::too_many_arguments)] // Bevy injects each system resource/query.
 pub(super) fn update(
     mut commands: Commands,
     runtime: Res<MotionRuntime>,
+    ui: Res<super::MotionUi>,
     mut display: ResMut<BodyDisplay>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
@@ -78,9 +88,8 @@ pub(super) fn update(
             ));
             display.mesh = Some(handle);
         }
-        display.frame_view = display.surface.is_none();
+        display.frame_view |= display.surface.is_none() && ui.is_body_tab();
         display.surface = Some(surface);
-        display.visible = true;
     }
     let active = display.visible && display.surface.is_some();
     for (mut visibility, mut transform) in &mut actors {
@@ -92,7 +101,7 @@ pub(super) fn update(
         *transform = display.transform;
     }
     for mut visibility in &mut anny {
-        *visibility = if active {
+        *visibility = if ui.is_body_tab() {
             Visibility::Hidden
         } else {
             Visibility::Inherited
@@ -121,13 +130,28 @@ fn body_mesh(vertices: &[[f32; 3]], faces: &[[u32; 3]]) -> Mesh {
     mesh
 }
 
-pub(super) fn draw(mut gizmos: Gizmos, display: Res<BodyDisplay>) {
+pub(super) fn draw(
+    mut gizmos: Gizmos<RigGizmos>,
+    display: Res<BodyDisplay>,
+    ui: Res<super::MotionUi>,
+) {
     if !display.visible || !display.skeleton {
         return;
     }
     let Some(surface) = &display.surface else {
         return;
     };
+    if ui.is_body_tab()
+        && let Some(joint) = surface.joints.get(ui.body.joint + 1)
+    {
+        gizmos.sphere(
+            Isometry3d::from_translation(
+                display.transform.transform_point(Vec3::from_array(*joint)),
+            ),
+            0.015,
+            Color::WHITE,
+        );
+    }
     for (i, &parent) in surface.parents.iter().enumerate().skip(1) {
         if parent == 0 {
             continue;

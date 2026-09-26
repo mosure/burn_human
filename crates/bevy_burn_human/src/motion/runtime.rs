@@ -160,6 +160,52 @@ pub(super) fn load(runtime: &MotionRuntime, base: String, digest: String) {
     });
 }
 
+/// One discoverable action loads both prerequisites, retaining a successful
+/// first stage if the second download needs to be retried.
+pub(super) fn prepare_motion(
+    runtime: &MotionRuntime,
+    model: (String, String),
+    text: (String, String),
+) {
+    let mut state = runtime.0.lock().unwrap();
+    if state.status.busy() {
+        return;
+    }
+    let Some(device) = state.device.clone() else {
+        state.status = MotionStatus::Failed("No shared GPU device".into());
+        return;
+    };
+    let need_model = state.model.is_none();
+    let need_text = state.text_model.is_none();
+    state.status = MotionStatus::Working("Preparing motion models".into());
+    drop(state);
+    let shared = runtime.0.clone();
+    spawn_job(runtime.clone(), move || async move {
+        if need_model {
+            let mut artifact = burn_ardy::pretrained::DEFAULT.at_base(model.0);
+            artifact.sha256 = model.1;
+            let model = Ardy::load_artifact(&artifact, &device, |i, n| {
+                shared.lock().unwrap().status =
+                    MotionStatus::Working(format!("Loading ARDY {i}/{n}"));
+            })
+            .await?;
+            shared.lock().unwrap().model = Some(model);
+        }
+        if need_text {
+            let mut artifact = burn_llama::pretrained::DEFAULT.at_base(text.0);
+            artifact.sha256 = text.1;
+            let encoder = TextEncoder::load_artifact(&artifact, &device, |i, n| {
+                shared.lock().unwrap().status =
+                    MotionStatus::Working(format!("Loading Llama {i}/{n}"));
+            })
+            .await?;
+            shared.lock().unwrap().text_model = Some(encoder);
+        }
+        shared.lock().unwrap().status = MotionStatus::Ready;
+        Ok(())
+    });
+}
+
 pub(super) fn generate(runtime: &MotionRuntime, request: MotionRequest) {
     let mut state = runtime.0.lock().unwrap();
     if state.status.busy() {
@@ -297,12 +343,12 @@ fn apply_input(shared: &Arc<Mutex<RuntimeState>>, bytes: Vec<u8>, kind: InputKin
             state.image = Some(input);
             state.image_revision += 1;
             state.body.estimate = None;
+            state.body.estimate_input = None;
         }
     }
     Ok(())
 }
 
-#[cfg(target_arch = "wasm32")]
 pub(super) fn pick(runtime: &MotionRuntime, kind: InputKind) {
     let mut state = runtime.0.lock().unwrap();
     if state.status.busy() {
@@ -311,17 +357,37 @@ pub(super) fn pick(runtime: &MotionRuntime, kind: InputKind) {
     state.status = MotionStatus::Working("Choose a file".into());
     drop(state);
     let shared = runtime.0.clone();
+    #[cfg(not(target_arch = "wasm32"))]
+    let selection = {
+        let dialog = rfd::AsyncFileDialog::new();
+        match kind {
+            InputKind::Image => dialog.add_filter("PNG or JPEG image", &["png", "jpg", "jpeg"]),
+            _ => dialog.add_filter("JSON", &["json"]),
+        }
+        .pick_file()
+    };
     spawn_job(runtime.clone(), move || async move {
         let (accept, limit) = match kind {
             InputKind::Clip => (".json", 32 * 1024 * 1024),
             InputKind::Embedding => (".json", 256 * 1024),
             InputKind::Image => ("image/png,image/jpeg", 8 * 1024 * 1024),
         };
-        let value = super::browser_io::select_motion_file(accept, limit)
-            .await
-            .map_err(|e| anyhow::anyhow!("file selection: {e:?}"))?;
-        if !value.is_null() {
-            apply_input(&shared, js_sys::Uint8Array::new(&value).to_vec(), kind)?;
+        #[cfg(target_arch = "wasm32")]
+        {
+            let value = super::browser_io::select_motion_file(accept, limit)
+                .await
+                .map_err(|e| anyhow::anyhow!("file selection: {e:?}"))?;
+            if !value.is_null() {
+                apply_input(&shared, js_sys::Uint8Array::new(&value).to_vec(), kind)?;
+            }
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            let _ = accept;
+            if let Some(file) = selection.await {
+                let bytes = read_bounded(&file.path().to_string_lossy(), limit).await?;
+                apply_input(&shared, bytes, kind)?;
+            }
         }
         shared.lock().unwrap().status = MotionStatus::Ready;
         Ok(())
@@ -329,27 +395,8 @@ pub(super) fn pick(runtime: &MotionRuntime, kind: InputKind) {
 }
 
 pub(super) fn export(runtime: &MotionRuntime, clip: &MotionClip, path: &str) {
-    let result = (|| -> Result<()> {
-        let bytes = serde_json::to_vec(clip)?;
-        #[cfg(target_arch = "wasm32")]
-        {
-            let _ = path;
-            super::browser_io::download_motion_clip(&bytes);
-        }
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            use std::io::Write;
-            std::fs::OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .open(path)?
-                .write_all(&bytes)?;
-        }
-        Ok(())
-    })();
-    if let Err(e) = result {
-        runtime.0.lock().unwrap().status = MotionStatus::Failed(e.to_string());
-    }
+    // Keep long clips compact enough to round-trip through the bounded importer.
+    save_bytes(runtime, serde_json::to_vec(clip), path, "motion.json");
 }
 
 pub(super) fn export_json(
@@ -358,27 +405,43 @@ pub(super) fn export_json(
     path: &str,
     name: &str,
 ) {
-    let result = (|| -> Result<()> {
-        let bytes = serde_json::to_vec_pretty(value)?;
-        #[cfg(target_arch = "wasm32")]
-        {
-            let _ = path;
-            super::browser_io::download_motion_artifact(&bytes, name);
+    save_bytes(runtime, serde_json::to_vec_pretty(value), path, name);
+}
+
+fn save_bytes(runtime: &MotionRuntime, bytes: serde_json::Result<Vec<u8>>, path: &str, name: &str) {
+    let bytes = match bytes {
+        Ok(bytes) => bytes,
+        Err(e) => {
+            runtime.0.lock().unwrap().status = MotionStatus::Failed(e.to_string());
+            return;
         }
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            let _ = name;
-            use std::io::Write;
-            std::fs::OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .open(path)?
-                .write_all(&bytes)?;
+    };
+    #[cfg(target_arch = "wasm32")]
+    {
+        let _ = path;
+        super::browser_io::download_motion_artifact(&bytes, name);
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        let _ = name;
+        let mut state = runtime.0.lock().unwrap();
+        if state.status.busy() {
+            return;
         }
-        Ok(())
-    })();
-    if let Err(e) = result {
-        runtime.0.lock().unwrap().status = MotionStatus::Failed(e.to_string());
+        state.status = MotionStatus::Working("Choose where to save".into());
+        drop(state);
+        let selection = rfd::AsyncFileDialog::new()
+            .add_filter("JSON", &["json"])
+            .set_file_name(path)
+            .save_file();
+        let shared = runtime.0.clone();
+        spawn_job(runtime.clone(), move || async move {
+            if let Some(file) = selection.await {
+                file.write(&bytes).await?;
+            }
+            shared.lock().unwrap().status = MotionStatus::Ready;
+            Ok(())
+        });
     }
 }
 

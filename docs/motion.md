@@ -159,11 +159,13 @@ cargo run -p burn_ardy --features tools,wgpu --bin ardy-run -- \
 cargo run -p bevy_burn_human
 ```
 
-In **Motion studio**, load the bundle URL/directory, load the local Llama text bundle, and generate. The prompt is encoded automatically when changed. You can also import
+In **burn_human studio**, select **Load motion models**, enter a prompt, and generate.
+The [studio guide](studio.md) covers the native and browser workflows.
+Default CDN sources are preconfigured; custom bundles are under **Advanced**. The prompt is encoded automatically when changed. You can also import
 a previously computed embedding. Frames and history must be multiples of four.
 World trajectory supports ground clicks, dragging a selected waypoint, frame
 timing, heading and optional root height. Gold marks the requested path, blue
-the generated root path, and green the source rig. Frame trajectory fits the
+the generated root path, and green the source rig. Frame path fits the
 camera to the motion; ordinary camera orbit is disabled while placing points.
 Playback has pause, scrub, speed, optional loop, per-joint rotation offsets and
 JSON export. Disable motion animation to return to manual Anny posing.

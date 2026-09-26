@@ -71,7 +71,7 @@ Bevy loads the model through the asset server (native and wasm). Keep the files 
 
 ## run the demo
 ```bash
-cargo run -p bevy_burn_human
+cargo run --locked -p bevy_burn_human
 ```
 
 
@@ -83,3 +83,6 @@ mit or apache-2.0 (anny stays under its original license). Model crates and conv
 Portable Llama text encoding, ARDY motion generation, Anny retargeting, SOMA body evaluation, and GEM-X image-to-pose inference run locally in Rust/Burn on native WGPU and browser WebGPU. See [Motion inference and rigging](docs/motion.md) for model packing, world-space waypoint controls, SOMA controls, image input, and numerical/performance evidence.
 
 The published model crates are `burn_ardy`, `burn_llama`, `burn_soma` and `burn_gemx`. Each owns its pinned aberration CDN catalog and cached loading API. See [CDN bundles and loading](docs/cdn.md); the older `burn_ardy_text` and `burn_gem` 0.1.0 packages remain available under their original names.
+
+The [studio guide](docs/studio.md) covers text prompts, SOMA controls, world-space
+waypoints, PanOrbit navigation and GEM-X image input on native and WebGPU.

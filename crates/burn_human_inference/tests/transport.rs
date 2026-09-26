@@ -3,6 +3,43 @@ use burn_human_inference::transport::{ModelSource, read_bounded};
 use burn_human_motion::artifacts::{Part, PartReader, sha256};
 
 #[test]
+fn sequential_shards_reuse_one_http_connection() -> anyhow::Result<()> {
+    use std::io::{BufRead, BufReader, Write};
+    let listener = std::net::TcpListener::bind("127.0.0.1:0")?;
+    let url = format!("http://{}/part", listener.local_addr()?);
+    let server = std::thread::spawn(move || -> anyhow::Result<()> {
+        let (mut stream, _) = listener.accept()?;
+        stream.set_read_timeout(Some(std::time::Duration::from_secs(3)))?;
+        let mut reader = BufReader::new(stream.try_clone()?);
+        for _ in 0..2 {
+            loop {
+                let mut line = String::new();
+                anyhow::ensure!(
+                    reader.read_line(&mut line)? > 0,
+                    "client closed the reusable connection"
+                );
+                if line == "\r\n" {
+                    break;
+                }
+            }
+            stream.write_all(
+                b"HTTP/1.1 200 OK\r\nContent-Length: 4\r\nConnection: keep-alive\r\n\r\npart",
+            )?;
+            stream.flush()?;
+        }
+        Ok(())
+    });
+    pollster::block_on(async {
+        for _ in 0..2 {
+            assert_eq!(read_bounded(&url, 4).await?, b"part");
+        }
+        Ok::<_, anyhow::Error>(())
+    })?;
+    server.join().unwrap()?;
+    Ok(())
+}
+
+#[test]
 fn pinned_location_rejects_substituted_manifest_before_weights() -> anyhow::Result<()> {
     use burn_human_inference::pretrained::ArtifactLocation;
     use burn_human_motion::artifacts::{Manifest, Object, TensorSpec};

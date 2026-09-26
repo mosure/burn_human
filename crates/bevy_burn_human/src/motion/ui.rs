@@ -2,9 +2,9 @@ use super::{
     MotionPlayback, MotionRuntime, MotionStatus,
     runtime::{self, InputKind},
 };
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::prelude::*;
 use bevy_egui::{EguiContexts, egui};
-use burn_human_motion::{MotionRequest, Waypoint};
+use burn_human_motion::MotionRequest;
 
 #[derive(Resource)]
 pub struct MotionUi {
@@ -19,10 +19,11 @@ pub struct MotionUi {
     pub(super) image: String,
     export_path: String,
     pub(super) image_preview: Option<egui::TextureHandle>,
-    image_revision: u64,
+    pub(super) image_revision: u64,
     pub(super) body: super::body_ui::BodyUi,
     tab: usize,
-    selected_waypoint: Option<usize>,
+    pub(super) selected_waypoint: Option<usize>,
+    pub(super) dragging_waypoint: bool,
 }
 
 impl Default for MotionUi {
@@ -47,6 +48,7 @@ impl Default for MotionUi {
             body: Default::default(),
             tab: 0,
             selected_waypoint: None,
+            dragging_waypoint: false,
         }
     }
 }
@@ -54,6 +56,12 @@ impl Default for MotionUi {
 impl MotionUi {
     pub fn is_motion_tab(&self) -> bool {
         self.tab == 0
+    }
+    pub fn is_manual_tab(&self) -> bool {
+        self.tab == 3
+    }
+    pub(super) fn is_body_tab(&self) -> bool {
+        self.tab == 1 || self.tab == 2
     }
 }
 
@@ -63,6 +71,8 @@ pub(super) fn controls(
     runtime: Res<MotionRuntime>,
     mut playback: ResMut<MotionPlayback>,
     mut display: ResMut<super::body_view::BodyDisplay>,
+    mut view: ResMut<super::camera::ViewControls>,
+    anny: Option<Res<crate::BurnHumanAssets>>,
 ) {
     let Ok(ctx) = contexts.ctx_mut() else {
         return;
@@ -94,9 +104,14 @@ pub(super) fn controls(
     }
     drop(shared);
     super::body_ui::sync(&mut state.body, &runtime);
-    egui::Window::new("Motion studio")
+    egui::Window::new("burn_human studio")
         .default_width(360.0)
-        .default_height(620.0)
+        .default_height(780.0)
+        .max_height(if state.is_manual_tab() {
+            210.0
+        } else {
+            (ctx.content_rect().height() - 24.0).max(200.0)
+        })
         .default_pos([12.0, 12.0])
         .vscroll(true)
         .show(ctx, |ui| {
@@ -113,10 +128,18 @@ pub(super) fn controls(
                     state.place_waypoints = false;
                     display.visible = true;
                 }
+                if ui.selectable_value(&mut state.tab, 3, "Anny").clicked() {
+                    state.place_waypoints = false;
+                    display.visible = false;
+                    playback.active = false;
+                    playback.playing = false;
+                }
             });
+            super::camera::controls(ui, &mut view, state.place_waypoints);
+            ui.separator();
             match &status {
                 MotionStatus::Unloaded => {
-                    ui.label("Load a model bundle or import a motion clip to begin.");
+                    ui.label("Explore a mode below. Models load when you request them.");
                 }
                 MotionStatus::Ready => {
                     ui.label("Ready");
@@ -141,6 +164,15 @@ pub(super) fn controls(
                     ui.colored_label(egui::Color32::LIGHT_RED, message);
                 }
             }
+            if state.tab == 3 {
+                ui.label("Anny · interactive body and pose");
+                if anny.is_some() {
+                    ui.small("Shape the bundled body, pose individual joints, or try procedural motion in the Anny panel.");
+                } else {
+                    ui.label("Waiting for Anny assets. Native installations need assets/model beside the application or in the working directory.");
+                }
+                return;
+            }
             if state.tab == 1 {
                 super::body_ui::soma(ui, &mut state.body, &runtime, busy, &mut display);
                 return;
@@ -150,10 +182,22 @@ pub(super) fn controls(
                 return;
             }
             ui.label("ARDY Core · 20 FPS · Anny rig");
+            ui.small("Describe an action, optionally sketch its path, then generate and play it.");
+            if !loaded || !text_loaded {
+                if ui.add_enabled(!busy, egui::Button::new("Load motion models")).clicked() {
+                    runtime::prepare_motion(&runtime, (state.bundle.clone(), state.digest.clone()), (state.text_bundle.clone(), state.text_digest.clone()));
+                }
+                ui.small("First use downloads ARDY and Llama. Later loads reuse the local cache.");
+            } else { ui.colored_label(egui::Color32::LIGHT_GREEN, "Motion and text models ready"); }
             model_controls(ui, state, &runtime, busy, &adapter);
             ui.separator();
             ui.label("Describe the motion");
-            ui.text_edit_multiline(&mut state.request.prompt);
+            ui.add(egui::TextEdit::multiline(&mut state.request.prompt).desired_rows(3).desired_width(f32::INFINITY).hint_text("A person walks forward, then turns left."));
+            ui.horizontal_wrapped(|ui| {
+                for (label, prompt) in [("Walk", "A person walks forward."), ("Run", "A person runs forward."), ("Dance", "A person dances with their arms moving."), ("Wave", "A person stands and waves their right hand.")] {
+                    if ui.small_button(label).clicked() { state.request.prompt = prompt.into(); }
+                }
+            });
             ui.horizontal(|ui| {
                 if ui
                     .add_enabled(!busy && text_loaded, egui::Button::new("Encode prompt"))
@@ -167,8 +211,15 @@ pub(super) fn controls(
                     "Encodes automatically when generating"
                 });
             });
-            generation_controls(ui, state);
-            trajectory_controls(ui, state, &mut playback);
+            ui.horizontal(|ui| {
+                ui.label("Duration");
+                let mut seconds = state.request.frames as f32 / 20.0;
+                if ui.add(egui::DragValue::new(&mut seconds).range(2.0..=600.0).speed(0.2).suffix(" s")).changed() {
+                    state.request.frames = ((seconds * 5.0).round() as usize * 4).clamp(40, 12000);
+                    super::trajectory::retime(&mut state.request);
+                }
+                ui.small(format!("{} frames", state.request.frames));
+            });
             if let Err(e) = state.request.validate() {
                 ui.colored_label(egui::Color32::YELLOW, e.to_string());
             }
@@ -195,6 +246,8 @@ pub(super) fn controls(
                 }
             });
             playback_controls(ui, state, &runtime, &mut playback);
+            super::trajectory::controls(ui, state, &mut playback);
+            generation_controls(ui, state);
             import_controls(ui, state, &runtime, busy);
         });
 }
@@ -206,7 +259,7 @@ fn model_controls(
     busy: bool,
     adapter: &str,
 ) {
-    ui.collapsing("Model and text encoder", |ui| {
+    ui.collapsing("Advanced model sources / embeddings", |ui| {
         ui.label("Model bundle URL or native directory");
         ui.text_edit_singleline(&mut state.bundle);
         ui.label("Manifest SHA-256");
@@ -240,7 +293,6 @@ fn model_controls(
             );
         }
         ui.small("Prompts run locally on the shared GPU. Built with Meta Llama 3.");
-        #[cfg(target_arch = "wasm32")]
         if ui
             .add_enabled(!busy, egui::Button::new("Choose embedding JSON…"))
             .clicked()
@@ -263,14 +315,6 @@ fn model_controls(
 
 fn generation_controls(ui: &mut egui::Ui, state: &mut MotionUi) {
     ui.collapsing("Generation settings", |ui| {
-        ui.horizontal(|ui| {
-            ui.label("Frames");
-            ui.add(
-                egui::DragValue::new(&mut state.request.frames)
-                    .range(40..=12000)
-                    .speed(4),
-            );
-        });
         ui.horizontal(|ui| {
             ui.label("Seed");
             ui.add(egui::DragValue::new(&mut state.request.seed));
@@ -297,92 +341,8 @@ fn generation_controls(ui: &mut egui::Ui, state: &mut MotionUi) {
     });
 }
 
-fn trajectory_controls(ui: &mut egui::Ui, state: &mut MotionUi, playback: &mut MotionPlayback) {
-    ui.collapsing("World trajectory", |ui| {
-        ui.checkbox(
-            &mut state.place_waypoints,
-            "Place / move waypoints in scene",
-        );
-        ui.small(
-            "Click the ground to add a waypoint. Select one below, then drag it in the scene. \
-             Positions are metres; frame / 20 is time in seconds.",
-        );
-        ui.checkbox(
-            &mut state.request.dense_trajectory,
-            "Interpolate path between waypoints",
-        );
-        let mut remove = None;
-        for (i, w) in state.request.waypoints.iter_mut().enumerate() {
-            ui.horizontal(|ui| {
-                if ui
-                    .selectable_label(state.selected_waypoint == Some(i), format!("{}", i + 1))
-                    .clicked()
-                {
-                    state.selected_waypoint = Some(i);
-                }
-                ui.add(egui::DragValue::new(&mut w.frame).prefix("frame ").speed(1));
-                ui.add(
-                    egui::DragValue::new(&mut w.position.x)
-                        .prefix("X ")
-                        .speed(0.05),
-                );
-                ui.add(
-                    egui::DragValue::new(&mut w.position.z)
-                        .prefix("Z ")
-                        .speed(0.05),
-                );
-                if ui.small_button("×").clicked() {
-                    remove = Some(i);
-                }
-            });
-            if state.selected_waypoint == Some(i) {
-                let mut orient = w.heading.is_some();
-                if ui.checkbox(&mut orient, "Heading").changed() {
-                    w.heading = orient.then_some(0.0);
-                }
-                if let Some(h) = &mut w.heading {
-                    let mut degrees = h.to_degrees();
-                    ui.add(egui::Slider::new(&mut degrees, -180.0..=180.0).text("Heading °"));
-                    *h = degrees.to_radians();
-                }
-                ui.checkbox(&mut w.constrain_height, "Constrain root height");
-                if w.constrain_height {
-                    ui.add(
-                        egui::DragValue::new(&mut w.position.y)
-                            .prefix("Y ")
-                            .speed(0.02),
-                    );
-                }
-            }
-        }
-        if let Some(i) = remove {
-            state.request.waypoints.remove(i);
-            state.selected_waypoint = None;
-        }
-        ui.horizontal(|ui| {
-            if ui.button("Add point").clicked() {
-                add_waypoint(state, Vec3::ZERO);
-            }
-            if ui.button("Deselect").clicked() {
-                state.selected_waypoint = None;
-            }
-            if ui.button("Clear path").clicked() {
-                state.request.waypoints.clear();
-                state.selected_waypoint = None;
-            }
-        });
-        ui.checkbox(
-            &mut playback.show_path,
-            "Show requested (gold) and generated (blue) paths",
-        );
-        if ui.button("Frame trajectory").clicked() {
-            playback.frame_view = true;
-        }
-    });
-}
-
 fn rig_controls(ui: &mut egui::Ui, playback: &mut MotionPlayback) {
-    ui.collapsing("Rig controls (Core / SOMA)", |ui| {
+    ui.collapsing("Motion joint offset", |ui| {
         let names: Vec<_> = playback
             .clip
             .as_ref()
@@ -412,7 +372,6 @@ fn rig_controls(ui: &mut egui::Ui, playback: &mut MotionPlayback) {
 
 fn import_controls(ui: &mut egui::Ui, state: &mut MotionUi, runtime: &MotionRuntime, busy: bool) {
     ui.collapsing("Import motion / SOMA animation", |ui| {
-        #[cfg(target_arch = "wasm32")]
         if ui
             .add_enabled(!busy, egui::Button::new("Choose motion JSON…"))
             .clicked()
@@ -446,9 +405,13 @@ fn playback_controls(
         return;
     }
     ui.separator();
-    #[cfg(not(target_arch = "wasm32"))]
-    ui.text_edit_singleline(&mut state.export_path);
-    if ui.button("Export clip JSON").clicked() {
+    if ui
+        .add_enabled(
+            !runtime.0.lock().unwrap().status.busy(),
+            egui::Button::new("Export clip JSON"),
+        )
+        .clicked()
+    {
         runtime::export(runtime, playback.clip.as_ref().unwrap(), &state.export_path);
     }
     ui.checkbox(
@@ -477,64 +440,4 @@ fn playback_controls(
     )
     .on_hover_text("Preserves the X/Z path. Disable to use the source rig's exact root height.");
     rig_controls(ui, playback);
-}
-
-fn add_waypoint(state: &mut MotionUi, position: Vec3) {
-    let frame = state.request.waypoints.last().map_or(0, |w| w.frame + 40);
-    if frame < state.request.frames {
-        state.request.waypoints.push(Waypoint {
-            frame,
-            position,
-            heading: None,
-            constrain_height: false,
-        });
-        state.selected_waypoint = None;
-    }
-}
-
-pub(super) fn place_waypoints(
-    mut state: ResMut<MotionUi>,
-    buttons: Res<ButtonInput<MouseButton>>,
-    windows: Query<&Window, With<PrimaryWindow>>,
-    cameras: Query<(&Camera, &GlobalTransform), With<Camera3d>>,
-    mut contexts: EguiContexts,
-) {
-    if state.tab != 0 || !state.place_waypoints || !buttons.pressed(MouseButton::Left) {
-        return;
-    }
-    let Ok(ctx) = contexts.ctx_mut() else {
-        return;
-    };
-    if ctx.is_pointer_over_egui() || ctx.egui_wants_pointer_input() {
-        return;
-    }
-    let Ok(window) = windows.single() else {
-        return;
-    };
-    let Some(cursor) = window.cursor_position() else {
-        return;
-    };
-    let Ok((camera, transform)) = cameras.single() else {
-        return;
-    };
-    let Ok(ray) = camera.viewport_to_world(transform, cursor) else {
-        return;
-    };
-    if ray.direction.y.abs() < 1e-6 {
-        return;
-    }
-    let distance = -ray.origin.y / ray.direction.y;
-    if distance < 0.0 {
-        return;
-    }
-    let mut point = ray.origin + ray.direction * distance;
-    point.y = 0.02;
-    if let Some(i) = state.selected_waypoint {
-        if let Some(w) = state.request.waypoints.get_mut(i) {
-            w.position.x = point.x;
-            w.position.z = point.z;
-        }
-    } else if buttons.just_pressed(MouseButton::Left) {
-        add_waypoint(&mut state, point);
-    }
 }

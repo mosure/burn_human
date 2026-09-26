@@ -1,0 +1,6 @@
+{
+  "passed": true,
+  "case": "Browser without WebGPU shows an actionable startup message",
+  "message": "This browser does not expose WebGPU. Open the studio in a WebGPU-enabled browser, or run the native Bevy application.",
+  "canvas_count": 0
+}

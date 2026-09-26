@@ -5,13 +5,13 @@
 | `burn_ardy` | 0.1.1 | ARDY Core27 motion, trajectory conditioning, checkpoint loading |
 | `burn_llama` | 0.1.0 | Llama 3 8B / LLM2Vec text conditioning, paged vocabulary |
 | `burn_soma` | 0.1.1 | SOMA-X identity, rig, correctives, skinning and optional MHR transfer |
-| `burn_gemx` | 0.1.0 | GEM-X image inference and composition of seven component releases |
+| `burn_gemx` | 0.1.1 | GEM-X image inference and composition of seven component releases |
 | `burn_mhr` | 0.1.1 | MHR evaluation and its independent checkpoint |
-| `burn_human_inference` | 0.1.1 | Model-neutral transport, bounded cache, Burnpack/tensor verification |
+| `burn_human_inference` | 0.1.2 | Model-neutral transport, bounded cache, Burnpack/tensor verification |
 
 `burn_llama` replaces `burn_ardy_text` 0.1.0; `burn_gemx` replaces `burn_gem`
 0.1.0. Their implementations live in the newly named crates. The previously
-published packages remain available. `burn_human` and `bevy_burn_human` 0.5.1
+published packages remain available. `burn_human` 0.5.1 and `bevy_burn_human` 0.5.2
 integrate these crates. All use published Burn 0.21 / Bevy 0.19 dependencies
 and the same wgpu 29 version, without patches.
 
@@ -77,7 +77,7 @@ remain below 25,000,000 bytes. The current loader fetches and authenticates
 whole bounded parts; unlike `burn_image`'s 4 MiB range cache, it does not require
 HTTP Range support. It never assembles the complete model in WASM memory.
 
-Native HTTP loading uses `$XDG_CACHE_HOME/burn-human`, then
+Native HTTP reads reuse a shared connection pool across shards. Loading uses `$XDG_CACHE_HOME/burn-human`, then
 `$LOCALAPPDATA/burn-human`, then `$HOME/.cache/burn-human`. Browser loading uses
 CacheStorage `burn-human-motion-parts-v1`. Both use an 8 GiB FIFO budget,
 authenticate cache hits, repair corruption and tolerate unavailable storage.
@@ -122,7 +122,9 @@ Keep `UPLOAD.md`, `release.json` and `SHA256SUMS` outside the model prefixes.
 
 The public suite will be:
 `https://aberration.technology/model/gemx/v1/suite.json`.
-Local staging is complete; public deployment/download qualification awaits upload.
+The public deployment passed complete native shard verification and real
+WebGPU inference with cold, warm and corrupted-cache loads. See
+[public CDN and studio qualification](evidence/studio-2026-09-26/README.md).
 
 ## Validate native and browser downloads
 

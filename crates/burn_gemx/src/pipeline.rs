@@ -41,18 +41,6 @@ impl PipelineArtifacts {
             );
         }
         let mut suite: Self = serde_json::from_slice(&bytes)?;
-        let parent = location.rsplit_once('/').map_or(".", |p| p.0).to_string();
-        #[cfg(not(target_arch = "wasm32"))]
-        let parent = if location.starts_with("http://") || location.starts_with("https://") {
-            parent
-        } else {
-            std::path::Path::new(location)
-                .parent()
-                .filter(|p| !p.as_os_str().is_empty())
-                .unwrap_or_else(|| std::path::Path::new("."))
-                .to_string_lossy()
-                .into_owned()
-        };
         for a in [
             &mut suite.vitpose,
             &mut suite.sam_vision,
@@ -62,14 +50,58 @@ impl PipelineArtifacts {
             &mut suite.soma,
             &mut suite.transfer,
         ] {
-            let absolute = a.base.starts_with('/') || a.base.contains(":/");
-            #[cfg(not(target_arch = "wasm32"))]
-            let absolute = absolute || std::path::Path::new(&a.base).is_absolute();
-            if !absolute {
-                a.base = format!("{parent}/{}", a.base);
-            }
+            a.base = resolve_component(location, &a.base)?;
         }
         Ok(suite)
+    }
+}
+
+fn resolve_component(suite: &str, base: &str) -> Result<String> {
+    if suite.starts_with("https://") || suite.starts_with("http://") {
+        // Resolve dot segments before sending the request. Browsers do this
+        // implicitly; native HTTP and object-storage origins need the exact key.
+        return Ok(url::Url::parse(suite)?.join(base)?.to_string());
+    }
+    if base.contains(":/") || std::path::Path::new(base).is_absolute() {
+        return Ok(base.into());
+    }
+    let parent = std::path::Path::new(suite)
+        .parent()
+        .filter(|p| !p.as_os_str().is_empty())
+        .unwrap_or_else(|| std::path::Path::new("."));
+    Ok(parent.join(base).to_string_lossy().into_owned())
+}
+
+#[cfg(test)]
+mod location_tests {
+    use super::resolve_component;
+    #[test]
+    fn grouped_cdn_suite_resolves_shared_dependencies_without_dot_segments() {
+        let suite = "https://aberration.technology/model/gemx/v1/suite.json";
+        assert_eq!(
+            resolve_component(suite, "../../soma-x/v1/mhr").unwrap(),
+            "https://aberration.technology/model/soma-x/v1/mhr"
+        );
+        assert_eq!(
+            resolve_component(suite, "sam-decoder").unwrap(),
+            "https://aberration.technology/model/gemx/v1/sam-decoder"
+        );
+        assert_eq!(
+            resolve_component(&format!("{suite}?revision=1"), "/model/soma-x/v1/body").unwrap(),
+            "https://aberration.technology/model/soma-x/v1/body"
+        );
+        assert_eq!(
+            resolve_component(suite, "https://mirror.example/body").unwrap(),
+            "https://mirror.example/body"
+        );
+    }
+    #[test]
+    fn local_suite_keeps_relative_filesystem_semantics() {
+        let resolved = resolve_component("models/gemx/suite.json", "../soma").unwrap();
+        assert_eq!(
+            std::path::Path::new(&resolved),
+            std::path::Path::new("models/gemx/../soma")
+        );
     }
 }
 pub struct Pipeline<B: Backend> {

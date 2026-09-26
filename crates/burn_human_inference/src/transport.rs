@@ -63,7 +63,14 @@ pub async fn read_bounded(location: &str, limit: usize) -> Result<Vec<u8>> {
     use std::io::Read;
     let mut bytes = Vec::new();
     if location.starts_with("https://") || location.starts_with("http://") {
-        let mut response = ureq::get(location).call()?;
+        // Thousands of bounded shards share an origin. Retain the connection
+        // pool instead of doing a fresh TCP/TLS handshake for every GET.
+        static HTTP: std::sync::OnceLock<ureq::Agent> = std::sync::OnceLock::new();
+        let mut response = HTTP
+            .get_or_init(ureq::Agent::new_with_defaults)
+            .get(location)
+            .call()
+            .map_err(|e| anyhow::anyhow!("GET {location}: {e}"))?;
         if let Some(size) = response.headers().get("content-length") {
             ensure!(
                 size.to_str()?.parse::<u64>()? <= limit as u64,

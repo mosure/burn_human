@@ -1,0 +1,12 @@
+{
+  "unit_integration_tests": 33,
+  "clippy": "workspace/all-targets/all-model-tools/-D warnings passed",
+  "wasm": "Bevy release viewer built; public browser validators passed",
+  "wgpu_versions": [
+    "29.0.4"
+  ],
+  "patches": false,
+  "cargo_lock_sha256": "0de3f421e340949010eaca5171d73a59d75522dbc40f4d0f093beb4e6b47c011",
+  "formatting": "Changed Rust files formatted; whole-workspace fmt check reports pre-existing differences in other files",
+  "package_dry_runs": 3
+}

@@ -1,0 +1,342 @@
+{
+  "passed": true,
+  "root": "https://aberration.technology/model",
+  "files": [
+    {
+      "path": "ardy/core-rp-20fps-h40/v1/manifest.json",
+      "bytes": 165219,
+      "sha256": "a297a2202f9cb46e1ac8749975411360874aa620a403b1898cdb863270a6dd9a",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "ardy/core-rp-20fps-h40/v1/metadata/ATTRIBUTIONS.MD",
+      "bytes": 2754,
+      "sha256": "afaccd58a871e5abdc74aea47f43e28e22541afa4400210a2596b7b600f10670",
+      "content_type": "text/markdown",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "ardy/core-rp-20fps-h40/v1/metadata/LICENSE",
+      "bytes": 12576,
+      "sha256": "411f74af832a12782ba4dfaec7cb73eae7a77f8c2d36c97402aa92735fff5e9b",
+      "content_type": "application/x-www-form-urlencoded",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/denoiser/manifest.json",
+      "bytes": 154791,
+      "sha256": "fccd255580ee43c201d3a286e95fde5f0175b39b68a9661d407aa5e2f2d42054",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/denoiser/metadata/LICENSE",
+      "bytes": 11387,
+      "sha256": "d1a7d615ab8eff4de143b1456f46dabf232f54daf0fcf9a70442bb6f637a9e95",
+      "content_type": "application/x-www-form-urlencoded",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/denoiser/metadata/decode.json",
+      "bytes": 6345,
+      "sha256": "5864c5b729f6f2904babfbc63f65673f6e3a959a182c41f27140f6017fd52757",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/denoiser/metadata/provenance.json",
+      "bytes": 455,
+      "sha256": "64eeb83acbeb373e469c957ab60b01650b5cd0d17f0ffc1b4e10ff16d2363891",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/sam-decoder/manifest.json",
+      "bytes": 138614,
+      "sha256": "407520df1e32bb92530043e33a7f36a9b2edbf89f30c00df51e7d63cdf4e9402",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/sam-decoder/metadata/LICENSE",
+      "bytes": 8204,
+      "sha256": "b3a5a0e2d973ab80e6610ccf1cffc40756050d0ace3cd4fec879b3ec290b2e9b",
+      "content_type": "application/x-www-form-urlencoded",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/sam-decoder/metadata/head.json",
+      "bytes": 19655,
+      "sha256": "a77bfc65e8a84f412f162a2481fca7a191376d54ec34d8a49400afccc84f9806",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/sam-decoder/metadata/provenance.json",
+      "bytes": 372,
+      "sha256": "0503c2e037f0b69020dad73f046caef202e8440e30bedaad6063957c94934a18",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/sam-vision/manifest.json",
+      "bytes": 314155,
+      "sha256": "15a018764e24fb6911db031d3bf3bb522cdbd63172fab235b56e6de5a9649e4e",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/sam-vision/metadata/ATTRIBUTIONS.md",
+      "bytes": 13656,
+      "sha256": "cd2981c52f484c6f20506a01de356ca05cc016a741c8801785e88bae3763a4ee",
+      "content_type": "text/markdown",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/sam-vision/metadata/LICENSE",
+      "bytes": 11387,
+      "sha256": "d1a7d615ab8eff4de143b1456f46dabf232f54daf0fcf9a70442bb6f637a9e95",
+      "content_type": "application/x-www-form-urlencoded",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/sam-vision/metadata/SAM-LICENSE",
+      "bytes": 8204,
+      "sha256": "b3a5a0e2d973ab80e6610ccf1cffc40756050d0ace3cd4fec879b3ec290b2e9b",
+      "content_type": "application/x-www-form-urlencoded",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/sam-vision/metadata/THIRD-PARTY-LICENSES",
+      "bytes": 26053,
+      "sha256": "b224751b0ea0d89535e16066b2e0979d7ec54b1351f5ea3011155d1a171b8fbf",
+      "content_type": "application/x-www-form-urlencoded",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/sam-vision/metadata/provenance.json",
+      "bytes": 270,
+      "sha256": "038d62f68955a6fb01cf0b7101f74ed78887cdb3ae473bb94999b41c5dfd10fa",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/suite.json",
+      "bytes": 922,
+      "sha256": "c21010ed4da582e66fb975ecb2a775f4f0c3a28a7816e89f0275d468c0205952",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/vitpose/manifest.json",
+      "bytes": 317647,
+      "sha256": "d66b17db9a39db04257939a4453d39c2f5897e412a35cc415e81babcc338dd8f",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/vitpose/metadata/ATTRIBUTIONS.md",
+      "bytes": 13656,
+      "sha256": "cd2981c52f484c6f20506a01de356ca05cc016a741c8801785e88bae3763a4ee",
+      "content_type": "text/markdown",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/vitpose/metadata/LICENSE",
+      "bytes": 11387,
+      "sha256": "d1a7d615ab8eff4de143b1456f46dabf232f54daf0fcf9a70442bb6f637a9e95",
+      "content_type": "application/x-www-form-urlencoded",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/vitpose/metadata/THIRD-PARTY-LICENSES",
+      "bytes": 26053,
+      "sha256": "b224751b0ea0d89535e16066b2e0979d7ec54b1351f5ea3011155d1a171b8fbf",
+      "content_type": "application/x-www-form-urlencoded",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "gemx/v1/vitpose/metadata/provenance.json",
+      "bytes": 280,
+      "sha256": "5c330f9cf13e2e02f62e51dd3b5788a5c5cb73e24434f542c65d3eddc0db9b59",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "llama/ardy-llm2vec-8b/v1/manifest.json",
+      "bytes": 347038,
+      "sha256": "0ad7e4c5129a41921fd12a7797d499492d62a7653a9afd985049269d60958f8d",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "llama/ardy-llm2vec-8b/v1/metadata/ACCEPTABLE_USE_POLICY.md",
+      "bytes": 4696,
+      "sha256": "003513f595a20b7d63c609dfe80879531acb9caef6376fcc109bf0827471f3d1",
+      "content_type": "text/markdown",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "llama/ardy-llm2vec-8b/v1/metadata/LICENSE",
+      "bytes": 7801,
+      "sha256": "475211637354ce4c14b9c3dacccbefbaba735fe1b0db97d6c4fd11cd1356819f",
+      "content_type": "application/x-www-form-urlencoded",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "llama/ardy-llm2vec-8b/v1/metadata/LLM2VEC-LICENSE",
+      "bytes": 1068,
+      "sha256": "cdd4b31a46ccd062f4898e60e9d8480a6c0c6b001ce6680eada0bd82ec4245fe",
+      "content_type": "application/x-www-form-urlencoded",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "llama/ardy-llm2vec-8b/v1/metadata/NOTICE",
+      "bytes": 448,
+      "sha256": "b930310ea09008d2f3f9c336049c255c6dcaf38befbddd2aa33ec2d89bd9f77c",
+      "content_type": "application/x-www-form-urlencoded",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "llama/ardy-llm2vec-8b/v1/metadata/provenance.json",
+      "bytes": 767,
+      "sha256": "1ac5b87e401bb67f93454c990b66e532941375af9aae09ac949ba36cb53edac0",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "llama/ardy-llm2vec-8b/v1/metadata/tokenizer.json",
+      "bytes": 9085698,
+      "sha256": "e134af98b985517b4f068e3755ae90d4e9cd2d45d328325dc503f1c6b2d06cc7",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "llama/ardy-llm2vec-8b/v1/metadata/tokenizer_config.json",
+      "bytes": 50977,
+      "sha256": "da0e3a7cce6e4d787e85eb1c24d548420e0d7fe2c7a214e192795c46e40d75bb",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "soma-x/v1/body/manifest.json",
+      "bytes": 47676,
+      "sha256": "8675fe015229df7dd9e65fdfdf99bc5b14ad786b2a1114e910f06dbf19b98552",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "soma-x/v1/body/metadata/LICENSE",
+      "bytes": 11387,
+      "sha256": "d1a7d615ab8eff4de143b1456f46dabf232f54daf0fcf9a70442bb6f637a9e95",
+      "content_type": "application/x-www-form-urlencoded",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "soma-x/v1/body/metadata/provenance.json",
+      "bytes": 688,
+      "sha256": "388cffdcadfb253034c52e585b573dc293fe1324efb42dd4ff3b463ad4fd862c",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "soma-x/v1/body/metadata/rig.json",
+      "bytes": 448162,
+      "sha256": "6da764f45ff6dcdcc6030a398c71140e229e7e78b0cac5bfb6a749d1f25fffea",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "soma-x/v1/mhr/manifest.json",
+      "bytes": 17265,
+      "sha256": "e3cf261e02a0a2c30e599e42a28212ef1ea1e7b143bef31b553c93e248114c05",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "soma-x/v1/mhr/metadata/LICENSE",
+      "bytes": 11387,
+      "sha256": "d1a7d615ab8eff4de143b1456f46dabf232f54daf0fcf9a70442bb6f637a9e95",
+      "content_type": "application/x-www-form-urlencoded",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "soma-x/v1/mhr/metadata/provenance.json",
+      "bytes": 264,
+      "sha256": "9892e703fa62844a0f1c8ad6f3dcc30895f52bb73c82118c1143a298099e217c",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "soma-x/v1/mhr/metadata/rig.json",
+      "bytes": 33331,
+      "sha256": "366d75b40e323b5ceff02a059bd83c09d5a150892de647493facb98c26b45d51",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "soma-x/v1/transfer/manifest.json",
+      "bytes": 5431,
+      "sha256": "8b6bcc4fc68bdbdf4d9e13dee258358ec4eb71e183de5fe400c514233dfc371d",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "soma-x/v1/transfer/metadata/LICENSE",
+      "bytes": 11387,
+      "sha256": "d1a7d615ab8eff4de143b1456f46dabf232f54daf0fcf9a70442bb6f637a9e95",
+      "content_type": "application/x-www-form-urlencoded",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    },
+    {
+      "path": "soma-x/v1/transfer/metadata/provenance.json",
+      "bytes": 339,
+      "sha256": "785e7aa19e3eb2104c5542a4e04d14491e08f5a610219ea7b0ed4f135c1ad5e1",
+      "content_type": "application/json",
+      "cors": "*",
+      "cache_control": "public, max-age=604800, immutable"
+    }
+  ]
+}

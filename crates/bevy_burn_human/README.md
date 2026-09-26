@@ -10,6 +10,9 @@ WebGPU. Weights load on demand from verified, bounded Burnpack parts.
 SOMA controls and image-pose UI; it requires Bevy Egui and the render plugins.
 The repository's demo shows the complete plugin setup and required Anny assets.
 
+For the interactive workflows, camera and controls, see the
+[studio guide](https://github.com/mosure/burn_human/blob/main/docs/studio.md).
+
 See the [model and viewer guide](https://github.com/mosure/burn_human/blob/main/docs/motion.md)
 for conversion, loading, native/WASM use and numerical/performance evidence.
 Model weights are separate and retain their upstream terms; see

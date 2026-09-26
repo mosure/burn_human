@@ -30,6 +30,7 @@ pub(super) struct BodyState {
     pub prepared: Option<(String, PreparedIdentity<Wgpu>)>,
     pub surface: Option<Surface>,
     pub estimate: Option<PoseEstimate>,
+    pub estimate_input: Option<(u64, Crop, Camera)>,
     pub joint_names: Vec<String>,
     pub scale_names: Vec<String>,
     pub revision: u64,
@@ -62,6 +63,7 @@ pub(super) fn load_soma(runtime: &MotionRuntime, base: String, digest: String) {
         state.body.prepared = None;
         state.body.surface = Some(surface);
         state.body.estimate = None;
+        state.body.estimate_input = None;
         state.body.revision += 1;
         state.status = MotionStatus::Ready;
         Ok(())
@@ -110,6 +112,7 @@ pub(super) fn estimate(runtime: &MotionRuntime, crop: Crop, camera: Camera) {
     let Some(input) = state.image.clone() else {
         return;
     };
+    let image_revision = state.image_revision;
     let Some(gem) = state.body.gem.take() else {
         return;
     };
@@ -140,6 +143,7 @@ pub(super) fn estimate(runtime: &MotionRuntime, crop: Crop, camera: Camera) {
                     camera_space: true,
                 });
                 state.body.estimate = Some(pose);
+                state.body.estimate_input = Some((image_revision, crop, camera));
                 state.body.prepared = None;
                 state.body.revision += 1;
                 state.status = MotionStatus::Ready;

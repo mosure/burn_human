@@ -5,7 +5,9 @@ mod body_ui;
 mod body_view;
 #[cfg(target_arch = "wasm32")]
 mod browser_io;
+mod camera;
 mod runtime;
+mod trajectory;
 mod ui;
 
 use crate::{BurnHumanAssets, BurnHumanInput};
@@ -23,6 +25,9 @@ impl Plugin for HumanMotionPlugin {
             .init_resource::<MotionUi>()
             .init_resource::<MotionPlayback>()
             .init_resource::<body_view::BodyDisplay>()
+            .init_resource::<camera::ViewControls>()
+            .init_gizmo_group::<body_view::RigGizmos>()
+            .add_systems(Startup, body_view::configure_gizmos)
             .add_systems(EguiPrimaryContextPass, ui::controls)
             .add_systems(
                 PreUpdate,
@@ -33,12 +38,18 @@ impl Plugin for HumanMotionPlugin {
             .add_systems(
                 Update,
                 (
-                    ui::place_waypoints,
                     draw_motion,
                     frame_trajectory,
                     body_view::update,
                     body_view::draw,
                 ),
+            )
+            .add_systems(
+                PostUpdate,
+                (trajectory::place_waypoints, camera::update)
+                    .chain()
+                    .after(bevy_egui::EguiPostUpdateSet::EndPass)
+                    .before(bevy_panorbit_camera::PanOrbitCameraSystemSet),
             );
     }
     fn finish(&self, app: &mut App) {
@@ -76,7 +87,7 @@ impl Default for MotionPlayback {
             looping: false,
             time: 0.0,
             speed: 1.0,
-            show_skeleton: true,
+            show_skeleton: false,
             show_path: true,
             joint: 0,
             joint_euler: [0.0; 3],
@@ -221,12 +232,17 @@ fn draw_motion(
                 Color::srgb(1.0, 0.7, 0.1),
             );
         }
-        for waypoint in &request.waypoints {
+        for (index, waypoint) in request.waypoints.iter().enumerate() {
             let p = waypoint.position;
+            let selected = ui.selected_waypoint == Some(index);
             gizmos.sphere(
                 Isometry3d::from_translation(p),
-                0.06,
-                Color::srgb(1.0, 0.65, 0.1),
+                if selected { 0.10 } else { 0.06 },
+                if selected {
+                    Color::WHITE
+                } else {
+                    Color::srgb(1.0, 0.65, 0.1)
+                },
             );
             gizmos.line(
                 p - Vec3::X * 0.15,
