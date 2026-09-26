@@ -1,0 +1,33 @@
+name: motion contracts
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: brndnmtthws/rust-action@v1
+        with:
+          toolchain: nightly
+      - run: cargo test -p burn_human -p burn_human_motion -p burn_human_inference -p burn_ardy -p burn_ardy_text -p burn_soma -p burn_mhr -p burn_gem --features burn_ardy/transport,burn_soma/mhr --lib --tests --locked
+      - run: cargo clippy -p burn_human_motion -p burn_human_inference -p burn_ardy -p burn_ardy_text -p burn_soma -p burn_mhr -p burn_gem --all-targets --features burn_ardy/tools,burn_ardy/wgpu,burn_ardy_text/tools,burn_soma/tools,burn_mhr/tools,burn_gem/tools,burn_human_inference/tools,burn_human_inference/wgpu --locked -- -D warnings
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install numpy scipy
+      - run: python tool/scripts/test_soma_animation.py
+  wasm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: brndnmtthws/rust-action@v1
+        with:
+          toolchain: nightly
+      - run: rustup target add wasm32-unknown-unknown
+      - run: cargo check -p bevy_burn_human --target wasm32-unknown-unknown --no-default-features --locked
+      - run: cargo check -p burn_ardy --target wasm32-unknown-unknown --no-default-features --features web-validation --lib --locked
+      - run: cargo check -p burn_ardy_text -p burn_soma -p burn_gem --target wasm32-unknown-unknown --no-default-features --features burn_ardy_text/web-validation,burn_soma/web-validation,burn_gem/web-validation --lib --locked

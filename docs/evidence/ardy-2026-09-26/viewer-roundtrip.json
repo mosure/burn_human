@@ -1,0 +1,12 @@
+{
+  "backend": "Bevy shared WebGPU device",
+  "text_service": "TREE Industries INT4 ONNX CUDA",
+  "prompt": "walk forward calmly",
+  "frames": 120,
+  "seed": 42,
+  "max_joint_coordinate_difference_m": 0.00349352206505138,
+  "joint_coordinate_rmse_m": 0.0003524170031834672,
+  "browser_clip_sha256": "66ea992625ac83877e5a05ccd4919cd9daab29fd7ae637591276ff14eee13973",
+  "native_clip_sha256": "b8031e60005505db7f292356d5625872a81921bccf1b411fab404cdb5277fbb7",
+  "note": "Exported source motion compared with native. Retargeted mesh appearance is a separate check."
+}

@@ -1,0 +1,15 @@
+{
+  "backend": "native-wgpu-f32",
+  "cold_seconds": 1.578792066,
+  "cosine": 0.9999995858530728,
+  "kind": "sam-body",
+  "load_seconds": 10.587998292,
+  "manifest": "ec2403d45c2aa690565b556ebfa37762d317085c4d43f3ee00f27318ac7b415b",
+  "max": 0.028270721435546875,
+  "rmse": 0.0003063582303143352,
+  "warm_seconds": [
+    0.23056661,
+    0.251579704,
+    0.243838506
+  ]
+}

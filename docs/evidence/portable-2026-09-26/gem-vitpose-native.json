@@ -1,0 +1,15 @@
+{
+  "backend": "native-wgpu-f32",
+  "cold_seconds": 1.114015101,
+  "cosine": 0.9999999999955784,
+  "kind": "vitpose",
+  "load_seconds": 11.771201881,
+  "manifest": "fb27cd7a46d4800c9941bb69b0070754b619f0a516d4b59233e32ee2cc865eef",
+  "max": 6.780028343200684e-07,
+  "rmse": 3.5300054478468466e-08,
+  "warm_seconds": [
+    0.119692907,
+    0.125905859,
+    0.123537893
+  ]
+}

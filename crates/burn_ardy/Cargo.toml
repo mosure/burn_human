@@ -1,0 +1,58 @@
+[package]
+name = "burn_ardy"
+version = "0.1.0"
+edition = "2024"
+description = "ARDY Core motion inference on Burn, native WGPU and WebGPU"
+license = "Apache-2.0"
+repository = "https://github.com/mosure/burn_human"
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[features]
+default = ["ndarray"]
+ndarray = ["burn/ndarray"]
+wgpu = ["burn/wgpu"]
+tools = ["validation", "dep:memmap2", "dep:pollster"]
+validation = ["dep:safetensors", "dep:web-time"]
+web-validation = ["validation", "transport", "wgpu", "dep:console_error_panic_hook", "dep:wasm-bindgen", "dep:wasm-bindgen-futures"]
+transport = ["dep:burn_human_inference", "burn_human_inference/transport"]
+
+[dependencies]
+burn_human_inference = { path = "../burn_human_inference", version = "0.1.0", optional = true }
+anyhow = "1"
+burn = { version = "0.21", default-features = false, features = ["std"] }
+burn-store = { version = "0.21", default-features = false, features = ["std", "burnpack"] }
+burn_human_motion = { path = "../burn_human_motion", version = "0.1.0" }
+glam = "0.32"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+safetensors = { version = "0.7", optional = true }
+memmap2 = { version = "0.9", optional = true }
+pollster = { version = "0.4", optional = true }
+web-time = { version = "1", optional = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.4", features = ["wasm_js"] }
+wasm-bindgen = { version = "0.2", optional = true }
+wasm-bindgen-futures = { version = "0.4", optional = true }
+console_error_panic_hook = { version = "0.1", optional = true }
+
+[dev-dependencies]
+pollster = "0.4"
+tempfile = "3"
+
+[[bin]]
+name = "ardy-pack"
+path = "src/bin/pack.rs"
+required-features = ["tools"]
+
+[[bin]]
+name = "ardy-run"
+path = "src/bin/run.rs"
+required-features = ["tools", "wgpu"]
+
+[[bin]]
+name = "ardy-validate"
+path = "src/bin/validate.rs"
+required-features = ["tools", "wgpu", "ndarray"]

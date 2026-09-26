@@ -1,0 +1,36 @@
+{
+  "workflow": "Bevy WebGPU: image file chooser, seven-model Burn GEM-X inference, editable fitted SOMA mesh, pose/identity export",
+  "image_sha256": "c11c50b69b8d84873e157d61a50ad74929cc53280de6740c9e9161cc42ea5f7f",
+  "crop": {
+    "center": [
+      1125.0,
+      750.0
+    ],
+    "size": 1500.0
+  },
+  "camera": {
+    "center": [
+      1125.0,
+      750.0
+    ],
+    "focal": [
+      2704.16357421875,
+      2704.16357421875
+    ]
+  },
+  "native_parameter_comparison": {
+    "identity_coefficients_max_abs": 1.430511474609375e-06,
+    "identity_scales_max_abs": 7.450580596923828e-07,
+    "identity_global_scale_max_abs": 0.0,
+    "identity_bone_length_flexibles_max_abs": 0.0,
+    "pose_rotations_max_abs": 1.5497207641601562e-06,
+    "pose_translation_max_abs": 4.76837158203125e-07
+  },
+  "controls": {
+    "reapply_inferred_pose": "passed; same visible pose after fitted-bind reconstruction",
+    "global_scale_before": 1.0,
+    "global_scale_after": 1.159999966621399,
+    "changed_scale_apply_and_export": "passed"
+  },
+  "server": "Static files only; all inference on the shared Bevy WebGPU device"
+}

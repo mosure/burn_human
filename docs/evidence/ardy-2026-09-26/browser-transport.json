@@ -1,0 +1,14 @@
+{
+  "browser": "153.0.8010.12",
+  "transport_js_sha256": "eb08691d9d91b1cba7f66e4da14c3b4c3ada17cd5ec1886f9ca0c151eabb8977",
+  "checks": {
+    "cold_read": "passed",
+    "warm_cache_no_network": "passed",
+    "corrupt_cache_repair": "passed",
+    "cache_match_failure": "passed",
+    "cache_open_failure": "passed",
+    "cache_write_failure": "passed",
+    "oversize_response_rejected": "passed",
+    "corrupt_network_rejected": "passed"
+  }
+}

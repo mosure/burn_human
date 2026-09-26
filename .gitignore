@@ -5,3 +5,4 @@ crates/bevy_burn_human/www/pkg/
 crates/bevy_burn_human/www/assets/
 .cache/
 out/
+tool/scripts/__pycache__/

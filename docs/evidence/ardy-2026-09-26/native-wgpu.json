@@ -1,0 +1,96 @@
+{
+  "backend": "wgpu-f32",
+  "batched_performance": {
+    "cfg_batch": 12,
+    "includes_decoder": false,
+    "includes_text_encoder": false,
+    "median_generated_frames_per_second": 357.2358740283603,
+    "parity": [
+      {
+        "hook": "sampled",
+        "max_abs": 0.0001827329397201538,
+        "max_abs_tolerance": 0.019999999552965164,
+        "rmse": 1.8820735112929092e-05
+      },
+      {
+        "hook": "sampled",
+        "max_abs": 0.0001827329397201538,
+        "max_abs_tolerance": 0.019999999552965164,
+        "rmse": 1.8820735112929092e-05
+      },
+      {
+        "hook": "sampled",
+        "max_abs": 0.0001827329397201538,
+        "max_abs_tolerance": 0.019999999552965164,
+        "rmse": 1.8820735112929092e-05
+      },
+      {
+        "hook": "sampled",
+        "max_abs": 0.0001827329397201538,
+        "max_abs_tolerance": 0.019999999552965164,
+        "rmse": 1.8820735112929092e-05
+      }
+    ],
+    "requests": 4,
+    "warm_window_seconds": [
+      0.443828437,
+      0.44788335,
+      0.452541443
+    ]
+  },
+  "fixture_sha256": "072cd33189a21efb19dc63dac02d7bc0a8f1aeb211a8bf7b00b4318bd23d043f",
+  "fk_max_error_m": 4.76837158203125e-07,
+  "load_seconds": 3.230003661,
+  "manifest_sha256": "b7905f24ed6b9c9a3fa08c622312a1ad7f843ce4fa818632c592d3ad0041ef5d",
+  "model_revision": "abe6c43beb28c867c950acb824b9c4ef3d63fb76",
+  "parity": [
+    {
+      "hook": "local_root",
+      "max_abs": 1.52587890625e-05,
+      "max_abs_tolerance": 0.0020000000949949026,
+      "rmse": 4.504029842722612e-06
+    },
+    {
+      "hook": "denoised",
+      "max_abs": 3.0428171157836914e-05,
+      "max_abs_tolerance": 0.0020000000949949026,
+      "rmse": 3.425574062009422e-06
+    },
+    {
+      "hook": "sampled",
+      "max_abs": 0.0001827329397201538,
+      "max_abs_tolerance": 0.019999999552965164,
+      "rmse": 1.8820735112929092e-05
+    },
+    {
+      "hook": "decoded",
+      "max_abs": 0.00025975704193115234,
+      "max_abs_tolerance": 0.0020000000949949026,
+      "rmse": 1.9392219284599874e-05
+    },
+    {
+      "hook": "encoded",
+      "max_abs": 2.384185791015625e-07,
+      "max_abs_tolerance": 0.0020000000949949026,
+      "rmse": 4.191227757163435e-08
+    }
+  ],
+  "performance": {
+    "cfg_batch": 3,
+    "diffusion_steps": 10,
+    "frames_per_window": 40,
+    "future_frames": 8,
+    "history_frames": 8,
+    "includes_decoder": false,
+    "includes_text_encoder": false,
+    "median_frames_per_second": 106.50674182350406,
+    "synchronization": "full_output_readback",
+    "warm_window_seconds": [
+      0.369495794,
+      0.37556308,
+      0.375981289
+    ]
+  },
+  "semantic_quality": "not_measured_random_embeddings",
+  "source_revision": "693f74d13b3d04a0a22ce127ee79c929dd89756b"
+}

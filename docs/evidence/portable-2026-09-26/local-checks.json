@@ -1,0 +1,25 @@
+{
+  "workspace_tests": {
+    "passed": 28,
+    "ignored": 0,
+    "command": "cargo test --workspace --lib --tests --locked"
+  },
+  "clippy": {
+    "passed": true,
+    "command": "cargo clippy --workspace --all-targets --features burn_ardy/tools,burn_ardy_text/tools,burn_soma/tools,burn_mhr/tools,burn_gem/tools,burn_human_inference/tools,burn_human_inference/wgpu --locked -- -D warnings"
+  },
+  "wasm": {
+    "passed": true,
+    "bevy": "cargo build -p bevy_burn_human --target wasm32-unknown-unknown --no-default-features --locked",
+    "models": "cargo check -p burn_ardy -p burn_ardy_text -p burn_soma -p burn_gem --target wasm32-unknown-unknown --no-default-features --features burn_ardy/web-validation,burn_ardy_text/web-validation,burn_soma/web-validation,burn_gem/web-validation --lib --locked"
+  },
+  "python_soma_animation_tests": "passed",
+  "python_exporter_syntax": "passed",
+  "package_dry_run": {
+    "passed": true,
+    "packages": 9,
+    "command": "cargo publish --workspace --exclude burn_human_tool --dry-run --allow-dirty"
+  },
+  "wgpu_graph": "One wgpu 29.0.4 shared by bevy_render 0.19.1 and cubecl-wgpu 0.10.0; no patches",
+  "limits": "Large checkpoint evidence is recorded in separate numerical/browser reports. CI does not download those weights."
+}

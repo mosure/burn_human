@@ -1,0 +1,53 @@
+{
+  "model": "TREEIndustries/Llama-3-ARDY-Text-Encoder-ONNX",
+  "revision": "7aa52a05d54c2fd9177366aeb3f88e9e7f3c5766",
+  "onnxruntime": "1.30.0",
+  "provider": "CUDAExecutionProvider",
+  "load_seconds": 7.504420393961482,
+  "records": [
+    {
+      "prompt": "walk forward calmly",
+      "cosine": 0.9817043094538104,
+      "max_abs": 2.375
+    },
+    {
+      "prompt": "walk forward confidently with long energetic strides",
+      "cosine": 0.9824059389717662,
+      "max_abs": 2.7578125
+    },
+    {
+      "prompt": "sneak forward cautiously",
+      "cosine": 0.9816397159719898,
+      "max_abs": 2.4921875
+    },
+    {
+      "prompt": "wave with the right hand while standing",
+      "cosine": 0.9772895293564623,
+      "max_abs": 1.892578125
+    },
+    {
+      "prompt": "jog forward quickly",
+      "cosine": 0.9802048316697305,
+      "max_abs": 2.875
+    }
+  ],
+  "warm_encode_seconds": [
+    0.022566354949958622,
+    0.015337627963162959,
+    0.020153481047600508,
+    0.025171845918521285,
+    0.02573034295346588
+  ],
+  "median_encode_seconds": 0.022566354949958622,
+  "hashes": {
+    "onnx/text_encoder_int4.onnx": "c44f7ce04611a1a6f44ddf346ee89f4bc37356e45c0348e72ccd80bbf7b84e61",
+    "onnx/text_encoder_int4.onnx.data": "765e9ce4f9def78042dbd7e275500a1dd87f3f65f9dc8c518b54d163ae46fca3",
+    "tokenizer/tokenizer.json": "e134af98b985517b4f068e3755ae90d4e9cd2d45d328325dc503f1c6b2d06cc7",
+    "tokenizer/tokenizer_config.json": "da0e3a7cce6e4d787e85eb1c24d548420e0d7fe2c7a214e192795c46e40d75bb",
+    "validation/text_encoder_reference.json": "f2feeacc3e9ba85740c5bbfeccfd21b5534be7ac578fb9c92f1b7e5933a69b26"
+  },
+  "comparison": "INT4 CUDA/CPU output vs publisher FP16 references; not bitwise parity",
+  "profile_node_provider_counts": {
+    "CUDAExecutionProvider": 13590
+  }
+}

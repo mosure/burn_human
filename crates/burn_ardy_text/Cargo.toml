@@ -1,0 +1,52 @@
+[package]
+name = "burn_ardy_text"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+description = "Portable Llama 3 LLM2Vec text conditioning for ARDY using Burn"
+repository = "https://github.com/mosure/burn_human"
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[[bin]]
+name = "text-encode"
+path = "src/bin/text_encode.rs"
+required-features = ["tools"]
+
+[[bin]]
+name = "text-validate"
+path = "src/bin/text_validate.rs"
+required-features = ["tools"]
+
+[[bin]]
+name = "ardy-text-run"
+path = "src/bin/ardy_text_run.rs"
+required-features = ["tools"]
+
+[features]
+default = []
+wgpu = ["burn/wgpu"]
+ndarray = ["burn/ndarray"]
+tools = ["dep:pollster", "dep:burn_ardy", "wgpu"]
+web-validation = ["wgpu", "dep:wasm-bindgen", "dep:wasm-bindgen-futures", "dep:console_error_panic_hook"]
+
+[dependencies]
+anyhow = "1"
+burn_ardy = { path = "../burn_ardy", version = "0.1.0", default-features = false, optional = true }
+burn = { version = "0.21", default-features = false, features = ["std"] }
+burn_human_motion = { path = "../burn_human_motion", version = "0.1.0" }
+burn_human_inference = { path = "../burn_human_inference", version = "0.1.0", features = ["transport"] }
+half = "2"
+tokenizers = { version = "0.22.2", default-features = false, features = ["fancy-regex"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+pollster = { version = "0.4", optional = true }
+web-time = "1"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.3", features = ["wasm_js"] }
+tokenizers = { version = "0.22.2", default-features = false, features = ["unstable_wasm"] }
+wasm-bindgen = { version = "0.2", optional = true }
+wasm-bindgen-futures = { version = "0.4", optional = true }
+console_error_panic_hook = { version = "0.1", optional = true }

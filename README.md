@@ -76,4 +76,8 @@ cargo run -p bevy_burn_human
 
 
 ## license
-mit or apache-2.0 (anny stays under its original license)
+mit or apache-2.0 (anny stays under its original license). Model crates and converted weights retain their [upstream licenses](THIRD_PARTY.md).
+
+## Motion generation
+
+Portable Llama text encoding, ARDY motion generation, Anny retargeting, SOMA body evaluation, and GEM-X image-to-pose inference run locally in Rust/Burn on native WGPU and browser WebGPU. See [Motion inference and rigging](docs/motion.md) for model packing, world-space waypoint controls, SOMA controls, image input, and numerical/performance evidence.

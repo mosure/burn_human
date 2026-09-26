@@ -1,0 +1,9 @@
+{
+  "prompt": "walk forward calmly",
+  "frames": 120,
+  "path": "Bevy WebGPU: load ARDY + local Llama, Generate without Encode, animate Anny, export clip",
+  "source_joint_position_max_error_m": 0.000726478183408652,
+  "source_joint_position_rmse_m": 5.975222600957431e-05,
+  "reference": "Native Burn bidirectional text encoder plus ARDY, same seed/settings",
+  "server": "Static model files only; no inference requests"
+}

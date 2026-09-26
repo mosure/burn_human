@@ -1,0 +1,61 @@
+[package]
+name = "burn_gem"
+version = "0.1.0"
+edition = "2024"
+license-file = "LICENSE"
+description = "Portable GEM-X image-conditioned SOMA inference on Burn"
+repository = "https://github.com/mosure/burn_human"
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[features]
+default = []
+wgpu = ["burn/wgpu"]
+tools = ["wgpu", "dep:pollster"]
+web-validation = ["wgpu", "dep:wasm-bindgen", "dep:wasm-bindgen-futures", "dep:console_error_panic_hook"]
+
+[dependencies]
+anyhow = "1"
+burn = { version = "0.21", default-features = false, features = ["std"] }
+burn_human_motion = { path = "../burn_human_motion", version = "0.1.0" }
+burn_human_inference = { path = "../burn_human_inference", version = "0.1.0", features = ["transport"] }
+burn_mhr = { path = "../burn_mhr", version = "0.1.0" }
+burn_soma = { path = "../burn_soma", version = "0.1.0", features = ["mhr"] }
+glam = "0.32"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+web-time = "1"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
+pollster = { version = "0.4", optional = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.4", features = ["wasm_js"] }
+wasm-bindgen = { version = "0.2", optional = true }
+wasm-bindgen-futures = { version = "0.4", optional = true }
+console_error_panic_hook = { version = "0.1", optional = true }
+
+[[bin]]
+name = "gem-vision-validate"
+path = "src/bin/vision_validate.rs"
+required-features = ["tools"]
+
+[[bin]]
+name = "gem-sam-validate"
+path = "src/bin/sam_validate.rs"
+required-features = ["tools"]
+
+[[bin]]
+name = "gem-denoiser-validate"
+path = "src/bin/denoiser_validate.rs"
+required-features = ["tools"]
+
+[[bin]]
+name = "gem-pose"
+path = "src/bin/pose.rs"
+required-features = ["tools"]
+
+[[bin]]
+name = "gem-validate"
+path = "src/bin/validate.rs"
+required-features = ["tools"]

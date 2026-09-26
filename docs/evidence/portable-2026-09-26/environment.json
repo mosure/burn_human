@@ -1,0 +1,43 @@
+{
+  "date": "2026-09-26",
+  "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+  "gpu_memory_mib": 97887,
+  "driver": "610.43.02",
+  "browser": "Chromium 153.0.8010.12, Vulkan WebGPU, hardware adapter; no software fallback",
+  "rust": "rustc 1.100.0-nightly (908501772 2026-08-30)",
+  "burn": "0.21.0",
+  "bevy": "0.19.1",
+  "wgpu": "29.0.4",
+  "wasm_bindgen": "0.2.128",
+  "timing_caveat": "Shared workstation, warm model timings; no isolated GPU benchmark, mobile qualification, or Bevy render FPS claim",
+  "image": {
+    "source": "SAM 3D Body notebook/images/dancing.jpg",
+    "source_revision": "b5c765a0d89d789985e186d396315e7590887b94",
+    "decoded_size": [
+      2250,
+      1500
+    ],
+    "lossless_png_sha256": "c11c50b69b8d84873e157d61a50ad74929cc53280de6740c9e9161cc42ea5f7f",
+    "crop": {
+      "center": [
+        960.0,
+        640.0
+      ],
+      "size": 1250.0
+    },
+    "camera": {
+      "focal": [
+        2704.163456597992,
+        2704.163456597992
+      ],
+      "center": [
+        1125.0,
+        750.0
+      ]
+    },
+    "sam_crop": [
+      2083.333251953125,
+      2083.333251953125
+    ]
+  }
+}

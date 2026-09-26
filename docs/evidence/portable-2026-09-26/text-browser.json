@@ -1,0 +1,350 @@
+{
+  "browser": "153.0.8010.12",
+  "reports": [
+    {
+      "run": "cold_cache",
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell",
+        "device": "",
+        "description": "",
+        "fallback": false
+      },
+      "result": {
+        "adapter": "",
+        "backend": "browser-webgpu-f32",
+        "execution": "Packed Q4F weights; per-matrix expansion on GPU before matmul; F32 activations",
+        "load_seconds": 72.2529,
+        "manifest": "3d1f90a846046723facf548ca6490c7f4402ff140e4529082312d477c0652449",
+        "performance": {
+          "warm_prompt_seconds": [
+            0.2111,
+            0.2284,
+            0.2248,
+            0.2122,
+            0.2283
+          ]
+        },
+        "pooling": "mean, excluding instruction header, including EOT",
+        "records": [
+          {
+            "cosine": 0.9999986485007131,
+            "max_abs": 0.041088104248046875,
+            "mode": "causal_export",
+            "prompt": "walk forward calmly",
+            "rmse": 0.0032881148606131562,
+            "seconds": 1.4832
+          },
+          {
+            "cosine": 0.9999989488330432,
+            "max_abs": 0.03649425506591797,
+            "mode": "causal_export",
+            "prompt": "walk forward confidently with long energetic strides",
+            "rmse": 0.0028581274180475473,
+            "seconds": 0.55
+          },
+          {
+            "cosine": 0.9999984140133155,
+            "max_abs": 0.04284477233886719,
+            "mode": "causal_export",
+            "prompt": "sneak forward cautiously",
+            "rmse": 0.0032616735698598152,
+            "seconds": 0.3202
+          },
+          {
+            "cosine": 0.9999989188952966,
+            "max_abs": 0.03308296203613281,
+            "mode": "causal_export",
+            "prompt": "wave with the right hand while standing",
+            "rmse": 0.0028091169193477632,
+            "seconds": 0.3917
+          },
+          {
+            "cosine": 0.9999984336573672,
+            "max_abs": 0.03899383544921875,
+            "mode": "causal_export",
+            "prompt": "jog forward quickly",
+            "rmse": 0.0034156653828759194,
+            "seconds": 0.3024
+          },
+          {
+            "cosine": 0.9999992046303606,
+            "max_abs": 0.013217449188232422,
+            "mode": "bidirectional",
+            "prompt": "walk forward calmly",
+            "rmse": 0.002674827093203152,
+            "seconds": 0.2319
+          },
+          {
+            "cosine": 0.9999994273656483,
+            "max_abs": 0.00919198989868164,
+            "mode": "bidirectional",
+            "prompt": "walk forward confidently with long energetic strides",
+            "rmse": 0.002270681376761236,
+            "seconds": 0.2397
+          },
+          {
+            "cosine": 0.9999991647485101,
+            "max_abs": 0.017452239990234375,
+            "mode": "bidirectional",
+            "prompt": "sneak forward cautiously",
+            "rmse": 0.0027282988031812044,
+            "seconds": 0.203
+          },
+          {
+            "cosine": 0.9999991992096062,
+            "max_abs": 0.009500443935394287,
+            "mode": "bidirectional",
+            "prompt": "wave with the right hand while standing",
+            "rmse": 0.002650030619850829,
+            "seconds": 0.2198
+          },
+          {
+            "cosine": 0.9999991034347497,
+            "max_abs": 0.012020111083984375,
+            "mode": "bidirectional",
+            "prompt": "jog forward quickly",
+            "rmse": 0.002794203113178182,
+            "seconds": 0.2208
+          }
+        ],
+        "reference": "Pinned ORT INT4/FP16 export, plus mask-only bidirectional variant",
+        "vocabulary_host_cache_limit_bytes": 67108864,
+        "wasm_linear_memory_peak_bytes": 539688960
+      },
+      "part_requests": 399,
+      "expected_parts": 399,
+      "corrupted_url": null
+    },
+    {
+      "run": "warm_cache",
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell",
+        "device": "",
+        "description": "",
+        "fallback": false
+      },
+      "result": {
+        "adapter": "",
+        "backend": "browser-webgpu-f32",
+        "execution": "Packed Q4F weights; per-matrix expansion on GPU before matmul; F32 activations",
+        "load_seconds": 50.8005,
+        "manifest": "3d1f90a846046723facf548ca6490c7f4402ff140e4529082312d477c0652449",
+        "performance": {
+          "warm_prompt_seconds": [
+            0.245,
+            0.2252,
+            0.2303,
+            0.2013,
+            0.2209
+          ]
+        },
+        "pooling": "mean, excluding instruction header, including EOT",
+        "records": [
+          {
+            "cosine": 0.9999986485007131,
+            "max_abs": 0.041088104248046875,
+            "mode": "causal_export",
+            "prompt": "walk forward calmly",
+            "rmse": 0.0032881148606131562,
+            "seconds": 0.69
+          },
+          {
+            "cosine": 0.9999989488330432,
+            "max_abs": 0.03649425506591797,
+            "mode": "causal_export",
+            "prompt": "walk forward confidently with long energetic strides",
+            "rmse": 0.0028581274180475473,
+            "seconds": 0.4324
+          },
+          {
+            "cosine": 0.9999984140133155,
+            "max_abs": 0.04284477233886719,
+            "mode": "causal_export",
+            "prompt": "sneak forward cautiously",
+            "rmse": 0.0032616735698598152,
+            "seconds": 0.2912
+          },
+          {
+            "cosine": 0.9999989188952966,
+            "max_abs": 0.03308296203613281,
+            "mode": "causal_export",
+            "prompt": "wave with the right hand while standing",
+            "rmse": 0.0028091169193477632,
+            "seconds": 0.3314
+          },
+          {
+            "cosine": 0.9999984336573672,
+            "max_abs": 0.03899383544921875,
+            "mode": "causal_export",
+            "prompt": "jog forward quickly",
+            "rmse": 0.0034156653828759194,
+            "seconds": 0.294
+          },
+          {
+            "cosine": 0.9999992046303606,
+            "max_abs": 0.013217449188232422,
+            "mode": "bidirectional",
+            "prompt": "walk forward calmly",
+            "rmse": 0.002674827093203152,
+            "seconds": 0.2421
+          },
+          {
+            "cosine": 0.9999994273656483,
+            "max_abs": 0.00919198989868164,
+            "mode": "bidirectional",
+            "prompt": "walk forward confidently with long energetic strides",
+            "rmse": 0.002270681376761236,
+            "seconds": 0.2447
+          },
+          {
+            "cosine": 0.9999991647485101,
+            "max_abs": 0.017452239990234375,
+            "mode": "bidirectional",
+            "prompt": "sneak forward cautiously",
+            "rmse": 0.0027282988031812044,
+            "seconds": 0.2341
+          },
+          {
+            "cosine": 0.9999991992096062,
+            "max_abs": 0.009500443935394287,
+            "mode": "bidirectional",
+            "prompt": "wave with the right hand while standing",
+            "rmse": 0.002650030619850829,
+            "seconds": 0.2304
+          },
+          {
+            "cosine": 0.9999991034347497,
+            "max_abs": 0.012020111083984375,
+            "mode": "bidirectional",
+            "prompt": "jog forward quickly",
+            "rmse": 0.002794203113178182,
+            "seconds": 0.237
+          }
+        ],
+        "reference": "Pinned ORT INT4/FP16 export, plus mask-only bidirectional variant",
+        "vocabulary_host_cache_limit_bytes": 67108864,
+        "wasm_linear_memory_peak_bytes": 613220352
+      },
+      "part_requests": 0,
+      "expected_parts": 399,
+      "corrupted_url": null
+    },
+    {
+      "run": "corrupt_cache",
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell",
+        "device": "",
+        "description": "",
+        "fallback": false
+      },
+      "result": {
+        "adapter": "",
+        "backend": "browser-webgpu-f32",
+        "execution": "Packed Q4F weights; per-matrix expansion on GPU before matmul; F32 activations",
+        "load_seconds": 51.3813,
+        "manifest": "3d1f90a846046723facf548ca6490c7f4402ff140e4529082312d477c0652449",
+        "performance": {
+          "warm_prompt_seconds": [
+            0.2332,
+            0.2001,
+            0.2015,
+            0.2048,
+            0.2102
+          ]
+        },
+        "pooling": "mean, excluding instruction header, including EOT",
+        "records": [
+          {
+            "cosine": 0.9999986485007131,
+            "max_abs": 0.041088104248046875,
+            "mode": "causal_export",
+            "prompt": "walk forward calmly",
+            "rmse": 0.0032881148606131562,
+            "seconds": 0.6751
+          },
+          {
+            "cosine": 0.9999989488330432,
+            "max_abs": 0.03649425506591797,
+            "mode": "causal_export",
+            "prompt": "walk forward confidently with long energetic strides",
+            "rmse": 0.0028581274180475473,
+            "seconds": 0.435
+          },
+          {
+            "cosine": 0.9999984140133155,
+            "max_abs": 0.04284477233886719,
+            "mode": "causal_export",
+            "prompt": "sneak forward cautiously",
+            "rmse": 0.0032616735698598152,
+            "seconds": 0.2868
+          },
+          {
+            "cosine": 0.9999989188952966,
+            "max_abs": 0.03308296203613281,
+            "mode": "causal_export",
+            "prompt": "wave with the right hand while standing",
+            "rmse": 0.0028091169193477632,
+            "seconds": 0.3314
+          },
+          {
+            "cosine": 0.9999984336573672,
+            "max_abs": 0.03899383544921875,
+            "mode": "causal_export",
+            "prompt": "jog forward quickly",
+            "rmse": 0.0034156653828759194,
+            "seconds": 0.2723
+          },
+          {
+            "cosine": 0.9999992046303606,
+            "max_abs": 0.013217449188232422,
+            "mode": "bidirectional",
+            "prompt": "walk forward calmly",
+            "rmse": 0.002674827093203152,
+            "seconds": 0.219
+          },
+          {
+            "cosine": 0.9999994273656483,
+            "max_abs": 0.00919198989868164,
+            "mode": "bidirectional",
+            "prompt": "walk forward confidently with long energetic strides",
+            "rmse": 0.002270681376761236,
+            "seconds": 0.2054
+          },
+          {
+            "cosine": 0.9999991647485101,
+            "max_abs": 0.017452239990234375,
+            "mode": "bidirectional",
+            "prompt": "sneak forward cautiously",
+            "rmse": 0.0027282988031812044,
+            "seconds": 0.2148
+          },
+          {
+            "cosine": 0.9999991992096062,
+            "max_abs": 0.009500443935394287,
+            "mode": "bidirectional",
+            "prompt": "wave with the right hand while standing",
+            "rmse": 0.002650030619850829,
+            "seconds": 0.1983
+          },
+          {
+            "cosine": 0.9999991034347497,
+            "max_abs": 0.012020111083984375,
+            "mode": "bidirectional",
+            "prompt": "jog forward quickly",
+            "rmse": 0.002794203113178182,
+            "seconds": 0.203
+          }
+        ],
+        "reference": "Pinned ORT INT4/FP16 export, plus mask-only bidirectional variant",
+        "vocabulary_host_cache_limit_bytes": 67108864,
+        "wasm_linear_memory_peak_bytes": 613220352
+      },
+      "part_requests": 1,
+      "expected_parts": 399,
+      "corrupted_url": "http://127.0.0.1:8866/.cache/ardy-text-bundle/parts/34f69e83c50d9cf3117023da0745c3a35ec80071c4c906f6b3e9545ffb9f6115.bin"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "manifest_sha256": "b7905f24ed6b9c9a3fa08c622312a1ad7f843ce4fa818632c592d3ad0041ef5d",
+  "objects": 41,
+  "tensor_count": 428,
+  "part_count": 59,
+  "max_part_bytes": 20971520,
+  "max_object_bytes": 33601024,
+  "total_object_bytes": 765068032,
+  "repeat_conversion": "two byte-identical manifests and content-addressed parts",
+  "wgpu": "29.0.4",
+  "burn": "0.21.0",
+  "bevy": "0.19.1",
+  "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+  "driver": "610.43.02"
+}

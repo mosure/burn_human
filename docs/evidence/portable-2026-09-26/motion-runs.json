@@ -1,0 +1,45 @@
+{
+  "attention": "bidirectional",
+  "backend": "native-wgpu",
+  "motion_manifest": "b7905f24ed6b9c9a3fa08c622312a1ad7f843ce4fa818632c592d3ad0041ef5d",
+  "records": [
+    {
+      "case": "0",
+      "frames": 120,
+      "motion_seconds": 3.647827253,
+      "text_seconds": 1.362672893
+    },
+    {
+      "case": "1",
+      "frames": 120,
+      "motion_seconds": 1.290334652,
+      "text_seconds": 0.564933049
+    },
+    {
+      "case": "2",
+      "frames": 120,
+      "motion_seconds": 1.300953175,
+      "text_seconds": 0.491053568
+    },
+    {
+      "case": "3",
+      "frames": 120,
+      "motion_seconds": 1.361469565,
+      "text_seconds": 0.518176629
+    },
+    {
+      "case": "4",
+      "frames": 120,
+      "motion_seconds": 1.331284858,
+      "text_seconds": 0.520699254
+    },
+    {
+      "case": "path",
+      "frames": 120,
+      "motion_seconds": 1.38124579,
+      "text_seconds": 0.523512567
+    }
+  ],
+  "text_manifest": "3d1f90a846046723facf548ca6490c7f4402ff140e4529082312d477c0652449",
+  "timing_scope": "Includes decoder and readback; first request includes cold kernels; excludes model load"
+}

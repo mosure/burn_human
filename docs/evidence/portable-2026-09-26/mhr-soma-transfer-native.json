@@ -1,0 +1,17 @@
+{
+  "manifest": "0eaabd1e7fd976c37c9f99e609c2d713b814f56497c2c903b854a7d1d3abb6f8",
+  "records": [
+    {
+      "case": 0,
+      "max_vertex_error_m": 0.00015628337860107422
+    },
+    {
+      "case": 1,
+      "max_vertex_error_m": 0.00015616416931152344
+    },
+    {
+      "case": 2,
+      "max_vertex_error_m": 0.00015628337860107422
+    }
+  ]
+}

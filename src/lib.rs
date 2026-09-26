@@ -1,11 +1,11 @@
 //! burn_human: parametric human forward model (Anny) for Burn.
 //!
-//! This crate is currently a scaffold. It mirrors the module layout needed
-//! to port the Python implementation stage by stage while keeping tests and
-//! assets aligned with burn_depth / burn_dino conventions.
+//! Parametric meshes, forward kinematics and skinning with portable motion-rig
+//! adapters. Model inference lives in the separate `burn_ardy` crate.
 
 pub mod data;
 pub mod model;
+pub mod motion;
 pub mod util;
 
 use std::collections::HashMap;

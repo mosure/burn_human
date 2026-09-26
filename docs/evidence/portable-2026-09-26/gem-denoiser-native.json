@@ -1,0 +1,20 @@
+{
+  "backend": "native-wgpu-f32",
+  "manifest": "8849a57736ee9c5119a1598a5a931b8d0f6892f93eba340765553ac78b89b2f3",
+  "records": [
+    {
+      "batch": 1,
+      "camera_max": 7.152557373046875e-07,
+      "feature_max": 6.9141387939453125e-06,
+      "frames": 1,
+      "warm_seconds": 0.019146393
+    },
+    {
+      "batch": 2,
+      "camera_max": 5.960464477539062e-07,
+      "feature_max": 2.205371856689453e-06,
+      "frames": 8,
+      "warm_seconds": 0.031010483
+    }
+  ]
+}

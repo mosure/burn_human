@@ -1,0 +1,110 @@
+{
+  "text": {
+    "model": "TREEIndustries/Llama-3-ARDY-Text-Encoder-ONNX",
+    "model_revision": "7aa52a05d54c2fd9177366aeb3f88e9e7f3c5766",
+    "source_revision": "7aa52a05d54c2fd9177366aeb3f88e9e7f3c5766",
+    "content_sha256": "3d1f90a846046723facf548ca6490c7f4402ff140e4529082312d477c0652449",
+    "converter": "export_ardy_text.py:v1",
+    "objects": 540,
+    "unique_parts": 636,
+    "part_bytes": 5413420032,
+    "largest_part": 20971520,
+    "largest_object": 36700416
+  },
+  "ardy": {
+    "model": "nvidia/ARDY-Core-RP-20FPS-Horizon40",
+    "model_revision": "abe6c43beb28c867c950acb824b9c4ef3d63fb76",
+    "source_revision": "693f74d13b3d04a0a22ce127ee79c929dd89756b",
+    "content_sha256": "b7905f24ed6b9c9a3fa08c622312a1ad7f843ce4fa818632c592d3ad0041ef5d",
+    "converter": "burn-ardy-pack-v1-f32",
+    "objects": 41,
+    "unique_parts": 59,
+    "part_bytes": 765068032,
+    "largest_part": 20971520,
+    "largest_object": 33601024
+  },
+  "soma": {
+    "model": "nvidia/SOMA-X",
+    "model_revision": "104578ed58857f6faa7592fb83d0a2dad43c36fa",
+    "source_revision": "cc1f3967755f8e36d187d2e26114633dbd651cd5",
+    "content_sha256": "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7",
+    "converter": "export_soma.py:v1",
+    "objects": 79,
+    "unique_parts": 80,
+    "part_bytes": 62159860,
+    "largest_part": 20971520,
+    "largest_object": 27734272
+  },
+  "mhr": {
+    "model": "facebookresearch/MHR:SOMA-X-lod1",
+    "model_revision": "104578ed58857f6faa7592fb83d0a2dad43c36fa",
+    "source_revision": "104578ed58857f6faa7592fb83d0a2dad43c36fa",
+    "content_sha256": "c7d6e4fc479b8ca68ab1ba6736923bcd93d9f61252c3009ace1ebef6bb5eff65",
+    "converter": "export_mhr.py:v1",
+    "objects": 21,
+    "unique_parts": 48,
+    "part_bytes": 709453924,
+    "largest_part": 20971520,
+    "largest_object": 49152256
+  },
+  "transfer": {
+    "model": "nvidia/SOMA-X:MHR-transfer",
+    "model_revision": "104578ed58857f6faa7592fb83d0a2dad43c36fa",
+    "source_revision": "cc1f3967755f8e36d187d2e26114633dbd651cd5",
+    "content_sha256": "0eaabd1e7fd976c37c9f99e609c2d713b814f56497c2c903b854a7d1d3abb6f8",
+    "converter": "export_mhr_soma_transfer.py:v1",
+    "objects": 8,
+    "unique_parts": 8,
+    "part_bytes": 861904,
+    "largest_part": 342992,
+    "largest_object": 342992
+  },
+  "vitpose": {
+    "model": "nvidia/GEM-X:vitpose",
+    "model_revision": "5ccf5ca3746c3620aa4016114f069a5f6ae399cd",
+    "source_revision": "32992550dba114c62243fb55e361311972dce8f9",
+    "content_sha256": "fb27cd7a46d4800c9941bb69b0070754b619f0a516d4b59233e32ee2cc865eef",
+    "converter": "export_gem_vision.py:v1",
+    "objects": 525,
+    "unique_parts": 622,
+    "part_bytes": 3387959860,
+    "largest_part": 20971520,
+    "largest_object": 26214656
+  },
+  "sam_vision": {
+    "model": "nvidia/GEM-X:sam-body",
+    "model_revision": "5ccf5ca3746c3620aa4016114f069a5f6ae399cd",
+    "source_revision": "32992550dba114c62243fb55e361311972dce8f9",
+    "content_sha256": "ec2403d45c2aa690565b556ebfa37762d317085c4d43f3ee00f27318ac7b415b",
+    "converter": "export_gem_vision.py:v1",
+    "objects": 519,
+    "unique_parts": 615,
+    "part_bytes": 3362924288,
+    "largest_part": 20971520,
+    "largest_object": 26214656
+  },
+  "sam_decoder": {
+    "model": "nvidia/GEM-X:sam-decoder",
+    "model_revision": "5ccf5ca3746c3620aa4016114f069a5f6ae399cd",
+    "source_revision": "32992550dba114c62243fb55e361311972dce8f9",
+    "content_sha256": "35c5b33c1041f9950af97def56335e7d3929eec6a6ce6180989b8423fb3f4b3e",
+    "converter": "export_gem_sam.py:v1",
+    "objects": 229,
+    "unique_parts": 229,
+    "part_bytes": 209695712,
+    "largest_part": 7060736,
+    "largest_object": 7060736
+  },
+  "gem": {
+    "model": "nvidia/GEM-X:denoiser",
+    "model_revision": "5ccf5ca3746c3620aa4016114f069a5f6ae399cd",
+    "source_revision": "32992550dba114c62243fb55e361311972dce8f9",
+    "content_sha256": "8849a57736ee9c5119a1598a5a931b8d0f6892f93eba340765553ac78b89b2f3",
+    "converter": "export_gem_denoiser.py:v1",
+    "objects": 264,
+    "unique_parts": 264,
+    "part_bytes": 178119284,
+    "largest_part": 4325632,
+    "largest_object": 4325632
+  }
+}

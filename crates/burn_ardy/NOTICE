@@ -1,0 +1,12 @@
+ARDY inference is derived from https://github.com/nv-tlabs/ardy
+Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+Upstream revision: 693f74d13b3d04a0a22ce127ee79c929dd89756b
+
+This crate is a Rust/Burn port of the Core RP inference architecture, motion
+representation, tokenizer, DDIM sampler and checkpoint conventions. It adds
+bounded Burnpack artifact loading and native/browser transports. It is not
+the upstream Python distribution. The upstream software license and its
+third-party notice are retained in LICENSE.
+
+Model weights are not included. ARDY weights have separate NVIDIA model
+license terms. Optional Llama/LLM2Vec text encoders have their own licenses.

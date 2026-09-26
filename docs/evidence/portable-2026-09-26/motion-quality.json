@@ -1,0 +1,300 @@
+{
+  "quality_status": "diagnostic examples, no human-rated or dataset-level semantic score",
+  "method": "Y-up FK in metres; predicted contacts; no foot correction; fixed seed 42",
+  "unconditioned_waypoint_rmse_m": 1.0619531363217416,
+  "records": [
+    {
+      "case": "0",
+      "prompt": "walk forward calmly",
+      "request": {
+        "prompt": "walk forward calmly",
+        "seed": 42,
+        "frames": 120,
+        "history_frames": 40,
+        "diffusion_steps": 10,
+        "text_guidance": 2.0,
+        "trajectory_guidance": 2.0,
+        "waypoints": [],
+        "dense_trajectory": false
+      },
+      "clip_sha256": "295528c50da626b55687fb775841f187f9497c5df5cf6204c165c3735600d754",
+      "metrics": {
+        "frames": 120,
+        "fps": 20.0,
+        "root_distance_m": 4.140642805787084,
+        "root_height_range_m": [
+          0.92768407,
+          0.9540361
+        ],
+        "foot_min_height_m": 0.0057929832943142134,
+        "foot_contact_samples": 226,
+        "contact_foot_speed_mean_mps": 0.02105983391281871,
+        "root_step_max_m": 0.05175483178973742,
+        "joint_step_max_m": 0.16475230459365883,
+        "window_boundary_root_step_m": [
+          0.03429772598368583,
+          0.051095625648247316
+        ],
+        "window_boundary_joint_step_max_m": [
+          0.06370048984205072,
+          0.06950131217556886
+        ],
+        "root_relative_right_hand_speed_mean_mps": 0.28883993307650063,
+        "waypoint_error_m": [],
+        "waypoint_rmse_m": null
+      }
+    },
+    {
+      "case": "1",
+      "prompt": "walk forward confidently with long energetic strides",
+      "request": {
+        "prompt": "walk forward confidently with long energetic strides",
+        "seed": 42,
+        "frames": 120,
+        "history_frames": 40,
+        "diffusion_steps": 10,
+        "text_guidance": 2.0,
+        "trajectory_guidance": 2.0,
+        "waypoints": [],
+        "dense_trajectory": false
+      },
+      "clip_sha256": "db02269209a2debdd997fbbf9a01022562f84e9ab725575a88a2a14e3e34297c",
+      "metrics": {
+        "frames": 120,
+        "fps": 20.0,
+        "root_distance_m": 10.201558766033497,
+        "root_height_range_m": [
+          0.8492594,
+          0.9720631
+        ],
+        "foot_min_height_m": 0.012169868011804558,
+        "foot_contact_samples": 169,
+        "contact_foot_speed_mean_mps": 0.023938752707288395,
+        "root_step_max_m": 0.1290320370689532,
+        "joint_step_max_m": 0.3668680443788437,
+        "window_boundary_root_step_m": [
+          0.11930061314067145,
+          0.09869243289184056
+        ],
+        "window_boundary_joint_step_max_m": [
+          0.1630854168074814,
+          0.34609825034193314
+        ],
+        "root_relative_right_hand_speed_mean_mps": 1.098727219975232,
+        "waypoint_error_m": [],
+        "waypoint_rmse_m": null
+      }
+    },
+    {
+      "case": "2",
+      "prompt": "sneak forward cautiously",
+      "request": {
+        "prompt": "sneak forward cautiously",
+        "seed": 42,
+        "frames": 120,
+        "history_frames": 40,
+        "diffusion_steps": 10,
+        "text_guidance": 2.0,
+        "trajectory_guidance": 2.0,
+        "waypoints": [],
+        "dense_trajectory": false
+      },
+      "clip_sha256": "6d6f7ac3b1dcc7398ab96babb70ad1b4bfbf835e6f2ca47914ba7b49760e908c",
+      "metrics": {
+        "frames": 120,
+        "fps": 20.0,
+        "root_distance_m": 3.4896149122942974,
+        "root_height_range_m": [
+          0.8135898,
+          0.87917393
+        ],
+        "foot_min_height_m": 0.004455472347141068,
+        "foot_contact_samples": 254,
+        "contact_foot_speed_mean_mps": 0.021199956946672757,
+        "root_step_max_m": 0.04859655749712027,
+        "joint_step_max_m": 0.13938149741691927,
+        "window_boundary_root_step_m": [
+          0.03419535175430283,
+          0.034939262646262105
+        ],
+        "window_boundary_joint_step_max_m": [
+          0.04408143982555624,
+          0.04735177277268722
+        ],
+        "root_relative_right_hand_speed_mean_mps": 0.2666073810229429,
+        "waypoint_error_m": [],
+        "waypoint_rmse_m": null
+      }
+    },
+    {
+      "case": "3",
+      "prompt": "wave with the right hand while standing",
+      "request": {
+        "prompt": "wave with the right hand while standing",
+        "seed": 42,
+        "frames": 120,
+        "history_frames": 40,
+        "diffusion_steps": 10,
+        "text_guidance": 2.0,
+        "trajectory_guidance": 2.0,
+        "waypoints": [],
+        "dense_trajectory": false
+      },
+      "clip_sha256": "29483a98194b53b46ebf6ca9192bae11f2355cdf05c78c4b1653389e80a7ab32",
+      "metrics": {
+        "frames": 120,
+        "fps": 20.0,
+        "root_distance_m": 0.06998065454217305,
+        "root_height_range_m": [
+          0.94638705,
+          0.94810903
+        ],
+        "foot_min_height_m": 0.007339541988553258,
+        "foot_contact_samples": 476,
+        "contact_foot_speed_mean_mps": 0.005989753587463936,
+        "root_step_max_m": 0.0014313224688374513,
+        "joint_step_max_m": 0.11775970371063826,
+        "window_boundary_root_step_m": [
+          0.0012735449517491967,
+          0.0006102057980107821
+        ],
+        "window_boundary_joint_step_max_m": [
+          0.050393362771421736,
+          0.00382705720640271
+        ],
+        "root_relative_right_hand_speed_mean_mps": 0.504817404295077,
+        "waypoint_error_m": [],
+        "waypoint_rmse_m": null
+      }
+    },
+    {
+      "case": "4",
+      "prompt": "jog forward quickly",
+      "request": {
+        "prompt": "jog forward quickly",
+        "seed": 42,
+        "frames": 120,
+        "history_frames": 40,
+        "diffusion_steps": 10,
+        "text_guidance": 2.0,
+        "trajectory_guidance": 2.0,
+        "waypoints": [],
+        "dense_trajectory": false
+      },
+      "clip_sha256": "cf1a0361515fd36186af5990d81142124fd9fb2ae433bcc3dc59492cffc294e8",
+      "metrics": {
+        "frames": 120,
+        "fps": 20.0,
+        "root_distance_m": 8.09572835480901,
+        "root_height_range_m": [
+          0.88266474,
+          0.9791347
+        ],
+        "foot_min_height_m": -0.0059066667778778364,
+        "foot_contact_samples": 232,
+        "contact_foot_speed_mean_mps": 0.010730803400640771,
+        "root_step_max_m": 0.14603790864112767,
+        "joint_step_max_m": 0.35400749243796564,
+        "window_boundary_root_step_m": [
+          0.12951622127757126,
+          0.002821806328595618
+        ],
+        "window_boundary_joint_step_max_m": [
+          0.18221154307162157,
+          0.016011228820286896
+        ],
+        "root_relative_right_hand_speed_mean_mps": 0.5145054092938677,
+        "waypoint_error_m": [],
+        "waypoint_rmse_m": null
+      }
+    },
+    {
+      "case": "path",
+      "prompt": "walk forward calmly",
+      "request": {
+        "prompt": "walk forward calmly",
+        "seed": 42,
+        "frames": 120,
+        "history_frames": 40,
+        "diffusion_steps": 10,
+        "text_guidance": 2.0,
+        "trajectory_guidance": 2.0,
+        "waypoints": [
+          {
+            "frame": 0,
+            "position": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "heading": null,
+            "constrain_height": false
+          },
+          {
+            "frame": 40,
+            "position": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "heading": null,
+            "constrain_height": false
+          },
+          {
+            "frame": 80,
+            "position": [
+              0.7,
+              0.0,
+              2.0
+            ],
+            "heading": null,
+            "constrain_height": false
+          },
+          {
+            "frame": 119,
+            "position": [
+              1.6,
+              0.0,
+              2.7
+            ],
+            "heading": null,
+            "constrain_height": false
+          }
+        ],
+        "dense_trajectory": true
+      },
+      "clip_sha256": "5e5db934d721cdf01710f58ed93463a0f5361a628e04b9d860215285f15823a0",
+      "metrics": {
+        "frames": 120,
+        "fps": 20.0,
+        "root_distance_m": 3.3186721665698404,
+        "root_height_range_m": [
+          0.9043442,
+          0.93666863
+        ],
+        "foot_min_height_m": -0.006833232650127363,
+        "foot_contact_samples": 205,
+        "contact_foot_speed_mean_mps": 0.03561256732012967,
+        "root_step_max_m": 0.03437366070157363,
+        "joint_step_max_m": 0.14181685253455573,
+        "window_boundary_root_step_m": [
+          0.031268948928602276,
+          0.028952552508575088
+        ],
+        "window_boundary_joint_step_max_m": [
+          0.13107523208444796,
+          0.03648295172038336
+        ],
+        "root_relative_right_hand_speed_mean_mps": 0.31457377394623176,
+        "waypoint_error_m": [
+          0.0028037053425171553,
+          0.03515592236698622,
+          0.026862769129410366,
+          0.04109298399641986
+        ],
+        "waypoint_rmse_m": 0.03022433349203603
+      }
+    }
+  ],
+  "example_regression_gates": "passed; diagnostic examples only"
+}

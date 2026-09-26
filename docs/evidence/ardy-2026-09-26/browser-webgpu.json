@@ -1,0 +1,509 @@
+{
+  "browser": "153.0.8010.12",
+  "reports": [
+    {
+      "run": "cold_cache",
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell",
+        "device": "",
+        "description": "",
+        "fallback": false
+      },
+      "result": {
+        "adapter": "",
+        "backend": "browser-webgpu-f32",
+        "batched_performance": {
+          "cfg_batch": 12,
+          "includes_decoder": false,
+          "includes_text_encoder": false,
+          "median_generated_frames_per_second": 663.3499170812604,
+          "parity": [
+            {
+              "hook": "sampled",
+              "max_abs": 0.00015333294868469238,
+              "max_abs_tolerance": 0.019999999552965164,
+              "rmse": 2.177505880273971e-05
+            },
+            {
+              "hook": "sampled",
+              "max_abs": 0.00015333294868469238,
+              "max_abs_tolerance": 0.019999999552965164,
+              "rmse": 2.177505880273971e-05
+            },
+            {
+              "hook": "sampled",
+              "max_abs": 0.00015333294868469238,
+              "max_abs_tolerance": 0.019999999552965164,
+              "rmse": 2.177505880273971e-05
+            },
+            {
+              "hook": "sampled",
+              "max_abs": 0.00015333294868469238,
+              "max_abs_tolerance": 0.019999999552965164,
+              "rmse": 2.177505880273971e-05
+            }
+          ],
+          "requests": 4,
+          "warm_window_seconds": [
+            0.197,
+            0.2412,
+            0.2574
+          ]
+        },
+        "fixture_sha256": "072cd33189a21efb19dc63dac02d7bc0a8f1aeb211a8bf7b00b4318bd23d043f",
+        "fk_max_error_m": 4.76837158203125e-07,
+        "load_seconds": 13.4109,
+        "manifest_sha256": "b7905f24ed6b9c9a3fa08c622312a1ad7f843ce4fa818632c592d3ad0041ef5d",
+        "model_revision": "abe6c43beb28c867c950acb824b9c4ef3d63fb76",
+        "parity": [
+          {
+            "hook": "local_root",
+            "max_abs": 1.52587890625e-05,
+            "max_abs_tolerance": 0.0020000000949949026,
+            "rmse": 4.504029842722612e-06
+          },
+          {
+            "hook": "denoised",
+            "max_abs": 8.134543895721436e-05,
+            "max_abs_tolerance": 0.0020000000949949026,
+            "rmse": 7.185617626170037e-06
+          },
+          {
+            "hook": "sampled",
+            "max_abs": 0.00015333294868469238,
+            "max_abs_tolerance": 0.019999999552965164,
+            "rmse": 2.177505880273971e-05
+          },
+          {
+            "hook": "decoded",
+            "max_abs": 0.000702977180480957,
+            "max_abs_tolerance": 0.0020000000949949026,
+            "rmse": 3.492028424450619e-05
+          },
+          {
+            "hook": "encoded",
+            "max_abs": 2.384185791015625e-07,
+            "max_abs_tolerance": 0.0020000000949949026,
+            "rmse": 4.191227757163435e-08
+          }
+        ],
+        "performance": {
+          "cfg_batch": 3,
+          "diffusion_steps": 10,
+          "frames_per_window": 40,
+          "future_frames": 8,
+          "history_frames": 8,
+          "includes_decoder": false,
+          "includes_text_encoder": false,
+          "median_frames_per_second": 206.50490449148165,
+          "synchronization": "full_output_readback",
+          "warm_window_seconds": [
+            0.1794,
+            0.1937,
+            0.2495
+          ]
+        },
+        "semantic_quality": "not_measured_random_embeddings",
+        "source_revision": "693f74d13b3d04a0a22ce127ee79c929dd89756b",
+        "wasm_linear_memory_peak_bytes": 250281984
+      },
+      "network": [
+        {
+          "path": "/tool/web/ardy-validation.html?bundle=/.cache/ardy-bundle-v1&reference=/.cache/ardy-reference/reference.safetensors&digest=b7905f24ed6b9c9a3fa08c622312a1ad7f843ce4fa818632c592d3ad0041ef5d",
+          "status": 200
+        },
+        {
+          "path": "/tool/web/out/burn_ardy.js",
+          "status": 200
+        },
+        {
+          "path": "/tool/web/out/snippets/burn_ardy-90994c7a13eabbdb/inline0.js",
+          "status": 200
+        },
+        {
+          "path": "/tool/web/out/burn_ardy_bg.wasm",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/manifest.json",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/c9871dec4b0a82f6c4055473428878d0f9c96cbf86a9a560d7898b4d201c0df8.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/40da25c2ba30d43adf3f03a8eed012d95fab609dd15ab9112e6e77274fce713f.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/faf3b46ebbf7669261d1942b1c975b50feb002c98dc59f048f2f2275236c8982.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/fbb96ac3580306584c599f214b6f6b9911913530cbcfbe8bc977427f87556904.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/ea0b470c41a3246abd4765445932eda9334184bd14ccd463ab976df6b48bf25e.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/d48b5f8d4fe19e1e9d35ac15c974ec2af295acebbd42e209c8a2bbe12656f457.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/a967e54a8a53da5696e76dbed1eb2bba5a981cf317f16282d2389999a2b2b698.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/674cc5890067171577ac2e705516686b3e00bc56309b65bc8b0a36907ccb7b6b.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/2f5afe80d99a3de86a25edeb3aa4aa4878a40d2eed2f0e66f65b97b7a7f5d7b9.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/4f3175bee24dcdcd30bab6f72a05608c0b957f861f7f892284ff6811e178740b.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/503bacdfcc1b9a6e5a1321f7c93ff2f9913c95035264383084f5a2e12aa3a26c.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/92d1eae9d489bdd53ca6e9dc1d61b500b61c1a36cb1d4161bfc497421b2a2833.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/2a50c64b5670c56f1a03cd4ccf64718e3ea433029f94fb6b5ffdc36568c374a8.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/9096be8555e33e5eb6ee2b8cd0c9a95b59c270354986dce622dcb7c813c7de31.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/b7a1373a73db889fbfc46df76f71277f2fe53c6fe9cf2e092ee341b87d556c69.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/04b6c72169807893ceced8c5e7ebc54d1b00ac109b1304ed73ab0c0773699ab7.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/8a1e43a87a8a161900c264d645530372dae064d36d9d10ffae767e6a7e51d2b8.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/7a5c9ed84391f67e009bef4a1d2aa3a722835615541e70dcf4c7781bbb8306e7.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/8d716a25dba1da183c6bd4320ae3dd3a438e7ae3bcd6317fc87e25f3b21af968.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/593b889cb4e924914f39a5411ea604567ad5b97875a8d67b002c75d6d8cc295d.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/71a307a12f3b852674cc04055004d83ce99b60e686092fa9c7490df2d40dc988.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/01c61be8f88d0c158cd31cefcb6be1a63c0a7a6b06b75746ffa83315cc9cdf3c.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/ae53f162e3c1059cd4ce75354c7084a91a6f2430979ad8bd933c441aac293986.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/6b7c059fcd32528eb33c1edf2dc9d5de7b4aef9a1f1b2c6a0ae9d95afe164366.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/d3130e292ebfe9cdb5c02fe8cb716b796500632a60f50a0639e265fe28337a63.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/92e549c8121257dd02a4573c006cdd9c457a2c974ebc2952c6baa551ec466836.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/6a870c9c7700f4f1bbeeadb21a9a156c9f0a3328dd64a2dce756e67a5e8672d3.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/51f799aad5d59f6b85d972d67ff60538ce016ac4ca1021ee21fe47ac37d01317.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/26901f136363eb519ace81d83dbbe77d7e4840c6c26d7b08050db3feaf29adfc.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/c136ecdcd111912d55bae6d9479232b87ef291e21d2e57b270610704b42c276d.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/a48e2d13536b13d8a808b7ab090a7149ddd562c9b1bb4e7b71ffebc05ac3f01a.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/9f288a3dc3db530353aa30126d097f4abee8b5ab49448f9edcbec4358456fac2.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/bc959d090d87e91cc630e545c61a4b0b05bc080a93f4a6e5df2601afdb923fc5.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/c2d97499069729433bf99ad1eaec156dcf5494768f321a51ac4b10f568cc1701.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/ee277a75f519bf5ccfc00336cb17fe59f7217748e331d1a827635456d70b633e.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/a927a87f7d0f21b93046fd28e171d2563fd75b59f29612b01750fd1222d13ae3.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/e00588569c5c6a019955d45e447aced1db7b7324d02fa4971f63fb8944f6de45.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/9e84ac10892f274967889c25802a7869badf0122988e4711ac9482b3bf83ad59.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/5b377b8edb06b43cff8b7eb76d4822b31bba074a70cccb02115cabc6747d54b1.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/3f0a66e0399b52afcad6d24306ec6b46ebaf56854f9bbd85d0a58f37ff94934c.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/b4a6b4b6f1d58cbcf2493f9b64d8e28d8d7d7cd970e79905d78cd9767df651ed.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/0d79b1c7483df22ae117ec49f652d740df0dd880a99ee14b27e0642a216b7d30.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/9441d834a72eca4e361cbd233f3882db52190dca1b179571bfd8861c90815d28.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/24558632fe1ba673a05a6fe68dcfd5078bbea0b500e4e53551ceb269d6ed2b82.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/e4b6e5fe07d3e7a93eba2c40d5edce757488f53397e9ab4b4ee0c8f608bc6f0b.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/6363abe5ec42ea8b8bd05cd636b9b25102ae56f717874d04961082d4c083c07d.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/a2b969aa49174d003216a7d6eceb2fb1bb3916c753a3d5cf737d650975bbf2e8.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/78eab30efba099dfa3d2d21d527a02a81ab3ee931d855b1fc1c113bcea30d2ad.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/955c9b155f9c45ba0dc95811ff5afdd7267d95b382b0f13eb655526a33b48afc.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/87d3875e4bec00ed80028b44b441b033469f49633318b6b6cb385afa70cc5d3c.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/dae77948190888779d084a5beb0d4d60bbc24d022190d4c6e0cf3ce88f2ec14b.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/612dfe8fe7eb45b0b44365caee61383007b10d86edb05b02a8908e57ff017476.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/148bddf15cbc1be777889c81060989694767ebffd94f0cc115f67fc804d0105a.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/1e82067b0ad20ff4fc80c5a50577257d58d2946e4c81a3891e2a65e49a793e37.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/d7cc69e338428e15171f282da4e86c044138365671e8b8abec243929b590cf69.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/717e26a1609530780fbb512a5ea3c94d42f5b1fabf5b487b81b730c88530b642.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/c4b75e16ba04536a683712d521406ed09aa94571453794bfd6855e3bf0c5a0a8.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/0b8508e4b73708b3c8b0156f3e0eae31ec52e3d65cf3585c5cc1d6d647c985fb.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/parts/db0c4bed4a2ed65f1a34833f063d686d5998934b74e1a9ddc0c71e6abea8e7d1.bin",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-reference/reference.safetensors",
+          "status": 200
+        }
+      ]
+    },
+    {
+      "run": "warm_cache",
+      "adapter": {
+        "vendor": "nvidia",
+        "architecture": "blackwell",
+        "device": "",
+        "description": "",
+        "fallback": false
+      },
+      "result": {
+        "adapter": "",
+        "backend": "browser-webgpu-f32",
+        "batched_performance": {
+          "cfg_batch": 12,
+          "includes_decoder": false,
+          "includes_text_encoder": false,
+          "median_generated_frames_per_second": 718.7780772686433,
+          "parity": [
+            {
+              "hook": "sampled",
+              "max_abs": 0.00015333294868469238,
+              "max_abs_tolerance": 0.019999999552965164,
+              "rmse": 2.177505880273971e-05
+            },
+            {
+              "hook": "sampled",
+              "max_abs": 0.00015333294868469238,
+              "max_abs_tolerance": 0.019999999552965164,
+              "rmse": 2.177505880273971e-05
+            },
+            {
+              "hook": "sampled",
+              "max_abs": 0.00015333294868469238,
+              "max_abs_tolerance": 0.019999999552965164,
+              "rmse": 2.177505880273971e-05
+            },
+            {
+              "hook": "sampled",
+              "max_abs": 0.00015333294868469238,
+              "max_abs_tolerance": 0.019999999552965164,
+              "rmse": 2.177505880273971e-05
+            }
+          ],
+          "requests": 4,
+          "warm_window_seconds": [
+            0.212,
+            0.2226,
+            0.2495
+          ]
+        },
+        "fixture_sha256": "072cd33189a21efb19dc63dac02d7bc0a8f1aeb211a8bf7b00b4318bd23d043f",
+        "fk_max_error_m": 4.76837158203125e-07,
+        "load_seconds": 9.1921,
+        "manifest_sha256": "b7905f24ed6b9c9a3fa08c622312a1ad7f843ce4fa818632c592d3ad0041ef5d",
+        "model_revision": "abe6c43beb28c867c950acb824b9c4ef3d63fb76",
+        "parity": [
+          {
+            "hook": "local_root",
+            "max_abs": 1.52587890625e-05,
+            "max_abs_tolerance": 0.0020000000949949026,
+            "rmse": 4.504029842722612e-06
+          },
+          {
+            "hook": "denoised",
+            "max_abs": 8.134543895721436e-05,
+            "max_abs_tolerance": 0.0020000000949949026,
+            "rmse": 7.185617626170037e-06
+          },
+          {
+            "hook": "sampled",
+            "max_abs": 0.00015333294868469238,
+            "max_abs_tolerance": 0.019999999552965164,
+            "rmse": 2.177505880273971e-05
+          },
+          {
+            "hook": "decoded",
+            "max_abs": 0.000702977180480957,
+            "max_abs_tolerance": 0.0020000000949949026,
+            "rmse": 3.492028424450619e-05
+          },
+          {
+            "hook": "encoded",
+            "max_abs": 2.384185791015625e-07,
+            "max_abs_tolerance": 0.0020000000949949026,
+            "rmse": 4.191227757163435e-08
+          }
+        ],
+        "performance": {
+          "cfg_batch": 3,
+          "diffusion_steps": 10,
+          "frames_per_window": 40,
+          "future_frames": 8,
+          "history_frames": 8,
+          "includes_decoder": false,
+          "includes_text_encoder": false,
+          "median_frames_per_second": 185.96001859600185,
+          "synchronization": "full_output_readback",
+          "warm_window_seconds": [
+            0.1813,
+            0.2151,
+            0.2418
+          ]
+        },
+        "semantic_quality": "not_measured_random_embeddings",
+        "source_revision": "693f74d13b3d04a0a22ce127ee79c929dd89756b",
+        "wasm_linear_memory_peak_bytes": 250281984
+      },
+      "network": [
+        {
+          "path": "/tool/web/ardy-validation.html?bundle=/.cache/ardy-bundle-v1&reference=/.cache/ardy-reference/reference.safetensors&digest=b7905f24ed6b9c9a3fa08c622312a1ad7f843ce4fa818632c592d3ad0041ef5d",
+          "status": 200
+        },
+        {
+          "path": "/tool/web/out/burn_ardy.js",
+          "status": 304
+        },
+        {
+          "path": "/tool/web/out/snippets/burn_ardy-90994c7a13eabbdb/inline0.js",
+          "status": 304
+        },
+        {
+          "path": "/tool/web/out/burn_ardy_bg.wasm",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-bundle-v1/manifest.json",
+          "status": 200
+        },
+        {
+          "path": "/.cache/ardy-reference/reference.safetensors",
+          "status": 200
+        }
+      ]
+    }
+  ]
+}

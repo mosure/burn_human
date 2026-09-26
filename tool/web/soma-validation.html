@@ -1,0 +1,26 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>SOMA-X WebGPU evaluation validation</title>
+<style>body{background:#101824;color:#dde8f6;font:15px monospace;padding:2rem}pre{white-space:pre-wrap}</style>
+<h1>Rust / Burn SOMA-X WebGPU validation</h1>
+<pre id="result">Loading authenticated SOMA rig and identity assets…</pre>
+<script type="module">
+import init, {validate_soma_webgpu} from '../../.cache/soma-web/burn_soma.js';
+const q=new URLSearchParams(location.search);
+let memoryTimer;
+try {
+  const wasm=await init();
+  let peakMemory=wasm.memory.buffer.byteLength;
+  memoryTimer=setInterval(()=>{peakMemory=Math.max(peakMemory,wasm.memory.buffer.byteLength);},25);
+  const result=await validate_soma_webgpu(q.get('bundle'),q.get('reference'),q.get('digest'));
+  clearInterval(memoryTimer);
+  const report=JSON.parse(result);
+  report.wasm_linear_memory_peak_bytes=Math.max(peakMemory,wasm.memory.buffer.byteLength);
+  document.querySelector('#result').textContent=JSON.stringify(report,null,2);
+  window.ardyValidation={ok:true,report};
+}catch(error){
+  clearInterval(memoryTimer);
+  document.querySelector('#result').textContent=String(error);
+  window.ardyValidation={ok:false,error:String(error)};
+}
+</script>

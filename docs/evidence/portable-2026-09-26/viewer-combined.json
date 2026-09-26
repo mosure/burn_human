@@ -1,0 +1,14 @@
+{
+  "workflow": [
+    "Load GEM-X suite; estimate image pose",
+    "Switch to SOMA controls; evaluate native identity with pose correctives",
+    "Load ARDY and Llama while retaining all GEM-X models",
+    "Generate 120 frames from prompt on shared Bevy WebGPU device",
+    "Return to GEM-X and estimate image pose without reloading models"
+  ],
+  "passed": true,
+  "wasm_linear_memory_bytes_after_motion": 1279590400,
+  "frames": 120,
+  "motion_clip_sha256": "9d5f8aceb8a10c7514a899a9859d43f3aac1fb24e44fa46f65fc9873ccf63069",
+  "memory_scope": "WASM linear memory only, excluding GPU allocations and browser CacheStorage"
+}

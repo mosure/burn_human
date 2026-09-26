@@ -1,3 +1,6 @@
+#![recursion_limit = "256"]
+
+use anyhow::{Context, Result, anyhow, bail};
 use bevy::asset::{AssetLoader, LoadContext, RenderAssetUsages, io::Reader};
 use bevy::log::warn;
 use bevy::mesh::{
@@ -13,7 +16,6 @@ use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 use std::path::PathBuf;
 use std::sync::Arc;
-use anyhow::{Context, anyhow, bail, Result};
 
 /// How to load the reference data used by the Bevy plugin.
 #[derive(Clone)]
@@ -143,7 +145,11 @@ impl Plugin for BurnHumanPlugin {
                 Update,
                 (
                     hydrate_reference_asset,
-                    (hydrate_burn_humans, hydrate_skinning_bindings, update_burn_humans)
+                    (
+                        hydrate_burn_humans,
+                        hydrate_skinning_bindings,
+                        update_burn_humans,
+                    )
                         .chain()
                         .run_if(resource_exists::<BurnHumanAssets>),
                 ),
@@ -494,8 +500,8 @@ fn update_burn_humans(
                         &assets.body.metadata().metadata.bone_parents,
                     )
                     .expect("burn_human pose");
-                    let bone_mats = tensor_to_mat4s_first_batch(&bone_poses)
-                        .expect("burn_human pose matrices");
+                    let bone_mats =
+                        tensor_to_mat4s_first_batch(&bone_poses).expect("burn_human pose matrices");
 
                     if rig_needs_rebuild {
                         if let Some(skinned_mesh) = skinned.as_mut() {
@@ -506,10 +512,8 @@ fn update_burn_humans(
                         let inverse_bindposes =
                             inverse_bindposes_from_rest(phenotype.rest_bone_poses)
                                 .expect("burn_human bindposes");
-                        let handle =
-                            inverse_bindposes_assets.add(SkinnedMeshInverseBindposes::from(
-                                inverse_bindposes,
-                            ));
+                        let handle = inverse_bindposes_assets
+                            .add(SkinnedMeshInverseBindposes::from(inverse_bindposes));
                         let joints = spawn_joints(&mut commands, entity, &bone_mats);
                         commands.entity(entity).insert(SkinnedMesh {
                             inverse_bindposes: handle,
@@ -525,10 +529,8 @@ fn update_burn_humans(
                             {
                                 *existing = SkinnedMeshInverseBindposes::from(inverse_bindposes);
                             } else {
-                                skinned_mesh.inverse_bindposes =
-                                    inverse_bindposes_assets.add(SkinnedMeshInverseBindposes::from(
-                                        inverse_bindposes,
-                                    ));
+                                skinned_mesh.inverse_bindposes = inverse_bindposes_assets
+                                    .add(SkinnedMeshInverseBindposes::from(inverse_bindposes));
                             }
                         }
                         for (joint, mat) in skinned_mesh.joints.iter().zip(bone_mats.iter()) {
@@ -634,7 +636,10 @@ fn resolve_input(assets: &BurnHumanAssets, input: &BurnHumanInput) -> Result<Res
         }
     } else {
         match (&input.phenotype_inputs, case) {
-            (_, None) | (Some(_), _) => assets.body.phenotype_evaluator().weights(&phenotype_inputs)?,
+            (_, None) | (Some(_), _) => assets
+                .body
+                .phenotype_evaluator()
+                .weights(&phenotype_inputs)?,
             (None, Some(case)) => first_batch_2d(&case.blendshape_coeffs),
         }
     };
@@ -768,19 +773,15 @@ fn ensure_phenotype_cache<'a>(
     cache: &'a mut BurnHumanPhenotypeCache,
 ) -> Result<(bool, PhenotypeDataRef<'a>)> {
     let key = hash_tensor_f64(&resolved.blendshape_weights);
-    let needs_update = cache.key != key
-        || cache.rest_vertices.is_none()
-        || cache.rest_bone_poses.is_none();
+    let needs_update =
+        cache.key != key || cache.rest_vertices.is_none() || cache.rest_bone_poses.is_none();
     if needs_update {
         let phenotype = build_phenotype(assets, resolved)?;
         cache.rest_vertices = Some(phenotype.rest_vertices);
         cache.rest_bone_poses = Some(phenotype.rest_bone_poses);
         cache.key = key;
     }
-    let rest_vertices = cache
-        .rest_vertices
-        .as_ref()
-        .expect("rest_vertices cached");
+    let rest_vertices = cache.rest_vertices.as_ref().expect("rest_vertices cached");
     let rest_bone_poses = cache
         .rest_bone_poses
         .as_ref()
@@ -916,14 +917,18 @@ fn tensor_to_vec3(data: &TensorData<f64>) -> Vec<Vec3> {
     match data.shape.as_slice() {
         [n, 3] => data
             .data
-            .as_chunks::<3>().0.iter()
+            .as_chunks::<3>()
+            .0
+            .iter()
             .take(*n)
             .map(|c| Vec3::new(c[0] as f32, c[1] as f32, c[2] as f32))
             .collect(),
         // batched shape [B,N,3]; take the first batch (current demo renders one body)
         [b, n, 3] if *b >= 1 => data
             .data
-            .as_chunks::<3>().0.iter()
+            .as_chunks::<3>()
+            .0
+            .iter()
             .take(*n)
             .map(|c| Vec3::new(c[0] as f32, c[1] as f32, c[2] as f32))
             .collect(),
@@ -937,7 +942,9 @@ fn to_position_attribute(points: &[Vec3]) -> Vec<[f32; 3]> {
 
 fn tensor_to_uv_attribute(data: &TensorData<f64>, vertex_count: usize) -> Option<Vec<[f32; 2]>> {
     let to_uvs = |n: usize, data: &[f64]| -> Vec<[f32; 2]> {
-        data.as_chunks::<2>().0.iter()
+        data.as_chunks::<2>()
+            .0
+            .iter()
             .take(n.min(vertex_count))
             .map(|c| [c[0] as f32, c[1] as f32])
             .collect()
@@ -1133,7 +1140,11 @@ mod tests {
         app.insert_resource(load_assets()?);
         app.add_systems(
             Update,
-            (hydrate_burn_humans, hydrate_skinning_bindings, update_burn_humans)
+            (
+                hydrate_burn_humans,
+                hydrate_skinning_bindings,
+                update_burn_humans,
+            )
                 .chain()
                 .run_if(resource_exists::<BurnHumanAssets>),
         );
@@ -1181,7 +1192,11 @@ mod tests {
         app.insert_resource(load_assets()?);
         app.add_systems(
             Update,
-            (hydrate_burn_humans, hydrate_skinning_bindings, update_burn_humans)
+            (
+                hydrate_burn_humans,
+                hydrate_skinning_bindings,
+                update_burn_humans,
+            )
                 .chain()
                 .run_if(resource_exists::<BurnHumanAssets>),
         );
@@ -1206,3 +1221,4 @@ mod tests {
         Ok(())
     }
 }
+pub mod motion;

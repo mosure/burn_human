@@ -1,0 +1,134 @@
+{
+  "browser": "153.0.8010.12",
+  "runs": [
+    {
+      "run": "cold_cache",
+      "model_revision": "abe6c43beb28c867c950acb824b9c4ef3d63fb76",
+      "manifest_sha256": "b7905f24ed6b9c9a3fa08c622312a1ad7f843ce4fa818632c592d3ad0041ef5d",
+      "part_requests": 59,
+      "expected_parts": 59,
+      "corrupted_part": null,
+      "load_seconds": 12.0942,
+      "wasm_linear_memory_peak_bytes": 250281984,
+      "parity": [
+        {
+          "hook": "local_root",
+          "max_abs": 1.52587890625e-05,
+          "max_abs_tolerance": 0.0020000000949949026,
+          "rmse": 4.504029842722612e-06
+        },
+        {
+          "hook": "denoised",
+          "max_abs": 8.134543895721436e-05,
+          "max_abs_tolerance": 0.0020000000949949026,
+          "rmse": 7.185617626170037e-06
+        },
+        {
+          "hook": "sampled",
+          "max_abs": 0.00015333294868469238,
+          "max_abs_tolerance": 0.019999999552965164,
+          "rmse": 2.177505880273971e-05
+        },
+        {
+          "hook": "decoded",
+          "max_abs": 0.000702977180480957,
+          "max_abs_tolerance": 0.0020000000949949026,
+          "rmse": 3.492028424450619e-05
+        },
+        {
+          "hook": "encoded",
+          "max_abs": 2.384185791015625e-07,
+          "max_abs_tolerance": 0.0020000000949949026,
+          "rmse": 4.191227757163435e-08
+        }
+      ],
+      "fk_max_error_m": 4.76837158203125e-07
+    },
+    {
+      "run": "warm_cache",
+      "model_revision": "abe6c43beb28c867c950acb824b9c4ef3d63fb76",
+      "manifest_sha256": "b7905f24ed6b9c9a3fa08c622312a1ad7f843ce4fa818632c592d3ad0041ef5d",
+      "part_requests": 0,
+      "expected_parts": 59,
+      "corrupted_part": null,
+      "load_seconds": 8.598,
+      "wasm_linear_memory_peak_bytes": 250281984,
+      "parity": [
+        {
+          "hook": "local_root",
+          "max_abs": 1.52587890625e-05,
+          "max_abs_tolerance": 0.0020000000949949026,
+          "rmse": 4.504029842722612e-06
+        },
+        {
+          "hook": "denoised",
+          "max_abs": 8.134543895721436e-05,
+          "max_abs_tolerance": 0.0020000000949949026,
+          "rmse": 7.185617626170037e-06
+        },
+        {
+          "hook": "sampled",
+          "max_abs": 0.00015333294868469238,
+          "max_abs_tolerance": 0.019999999552965164,
+          "rmse": 2.177505880273971e-05
+        },
+        {
+          "hook": "decoded",
+          "max_abs": 0.000702977180480957,
+          "max_abs_tolerance": 0.0020000000949949026,
+          "rmse": 3.492028424450619e-05
+        },
+        {
+          "hook": "encoded",
+          "max_abs": 2.384185791015625e-07,
+          "max_abs_tolerance": 0.0020000000949949026,
+          "rmse": 4.191227757163435e-08
+        }
+      ],
+      "fk_max_error_m": 4.76837158203125e-07
+    },
+    {
+      "run": "corrupt_cache",
+      "model_revision": "abe6c43beb28c867c950acb824b9c4ef3d63fb76",
+      "manifest_sha256": "b7905f24ed6b9c9a3fa08c622312a1ad7f843ce4fa818632c592d3ad0041ef5d",
+      "part_requests": 1,
+      "expected_parts": 59,
+      "corrupted_part": "c9871dec4b0a82f6c4055473428878d0f9c96cbf86a9a560d7898b4d201c0df8.bin",
+      "load_seconds": 8.6656,
+      "wasm_linear_memory_peak_bytes": 250281984,
+      "parity": [
+        {
+          "hook": "local_root",
+          "max_abs": 1.52587890625e-05,
+          "max_abs_tolerance": 0.0020000000949949026,
+          "rmse": 4.504029842722612e-06
+        },
+        {
+          "hook": "denoised",
+          "max_abs": 8.134543895721436e-05,
+          "max_abs_tolerance": 0.0020000000949949026,
+          "rmse": 7.185617626170037e-06
+        },
+        {
+          "hook": "sampled",
+          "max_abs": 0.00015333294868469238,
+          "max_abs_tolerance": 0.019999999552965164,
+          "rmse": 2.177505880273971e-05
+        },
+        {
+          "hook": "decoded",
+          "max_abs": 0.000702977180480957,
+          "max_abs_tolerance": 0.0020000000949949026,
+          "rmse": 3.492028424450619e-05
+        },
+        {
+          "hook": "encoded",
+          "max_abs": 2.384185791015625e-07,
+          "max_abs_tolerance": 0.0020000000949949026,
+          "rmse": 4.191227757163435e-08
+        }
+      ],
+      "fk_max_error_m": 4.76837158203125e-07
+    }
+  ]
+}

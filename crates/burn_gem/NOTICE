@@ -1,0 +1,7 @@
+GEM-X inference equations and preprocessing: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. Apache-2.0. Source 32992550dba114c62243fb55e361311972dce8f9.
+
+vision.rs implements DINOv3 ViT-H+ equations: Meta Platforms, Inc. and affiliates. DINOv3 License, source 6876159a11b4df116f30f667f8c9888617df0751.
+
+sam.rs and sam_head.rs port SAM 3D Body inference conventions: Meta Platforms, Inc. and affiliates. SAM License, source b5c765a0d89d789985e186d396315e7590887b94.
+
+The original GEM-X third-party attributions are retained in ATTRIBUTIONS.md. Model weights are separately obtained and are not included in this package.
