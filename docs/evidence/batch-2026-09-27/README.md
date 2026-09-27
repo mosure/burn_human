@@ -1,5 +1,9 @@
 # Native and browser batch release qualification
 
+For the subsequent fixes to batch reproducibility and browser startup, see
+[the stability qualification](../stability-2026-09-27/README.md). The measurements
+below describe the earlier release and remain unchanged.
+
 Release scope: `burn_ardy` 0.1.3, `burn_llama` 0.1.1 and
 `bevy_burn_human` 0.6.0. Model weights and CDN manifests are unchanged.
 The preceding [pipeline qualification](../performance-2026-09-26/README.md)

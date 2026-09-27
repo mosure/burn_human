@@ -1,7 +1,7 @@
 //! Text and motion inference in one native process, using the same portable APIs as Bevy.
 use anyhow::{Result, ensure};
-use burn::backend::Wgpu;
 use burn_ardy::Ardy;
+use burn_human_inference::gpu::WgpuBackend as Wgpu;
 use burn_human_inference::transport::{ModelSource, read_bounded};
 use burn_human_motion::MotionRequest;
 use burn_llama::TextEncoder;

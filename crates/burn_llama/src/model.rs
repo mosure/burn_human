@@ -143,7 +143,7 @@ impl<B: Backend> TextEncoder<B> {
             .iter()
             .find(|a| a.path == "metadata/tokenizer.json")
             .ok_or_else(|| anyhow::anyhow!("Missing tokenizer"))?;
-        let tokenizer = PromptTokenizer::from_bytes(&source.asset(asset).await?)?;
+        let tokenizer = PromptTokenizer::from_bytes_async(&source.asset(asset).await?).await?;
         let mut weights = TensorBank::new(device);
         let objects: Vec<_> = manifest
             .objects
@@ -289,6 +289,7 @@ impl<B: Backend> TextEncoder<B> {
             let q = self.rope(project("q", self.config.heads), cos.clone(), sin.clone());
             let k = self.rope(project("k", self.config.kv_heads), cos.clone(), sin.clone());
             let v = project("v", self.config.kv_heads);
+            burn_human_inference::cooperative::yield_to_browser().await;
             let repeat = |v: Tensor<B, 4>| {
                 v.unsqueeze_dim::<5>(2)
                     .expand([
@@ -313,6 +314,7 @@ impl<B: Backend> TextEncoder<B> {
             x = x + self
                 .weights
                 .linear(&format!("{p}.self_attn.o_proj.weight"), attended);
+            burn_human_inference::cooperative::yield_to_browser().await;
             let normalized = self.norm(&format!("{p}.post_attention_layernorm.weight"), x.clone());
             let gate = activation::silu(
                 self.weights

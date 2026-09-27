@@ -1,0 +1,74 @@
+[
+  {
+    "crate": "burn_human_motion",
+    "version": "0.1.1",
+    "files": 13,
+    "bytes": 17386,
+    "largest_member_bytes": 11467,
+    "dry_run": "passed",
+    "weights_included": false
+  },
+  {
+    "crate": "burn_human_inference",
+    "version": "0.1.4",
+    "files": 17,
+    "bytes": 59282,
+    "largest_member_bytes": 155909,
+    "dry_run": "passed",
+    "weights_included": false
+  },
+  {
+    "crate": "burn_ardy",
+    "version": "0.1.4",
+    "files": 28,
+    "bytes": 77684,
+    "largest_member_bytes": 156656,
+    "dry_run": "passed",
+    "weights_included": false
+  },
+  {
+    "crate": "burn_llama",
+    "version": "0.1.2",
+    "files": 17,
+    "bytes": 59364,
+    "largest_member_bytes": 157413,
+    "dry_run": "passed",
+    "weights_included": false
+  },
+  {
+    "crate": "burn_mhr",
+    "version": "0.1.2",
+    "files": 10,
+    "bytes": 50815,
+    "largest_member_bytes": 155948,
+    "dry_run": "passed",
+    "weights_included": false
+  },
+  {
+    "crate": "burn_soma",
+    "version": "0.1.3",
+    "files": 17,
+    "bytes": 62536,
+    "largest_member_bytes": 161435,
+    "dry_run": "passed",
+    "weights_included": false
+  },
+  {
+    "crate": "burn_gemx",
+    "version": "0.1.3",
+    "files": 26,
+    "bytes": 80672,
+    "largest_member_bytes": 161833,
+    "dry_run": "passed",
+    "weights_included": false
+  },
+  {
+    "crate": "bevy_burn_human",
+    "version": "0.6.1",
+    "files": 21,
+    "bytes": 109135,
+    "largest_member_bytes": 243187,
+    "dry_run": "passed",
+    "weights_included": false
+  }
+]

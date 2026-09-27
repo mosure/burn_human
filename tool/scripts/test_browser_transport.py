@@ -20,10 +20,13 @@ async def main():
     ap.add_argument("--wasm-out", type=pathlib.Path, default=pathlib.Path("tool/web/out"))
     args = ap.parse_args()
     root = pathlib.Path(__file__).resolve().parents[2]
-    modules = list((root / args.wasm_out / "snippets").glob("burn_human_inference-*/inline0.js"))
+    modules = [p for p in (root / args.wasm_out / "snippets").glob("burn_human_inference-*/inline*.js")
+               if 'function motion_part(' in p.read_text()]
     if len(modules) != 1:
-        raise RuntimeError("Build a single current wasm-bindgen output in tool/web/out first")
+        raise RuntimeError("Build a single current wasm-bindgen output containing the transport first")
     module = modules[0]
+    yields = [p for p in module.parent.glob('inline*.js') if 'function inferenceYield(' in p.read_text()]
+    assert len(yields) == 1, 'missing production task scheduler'
     url = args.base.rstrip("/") + "/__transport_test_part.bin"
     fixture = b"verified browser artifact"
     network = dict(requests=0, body=fixture)
@@ -40,10 +43,12 @@ async def main():
         await page.goto(args.base)
         await page.evaluate("""async c=>{
             window.transport=await import(c.module);
+            window.cooperative=await import(c.scheduler);
             window.part=c;
             await caches.delete('burn-human-motion-parts-v1');
-            window.readPart=()=>transport.motion_part(c.url,c.size,c.digest);
+            window.readPart=()=>transport.motion_part(c.url,c.size,c.digest,cooperative.inferenceYieldCallback());
         }""", dict(module=args.base.rstrip("/") + "/" + module.relative_to(root).as_posix(),
+                   scheduler=args.base.rstrip('/') + '/' + yields[0].relative_to(root).as_posix(),
                    url=url, size=len(fixture), digest=hashlib.sha256(fixture).hexdigest()))
 
         async def read():
@@ -54,9 +59,11 @@ async def main():
         assert network["requests"] == 1
         await read()
         assert network["requests"] == 1, "warm cache fetched the network"
+        assert await page.evaluate("async()=>transport.motion_digest(new Uint8Array())") == hashlib.sha256(b'').hexdigest()
+        assert await page.evaluate("async()=>transport.motion_digest(await readPart())") == hashlib.sha256(fixture).hexdigest()
         await page.evaluate("""async()=>{
             const c=await caches.open('burn-human-motion-parts-v1');
-            await c.put(part.url,new Response('corrupt'));
+            await c.put(part.url,new Response(new Uint8Array(part.size).fill(88)));
         }""")
         await read()
         assert network["requests"] == 2
@@ -81,12 +88,12 @@ async def main():
             catch(_){return true;}
         }"""), "oversize response was accepted"
         await page.evaluate("async()=>{await caches.delete('burn-human-motion-parts-v1');}")
-        network["body"] = b"untrusted bytes"
+        network["body"] = b"x" * len(fixture)
         assert await page.evaluate("""async()=>{
             try {await readPart();return false;}catch(_){return true;}
         }"""), "corrupt network response was accepted"
         report = dict(browser=browser.version, transport_js_sha256=hashlib.sha256(module.read_bytes()).hexdigest(),
-                      checks={name: "passed" for name in ["cold_read", "warm_cache_no_network", "corrupt_cache_repair",
+                      checks={name: "passed" for name in ["cold_read", "warm_cache_no_network", "webcrypto_known_digests", "corrupt_cache_repair",
                                                          "cache_match_failure", "cache_open_failure", "cache_write_failure",
                                                          "oversize_response_rejected", "corrupt_network_rejected"]})
         args.out.parent.mkdir(parents=True, exist_ok=True)

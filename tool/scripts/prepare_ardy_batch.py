@@ -25,6 +25,7 @@ def main():
         ('sparse_long', 2, 240, 160, False, True),
         ('eight_actors', 8, 40, 0, True, False),
         ('duplicate_seed', 2, 40, 0, True, False),
+        *[(f'actors_{n}', n, 40, 0, True, False) for n in [3, 5, 6, 7]],
     ]:
         requests, indices = [], []
         for actor in range(actors):

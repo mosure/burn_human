@@ -2,11 +2,10 @@ use crate::config::{ArdyConfig, MODEL_ID, MODEL_REVISION, expected_tensors};
 use anyhow::{Result, ensure};
 use burn::{
     prelude::Backend,
-    tensor::{Bytes, DType, Tensor, TensorData},
+    tensor::{DType, Tensor, TensorData},
 };
-use burn_human_motion::artifacts::{Manifest, PartReader, read_object, sha256};
-use burn_store::{BurnpackStore, ModuleStore};
-use std::collections::{BTreeMap, BTreeSet};
+use burn_human_motion::artifacts::{Manifest, PartReader};
+use std::collections::BTreeMap;
 
 pub struct Weights<B: Backend> {
     tensors: BTreeMap<String, (Tensor<B, 1>, Vec<usize>)>,
@@ -40,56 +39,22 @@ impl<B: Backend> Weights<B> {
             "checkpoint tensor inventory does not match ARDY Core architecture"
         );
         let mut tensors = BTreeMap::new();
+        let mut uploads = burn_human_inference::weights::UploadBudget::default();
         for (i, object) in manifest.objects.iter().enumerate() {
-            let bytes = read_object(reader, object).await?;
-            let mut pack = BurnpackStore::from_bytes(Some(Bytes::from_bytes_vec(bytes)));
-            let snapshots = pack
-                .get_all_snapshots()
-                .map_err(|e| anyhow::anyhow!("Burnpack snapshots: {e}"))?;
-            let mut seen = BTreeSet::new();
-            for snapshot in snapshots.values() {
-                let name = snapshot
-                    .path_stack
-                    .as_ref()
-                    .ok_or_else(|| anyhow::anyhow!("unnamed tensor"))?
-                    .join(".");
-                let spec = object
-                    .tensors
-                    .iter()
-                    .find(|t| t.name == name)
-                    .ok_or_else(|| anyhow::anyhow!("unknown tensor {name}"))?;
+            for (name, data) in burn_human_inference::weights::read_tensors(reader, object).await? {
+                let bytes = data.bytes.len();
                 ensure!(
-                    seen.insert(name.clone()) && !tensors.contains_key(&name),
-                    "duplicate tensor {name}"
+                    data.dtype == DType::F32,
+                    "ARDY requires f32 weights: {name}"
                 );
-                let data = snapshot
-                    .to_data()
-                    .map_err(|e| anyhow::anyhow!("tensor data: {e}"))?;
-                ensure!(
-                    data.dtype == DType::F32 && data.shape.as_slice() == spec.shape,
-                    "tensor shape/dtype mismatch: {name}"
-                );
-                ensure!(
-                    sha256(&data.bytes) == spec.sha256,
-                    "tensor hash mismatch: {name}"
-                );
-                ensure!(
-                    data.as_slice::<f32>()
-                        .map_err(|e| anyhow::anyhow!("{e}"))?
-                        .iter()
-                        .all(|v| v.is_finite()),
-                    "non-finite weights: {name}"
-                );
-                let shape = spec.shape.clone();
+                ensure!(!tensors.contains_key(&name), "duplicate tensor {name}");
+                let shape = data.shape.to_vec();
                 let size: usize = shape.iter().product();
                 let flat = TensorData::from_bytes(data.bytes, [size], DType::F32);
                 tensors.insert(name, (Tensor::from_data(flat, device), shape));
+                uploads.record::<B>(device, bytes).await?;
+                burn_human_inference::cooperative::yield_to_browser().await;
             }
-            ensure!(
-                seen.len() == object.tensors.len(),
-                "missing tensors in {}",
-                object.stage
-            );
             // Each object, its snapshots and decoded host tensors drop before fetching the next.
             progress(i + 1, manifest.objects.len());
         }
@@ -118,14 +83,14 @@ impl<B: Backend> Weights<B> {
         let b: Tensor<B, 1> = self.tensor(bias);
         let [batch, time, dim] = x.dims();
         let output = w.dims()[0];
-        (x.reshape([batch * time, dim]).matmul(w.transpose()) + b.unsqueeze_dim(0))
+        (crate::ops::matmul(x.reshape([batch * time, dim]), w.transpose()) + b.unsqueeze_dim(0))
             .reshape([batch, time, output])
     }
 
     pub fn norm(&self, prefix: &str, x: Tensor<B, 3>) -> Tensor<B, 3> {
-        let mean = x.clone().mean_dim(2);
+        let mean = crate::ops::mean_dim(x.clone(), 2);
         let centered = x - mean;
-        let var = centered.clone().powf_scalar(2.0).mean_dim(2);
+        let var = crate::ops::mean_dim(centered.clone().powf_scalar(2.0), 2);
         let weight: Tensor<B, 1> = self.tensor(&format!("{prefix}.weight"));
         let bias: Tensor<B, 1> = self.tensor(&format!("{prefix}.bias"));
         centered / (var + 1e-5).sqrt() * weight.unsqueeze() + bias.unsqueeze()

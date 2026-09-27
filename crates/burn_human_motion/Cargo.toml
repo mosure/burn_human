@@ -1,6 +1,6 @@
 [package]
 name = "burn_human_motion"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "Portable motion, rig, conditioning, and verified model artifact contracts"
 license = "MIT OR Apache-2.0"

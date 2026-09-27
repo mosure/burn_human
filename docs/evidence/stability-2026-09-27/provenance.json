@@ -1,0 +1,603 @@
+{
+  "date_utc": "2026-09-27T14:07:36.644052+00:00",
+  "baseline_commit": "d26d7a4afa3b8657e85687e83539cbbdbbfca1f0",
+  "source_parent_commit": "edf66b4ee20f6c4521632789adb60c0b7322b99f",
+  "rustc": "rustc 1.100.0-nightly (908501772 2026-08-30)\nbinary: rustc\ncommit-hash: 90850177249efe0321573c569aec5d12b257f8d6\ncommit-date: 2026-08-30\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0-nightly\nLLVM version: 23.1.0\n",
+  "native_profile": "repository optimized dev; CARGO_PROFILE_DEV_DEBUG=0",
+  "wasm_profile": "repository release",
+  "measurement_scope": "shared workstation; no own compilation or overlapping GPU qualification jobs",
+  "source_sha256": {
+    "crates/burn_human_motion/src/artifacts.rs": "1c802501d3411b5960e808d64c40339961a9d86fe3fc921de8c68e8fabb12201",
+    "crates/burn_human_motion/src/conditioning.rs": "3a6d755ef3a65cad90b5c94aafea467d2af16f62e79ac25938dd4131d7761202",
+    "crates/burn_human_motion/src/lib.rs": "8520107a0a0c860431d89f209dd0425201f999ed9899f1a0c63bcf305e768a07",
+    "crates/burn_human_motion/src/rig.rs": "4d1d170a6da835ee5abbfe1187983bd085ece83a40ed0be21d87c6805a0aea4d",
+    "crates/burn_human_motion/src/soma.rs": "e62041c429108496bb00f5451673e9f9ba61df29fd55854ab0ade1f56a8ff38a",
+    "crates/burn_human_inference/src/cooperative.rs": "14158d4aa535103bbfcaaae12d32a86cda4807d5e87d7311dc6f7753f7b8845b",
+    "crates/burn_human_inference/src/gpu.rs": "b1ae2d9815a405f15669a82e2fe15ecf33bc024f282803fe6f0b6935221fd6ae",
+    "crates/burn_human_inference/src/lib.rs": "144984ec608b0fe6441241007fc2d97eb6584642b9aa7d520a4f92437a12bee6",
+    "crates/burn_human_inference/src/pretrained.rs": "888877d6989e516fc1154ac2ba435941e3da746486551ac569d4f59c3107b85e",
+    "crates/burn_human_inference/src/transport.rs": "5a84373a210a1d4d0a93079476d08271411683c0b33daa82e29ee48fff94d8ae",
+    "crates/burn_human_inference/src/weights.rs": "7b8e336ddcf0f393a76b6db6348f45e2b1b43a0dc4fb3be88a6d34ab09da0371",
+    "crates/burn_human_inference/src/bin/pack.rs": "ca71df042127ad534fce76bfb4ee0ed3fca67ec0ebe1e2966023f14c26ee5c22",
+    "crates/burn_human_inference/src/bin/quant_parity.rs": "ff470b25aa1eba6eef6ca1029e03cd28df3e94e5412d8af7e488ba39634fad48",
+    "crates/burn_ardy/src/batch.rs": "0bea63c1947dfdf6f28c6a1697d8e8b4480587c972f0d1f319f7bdc2f5777699",
+    "crates/burn_ardy/src/config.rs": "9884bbb309b6db9d0b79bb2e742ac72927a0c4acec6933edd3f0ed464b190c81",
+    "crates/burn_ardy/src/constants.rs": "362277771ca4b8657e60e50c07ae617d006d86ed3bd88e10f30be0dcfa676e61",
+    "crates/burn_ardy/src/lib.rs": "f0eeb4faf355f3f5d39e8bf30bb568c6ebeb738f5b4f4cac4c84d1bf915fd291",
+    "crates/burn_ardy/src/network.rs": "03aed5934bd18bf2c0c66e802d11b830fe93086acb7f758703a21feac48a9dfe",
+    "crates/burn_ardy/src/ops.rs": "5ffaa659199d05ef928e29d16228463f4320a0e0e49fd0c82cf68a5ffbffeb20",
+    "crates/burn_ardy/src/pretrained.rs": "73e3fbff581670e4f54f684619eab679afa194be26a5e70ba932d163c1df026f",
+    "crates/burn_ardy/src/representation.rs": "e4c4adca6f48051e186fd0693fc51b107df0ce75546f0bd85a4e45ddeafcd067",
+    "crates/burn_ardy/src/sampler.rs": "47a0d7dc220c88d5719081600ee07bb67b50bcfa54945cd4919e65539c991604",
+    "crates/burn_ardy/src/scheduling.rs": "7d9c65507feb56d74bc4187fe8c7b715f3dda7c27c1082f447c554df501260bb",
+    "crates/burn_ardy/src/transport.rs": "2d5ea13cab60a47ad81ef44210c78eae615cbece240d6e471bb56b834a6999e4",
+    "crates/burn_ardy/src/validation.rs": "380975ce7e37d7bebf8bc366688be34501ad88ca2315600db4dbb200dfe1b019",
+    "crates/burn_ardy/src/web_validation.rs": "d5bf40e550b10fbab7b62192171c9764ca5ee409ff9befd883fd6173d46692e8",
+    "crates/burn_ardy/src/weights.rs": "8ccb7b6e000c4579b8c02128bb615a75e884306095585f1b5444331d3d95168b",
+    "crates/burn_ardy/src/bin/batch_validate.rs": "1a574498e0301e58a302c0e096fad39a73801012965ca606344ad329dd6d7ba0",
+    "crates/burn_ardy/src/bin/pack.rs": "65a0b6b7e5cadd03e009b99f5ec974cd704e17bb23138e00183e1808610e55ae",
+    "crates/burn_ardy/src/bin/run.rs": "5c0c2d484b86a8dd3c79b68c814635ca46e696300c0e5ebabb3f460821e17900",
+    "crates/burn_ardy/src/bin/validate.rs": "ff23bba2c7707310ea7a18c25b60dbc990b437d0c16b9c18aacc307f752e7cab",
+    "crates/burn_ardy/src/validation/batch.rs": "9c3a051009da149ccf36bb74bf653739439a8d3c4c49604a38bac20db4b207b0",
+    "crates/burn_ardy/src/validation/batch/fixed.rs": "b939d62e563a7819ea56acd1b81dc05d31aaf6ba8c79dc8f17f992af41d44f39",
+    "crates/burn_llama/src/lib.rs": "24745f2f0c307dadd475f66a7930edb117b4f76860141407c4700ad978994857",
+    "crates/burn_llama/src/model.rs": "ffe4f2b5f6a89139624bd712962f8b530e5f2afe0b0031aabf01398aba336f82",
+    "crates/burn_llama/src/pretrained.rs": "2664708d0fdd1c20f1cdc81de18e5c1e5214adf5851e382824e4d2389c600a1d",
+    "crates/burn_llama/src/tokenizer.rs": "f1b14231899dff20b1140410ca555057072673e2987beca6b614db4334f772b4",
+    "crates/burn_llama/src/validation.rs": "58a946484debb61c1826f2ff12bc2915e57893121ad40e31ba500ea5b9cf9965",
+    "crates/burn_llama/src/web_validation.rs": "36edc68e248ac149249a2e9f6d04093da53a74fff88eaae602a2a17589947352",
+    "crates/burn_llama/src/bin/ardy_text_run.rs": "4cbd4ef46b1afe15b1255652167a0acc1235efe77ee9a8c229e401300e35d199",
+    "crates/burn_llama/src/bin/text_encode.rs": "d256f3302ab0097133aecf4319a70dc04b73987b95d455734b28ba1ce9ef4da0",
+    "crates/burn_llama/src/bin/text_validate.rs": "8db01721ae634130f3d369976bf8011a1938fe4a41a69c9a014589721b7d5027",
+    "crates/burn_llama/src/tokenizer/bpe.rs": "0817c20afc4ee9e27b0200776f795840e248ce80d720c091259947a30b225593",
+    "crates/burn_mhr/src/lib.rs": "1682555775bd4c8e184b8e8a1092ca58898bb3704ee71810d1f04df40338265a",
+    "crates/burn_mhr/src/pretrained.rs": "7edbc1aaefbeba5741ce3e814229e85c705a4685aa0d3ae0172dbeb634434bdc",
+    "crates/burn_mhr/src/bin/validate.rs": "0121cfd71453221ab83b21b5dd61e8f91e4f48fbf1d76ad54b2e2f2274dc3282",
+    "crates/burn_soma/src/geometry.rs": "949952147cb2b8ba2b6142bcf8f5403826650dc04b16be686dfb281e08fce52c",
+    "crates/burn_soma/src/lib.rs": "3240e7ec651b4a27a139d0a2b5054216c8d5823b2b91434012cb247da32fca0f",
+    "crates/burn_soma/src/mhr.rs": "e6b76a906b5dcdf3218e30a79432795beb0a34e4cccf76fa86bc0face37a0a62",
+    "crates/burn_soma/src/model.rs": "6e88e51c65b066e945bec251f01b130a767a62e5bbabb935fcb3416a005948cf",
+    "crates/burn_soma/src/pretrained.rs": "e29c543ecc50a8f4ef85497db4e223c84d164e679700691dfa6cc9c31bd3867f",
+    "crates/burn_soma/src/rig.rs": "17f211d5fb38e9d9228159823b2a30cc62838ca2dd6ab278d3d593d8e6cfb0d9",
+    "crates/burn_soma/src/validation.rs": "9c107ce19effa17703ea6f1c8922e52e3bcfc66f6927388e020fdda129e54e6f",
+    "crates/burn_soma/src/web_validation.rs": "fb7d024a37c349724e4309a0f2ecb6369f065246c1b3da0ccba953865ae78a6b",
+    "crates/burn_soma/src/bin/mhr_validate.rs": "19b0e9d203766a88f93d94889eb8d6132359e88e97a7ba82ea147386a98a0224",
+    "crates/burn_soma/src/bin/validate.rs": "d1f3b4207f504ee6ba35e00560b26db12362a4e9ddfb26888d54f0737109c060",
+    "crates/burn_gemx/src/camera.rs": "0e279b658aa4615d3f8523d48672751368cd3f494749e73d55c460e5e74fcf5b",
+    "crates/burn_gemx/src/denoiser.rs": "79a1898936f3f4c0b6bb601d128e2b046e98337c355b5c060272198fb97f9f3c",
+    "crates/burn_gemx/src/image_input.rs": "e42c67c056da56f98bcbf0c1c48f294c393e09a043e3c02324363f089c1d843e",
+    "crates/burn_gemx/src/lib.rs": "0b161996e9e164e72b217d46f101a1daa3dbcbe4826d65709f5619c931be6599",
+    "crates/burn_gemx/src/ops.rs": "61872391d8e968611c877eec7f5d979b2c6ca5de078c23edb84c9bdcf31d092d",
+    "crates/burn_gemx/src/pipeline.rs": "e29088008d08ce82a1fdf7894d765b2f0830d414833e7419636e28defa1847eb",
+    "crates/burn_gemx/src/pretrained.rs": "d249a6b8e39f9a615ff4cf9bd7e4afcc6b09205b0f13fb92fee88fb5c2cf0e39",
+    "crates/burn_gemx/src/sam.rs": "7d89d4492fa935cb19b5265993c5c184a46f5cae9947629bb7162696af9dd192",
+    "crates/burn_gemx/src/sam_head.rs": "422d1fe0a4c8379c287fc06a727b11ec94139754955152c8e19c9aabf1c47f6c",
+    "crates/burn_gemx/src/validation.rs": "380cdce483a56194cd330a1e25821a9023858591ead53865f4cb9f13cf5fad8e",
+    "crates/burn_gemx/src/vision.rs": "b8847e1a31b0e3883381c0b61751410e6f8ab1a6d2f6fcf96e1d08aa4579e9d6",
+    "crates/burn_gemx/src/web_validation.rs": "9fde509c151f2109be7c70feba51bf6763f3f2186a3bd36bce9fc5e1814ca27e",
+    "crates/burn_gemx/src/bin/denoiser_validate.rs": "05f1b0a1dda30dde6502a0bf31adf042f8837e30cd7adf6f8585583b0e92fe65",
+    "crates/burn_gemx/src/bin/pose.rs": "a033b95b0530eaca50ca71e351fc22d7802b6af1076cfcd53ca887c0d0530f74",
+    "crates/burn_gemx/src/bin/sam_validate.rs": "3de398bc5515f58214f5e05004f1ee77bf8b833a28249d121a57cbd9465728ed",
+    "crates/burn_gemx/src/bin/validate.rs": "818f539235345f6669cef236efb24cd660639430ca65ed1910f4628c5ab1c760",
+    "crates/burn_gemx/src/bin/vision_validate.rs": "4ffa305b244626556f68036e6e30a55cf2c375e34bf89ab6cb6633ccc3212336",
+    "crates/bevy_burn_human/src/lib.rs": "d5057a465444e863b333714d208881f00226698825986571bc2d06cb2017227c",
+    "crates/bevy_burn_human/src/main.rs": "d7a631a240fda789d2de71340ec87bb81e91c125183cb90235f570dc819c5863",
+    "crates/bevy_burn_human/src/motion.rs": "0f37b3c4d7a8310a71db47ba286c85043af2aa08a34167df48b84c84b74638ff",
+    "crates/bevy_burn_human/src/motion/body.rs": "e25cb832c67a8b02ddfc8901fc2e78f17a96a7a80a59ac8b0035d65409c6e1e3",
+    "crates/bevy_burn_human/src/motion/body_ui.rs": "2d8c17592b53f9628c524636b24142e0bb79054ccc5e4263238fa445c2a9aae7",
+    "crates/bevy_burn_human/src/motion/body_view.rs": "caee160ed274b7d3b682f7b1f8c7aa1c536d9558ab994c604206b665dda508be",
+    "crates/bevy_burn_human/src/motion/browser_io.rs": "6e66cf726a0ca3de49db9a431232028110867d7ec67406ace0b41e4e47568e2c",
+    "crates/bevy_burn_human/src/motion/camera.rs": "325ee6697ca9fd6a0fdc01a997ace6733e551debb64de1c352d0eae2c23dc7ce",
+    "crates/bevy_burn_human/src/motion/runtime.rs": "cdea837be44dca215d3f2e1c49e934597e2e37bdf281a12c622aebeac413d186",
+    "crates/bevy_burn_human/src/motion/surface.rs": "0eaaf2f43094eaf6515edbe624eed78dff80f32b44893e0d1a1d20e3f2aa13d7",
+    "crates/bevy_burn_human/src/motion/trajectory.rs": "5f6718b87cdc6425da8fd278c7ecdb30a6c488fdf90b4cd7f39a3e8474fb9010",
+    "crates/bevy_burn_human/src/motion/ui.rs": "fcaf014b65bfc183ff6866b5bf51543b44524b326791a95cf5d6340137907ce1"
+  },
+  "artifacts": {
+    ".cache/gaps-2026-09-27/expanded-suite.json": {
+      "bytes": 6691838,
+      "sha256": "f7850a7809ecc19adcf350343d098c5e36748c9e0d330bbb0c8ef4ac7a90b4d4"
+    },
+    ".cache/gaps-2026-09-27/expanded-suite-web.json": {
+      "bytes": 6671371,
+      "sha256": "b9d8fe341b193477ad3812a43ec92b7a19c038a44c7cf28ccd86f66fad22a331"
+    },
+    ".cache/gaps-2026-09-27/single-profile-input.json": {
+      "bytes": 238858,
+      "sha256": "b19fcce76b8085fe9b56b18f4c102ab582640bcebe00f8fb8739887d278f5ed3"
+    },
+    ".cache/ardy-reference-final/reference.safetensors": {
+      "bytes": 322388,
+      "sha256": "072cd33189a21efb19dc63dac02d7bc0a8f1aeb211a8bf7b00b4318bd23d043f"
+    },
+    ".cache/soma-raw/reference.json": {
+      "bytes": 9501660,
+      "sha256": "61ff5116c9ee3216ee3abdfa8f4d80832fe173f5b288ad1b8616aa8c964fafa7"
+    },
+    ".cache/gem-real-reference.json": {
+      "bytes": 1188583,
+      "sha256": "60f746781a2d716e909c72bc621d4d03ac93c57f840bfbe380c4f42db49a9481"
+    },
+    ".cache/gem-real-reference.png": {
+      "bytes": 3552241,
+      "sha256": "c11c50b69b8d84873e157d61a50ad74929cc53280de6740c9e9161cc42ea5f7f"
+    },
+    ".cache/text-reference.json": {
+      "bytes": 581478,
+      "sha256": "fb0e7d8c66f3ffe357d5111740e6ba319bf84ad5819b8cb6ac682e909a490c81"
+    },
+    ".cache/gaps-2026-09-27/studio/out/bevy_burn_human_bg.wasm": {
+      "bytes": 102576902,
+      "sha256": "364d92186ceb31e6e7e0a3e529338d91b7646e1d88b337318ca6e7327e6f9f35"
+    },
+    ".cache/gaps-2026-09-27/studio/out/bevy_burn_human.js": {
+      "bytes": 114745,
+      "sha256": "81cea310c4dd2e1e0ebb9d628dbacc9753a4c752ee92df8eeef6308521eefb3f"
+    },
+    ".cache/gaps-2026-09-27/release-source-hashes.json": {
+      "bytes": 9361,
+      "sha256": "aff2f2e2e1db43f3a9455f6786465ec9b3d5c886bac48c24e8168decb4ad0128"
+    },
+    "target/debug/ardy-batch-validate": {
+      "bytes": 46355952,
+      "sha256": "47a1cca00451eb00b78c4c56149cc2a31ec52479a506ed837ecba66f4982d01b"
+    },
+    "target/debug/ardy-validate": {
+      "bytes": 50751472,
+      "sha256": "f290e684877f2877760fece2df112b7ded39e26e98a1c35ced3a1130abe18374"
+    },
+    "target/debug/soma-validate": {
+      "bytes": 44995680,
+      "sha256": "2fa1af73913373852a732863532fe4a83430929fae576f239a8531e6d9e6e351"
+    },
+    "target/debug/gem-validate": {
+      "bytes": 57205504,
+      "sha256": "dcc6c663f3ea787c3963a834fe2f1f04b018033bd83ac50d8e85ec514cb5f157"
+    },
+    "target/debug/text-validate": {
+      "bytes": 52298096,
+      "sha256": "47669846efacfbec2c950d24901d83e8bc23d4ef1d9321e54c05a9d12eba73c5"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_ardy/burn_ardy.d.ts": {
+      "bytes": 3710,
+      "sha256": "d48b24748aea0c8aa039d4297bfdef478722ad34763cd006c558c49af165ae16"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_ardy/burn_ardy.js": {
+      "bytes": 49717,
+      "sha256": "1b8536584e276f68aad3419146ca7e6571eef6e39287001f5cc84bbb1c3f4bc5"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_ardy/burn_ardy_bg.wasm": {
+      "bytes": 16934767,
+      "sha256": "9f23c638588085ffa398a5ce89771d0fd9a33228b0726d04ff31eaf0a5782837"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_ardy/burn_ardy_bg.wasm.d.ts": {
+      "bytes": 2066,
+      "sha256": "a7cfedb48320016ae418e6aa0b1f7e0f1886868cf5a5f8c9fa0fdb2dded0c98e"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_ardy/snippets/burn_human_inference-b20730916ea5b8f3/inline0.js": {
+      "bytes": 467,
+      "sha256": "50b478147cb05f65704a9271834a066d83ee52947982b54c3d6471f10854c9f9"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_ardy/snippets/burn_human_inference-b20730916ea5b8f3/inline1.js": {
+      "bytes": 3011,
+      "sha256": "b19b5ff08a92e00291192fcb2259d6d2b5c8588a9f3c3847bd281f8edca27cda"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_soma/burn_soma.d.ts": {
+      "bytes": 3198,
+      "sha256": "4f3c5ca9b79cb75b04653beeec5074dd69866069905eac0e55ecb216683df3ed"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_soma/burn_soma.js": {
+      "bytes": 48642,
+      "sha256": "78577d9fca8b99d6e8aac44615beb182bc211ee6ab3759b621667095d806c0d0"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_soma/burn_soma_bg.wasm": {
+      "bytes": 16337406,
+      "sha256": "33cd0537a8cc590831545a801ae76a177e6c1242ce32a2d32ef5754afbeecfb7"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_soma/burn_soma_bg.wasm.d.ts": {
+      "bytes": 1932,
+      "sha256": "0d8ec7f9f2ea77ceceb99f48f9be04aa91d62eae3176150e860fc488bb4b35ed"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_soma/snippets/burn_human_inference-b20730916ea5b8f3/inline0.js": {
+      "bytes": 467,
+      "sha256": "50b478147cb05f65704a9271834a066d83ee52947982b54c3d6471f10854c9f9"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_soma/snippets/burn_human_inference-b20730916ea5b8f3/inline1.js": {
+      "bytes": 3011,
+      "sha256": "b19b5ff08a92e00291192fcb2259d6d2b5c8588a9f3c3847bd281f8edca27cda"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_gemx/burn_gemx.d.ts": {
+      "bytes": 3711,
+      "sha256": "47db02e42ef2285cf362d2ea11614c50dd90f4d6573812e93de0ce4a9abe1172"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_gemx/burn_gemx.js": {
+      "bytes": 50041,
+      "sha256": "6eff1d2729725a1df99885800ea83963e6c4c037b85893b662d2f32d6db75e0c"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_gemx/burn_gemx_bg.wasm": {
+      "bytes": 32448791,
+      "sha256": "1ddea43a992d1097b376adf70a64cf5388a905b23c7c7450c7c789f62fca712a"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_gemx/burn_gemx_bg.wasm.d.ts": {
+      "bytes": 2149,
+      "sha256": "734cd32a1fcbe3d0c0f6081fb024373aa12f00f0a1ad6168d685513a9f6bf56e"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_gemx/snippets/burn_human_inference-b20730916ea5b8f3/inline0.js": {
+      "bytes": 467,
+      "sha256": "50b478147cb05f65704a9271834a066d83ee52947982b54c3d6471f10854c9f9"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_gemx/snippets/burn_human_inference-b20730916ea5b8f3/inline1.js": {
+      "bytes": 3011,
+      "sha256": "b19b5ff08a92e00291192fcb2259d6d2b5c8588a9f3c3847bd281f8edca27cda"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_llama/burn_llama.d.ts": {
+      "bytes": 2935,
+      "sha256": "db63ba52bdca11e0b9c1456debc81d0d26c21e17cd8159d6116ecadf861543a5"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_llama/burn_llama.js": {
+      "bytes": 48295,
+      "sha256": "cdf3055a0b26efc2a2e907c4d4d597e07cb493281d0165edbc9e4ce50726545c"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_llama/burn_llama_bg.wasm": {
+      "bytes": 18696081,
+      "sha256": "495d1103eedfef0845530d7705791016d210a0aff9566ab33a8c8b2495aa32db"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_llama/burn_llama_bg.wasm.d.ts": {
+      "bytes": 1845,
+      "sha256": "f77031529796e0573a7d97b5a29c7760ea5b24724a5d09cda5b8fe71cd9dc7ef"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_llama/snippets/burn_human_inference-b20730916ea5b8f3/inline0.js": {
+      "bytes": 467,
+      "sha256": "50b478147cb05f65704a9271834a066d83ee52947982b54c3d6471f10854c9f9"
+    },
+    ".cache/gaps-2026-09-27/final-web/burn_llama/snippets/burn_human_inference-b20730916ea5b8f3/inline1.js": {
+      "bytes": 3011,
+      "sha256": "b19b5ff08a92e00291192fcb2259d6d2b5c8588a9f3c3847bd281f8edca27cda"
+    }
+  },
+  "runs": [
+    {
+      "name": "native-release",
+      "command": [
+        "target/debug/ardy-batch-validate",
+        "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model/ardy/core-rp-20fps-h40/v1",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/expanded-suite.json",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/native-release.json"
+      ],
+      "start_utc": "2026-09-27T13:57:40.467705+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 15 %\n",
+      "binary_sha256": "47a1cca00451eb00b78c4c56149cc2a31ec52479a506ed837ecba66f4982d01b",
+      "exit_code": 0
+    },
+    {
+      "name": "native-release-pipelines",
+      "command": [
+        "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/bin/python",
+        "tool/scripts/profile_pipelines.py",
+        "--bin-dir",
+        "target/debug",
+        "--catalog",
+        "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model",
+        "--ardy-reference",
+        ".cache/ardy-reference-final/reference.safetensors",
+        "--soma-reference",
+        ".cache/soma-raw/reference.json",
+        "--gem-reference",
+        ".cache/gem-real-reference.json",
+        "--image",
+        ".cache/gem-real-reference.png",
+        "--out",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/native-release-pipelines",
+        "--label",
+        "final-stability-release"
+      ],
+      "start_utc": "2026-09-27T13:59:30.856007+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 98 %\n",
+      "binary_sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
+      "exit_code": 0
+    },
+    {
+      "name": "llama-native-release",
+      "command": [
+        "target/debug/text-validate",
+        "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model/llama/ardy-llm2vec-8b/v1",
+        ".cache/text-reference.json",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/llama-native-release.json"
+      ],
+      "start_utc": "2026-09-27T14:00:08.855122+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 3 %\n",
+      "binary_sha256": "47669846efacfbec2c950d24901d83e8bc23d4ef1d9321e54c05a9d12eba73c5",
+      "exit_code": 0
+    },
+    {
+      "name": "browser-release",
+      "command": [
+        "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/bin/python",
+        "tool/scripts/profile_webgpu.py",
+        "--chrome",
+        "/home/mosure/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell",
+        "--origin",
+        "http://127.0.0.1:8866",
+        "--module",
+        "http://127.0.0.1:8866/.cache/gaps-2026-09-27/final-web/burn_ardy/burn_ardy.js",
+        "--function",
+        "validate_batch_webgpu",
+        "--args",
+        "[\"http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/ardy/core-rp-20fps-h40/v1\", \"http://127.0.0.1:8866/.cache/gaps-2026-09-27/expanded-suite-web.json\", \"6e03294854771ca3ed6641251c77ab75bd2542d778c02886ea795d8d77655cd8\"]",
+        "--out",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/browser-release.json"
+      ],
+      "start_utc": "2026-09-27T14:00:27.201156+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 100 %\n",
+      "binary_sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
+      "exit_code": 0
+    },
+    {
+      "name": "checkpoint-browser-release",
+      "command": [
+        "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/bin/python",
+        "tool/scripts/profile_webgpu.py",
+        "--chrome",
+        "/home/mosure/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell",
+        "--origin",
+        "http://127.0.0.1:8866",
+        "--module",
+        "http://127.0.0.1:8866/.cache/gaps-2026-09-27/final-web/burn_ardy/burn_ardy.js",
+        "--function",
+        "validate_webgpu",
+        "--args",
+        "[\"http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/ardy/core-rp-20fps-h40/v1\", \"http://127.0.0.1:8866/.cache/ardy-reference-final/reference.safetensors\", \"6e03294854771ca3ed6641251c77ab75bd2542d778c02886ea795d8d77655cd8\"]",
+        "--out",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/checkpoint-browser-release.json"
+      ],
+      "start_utc": "2026-09-27T14:02:07.566927+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 99 %\n",
+      "binary_sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
+      "exit_code": 0
+    },
+    {
+      "name": "production-public-release",
+      "command": [
+        "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/bin/python",
+        "tool/scripts/profile_webgpu.py",
+        "--chrome",
+        "/home/mosure/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell",
+        "--origin",
+        "http://127.0.0.1:8866",
+        "--module",
+        "http://127.0.0.1:8866/.cache/gaps-2026-09-27/final-web/burn_ardy/burn_ardy.js",
+        "--function",
+        "profile_generation_webgpu",
+        "--args",
+        "[\"https://aberration.technology/model/ardy/core-rp-20fps-h40/v1\", \"http://127.0.0.1:8866/.cache/gaps-2026-09-27/single-profile-input.json\", \"6e03294854771ca3ed6641251c77ab75bd2542d778c02886ea795d8d77655cd8\"]",
+        "--out",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/production-public-release.json"
+      ],
+      "start_utc": "2026-09-27T14:02:18.985551+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 7 %\n",
+      "binary_sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
+      "exit_code": 0
+    },
+    {
+      "name": "llama-browser-release",
+      "command": [
+        "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/bin/python",
+        "tool/scripts/profile_webgpu.py",
+        "--chrome",
+        "/home/mosure/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell",
+        "--origin",
+        "http://127.0.0.1:8866",
+        "--module",
+        "http://127.0.0.1:8866/.cache/gaps-2026-09-27/final-web/burn_llama/burn_llama.js",
+        "--function",
+        "validate_text_webgpu",
+        "--args",
+        "[\"http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/llama/ardy-llm2vec-8b/v1\", \"http://127.0.0.1:8866/.cache/text-reference.json\", \"09280ebcf02184708cff1a9f982b901166b433e504ff343f02c037cc52d8ee16\"]",
+        "--out",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/llama-browser-release.json"
+      ],
+      "start_utc": "2026-09-27T14:02:35.838941+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 99 %\n",
+      "binary_sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
+      "exit_code": 0
+    },
+    {
+      "name": "soma-production-release",
+      "command": [
+        "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/bin/python",
+        "tool/scripts/profile_webgpu.py",
+        "--chrome",
+        "/home/mosure/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell",
+        "--origin",
+        "http://127.0.0.1:8866",
+        "--module",
+        "http://127.0.0.1:8866/.cache/gaps-2026-09-27/final-web/burn_soma/burn_soma.js",
+        "--function",
+        "profile_soma_webgpu",
+        "--args",
+        "[\"http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/soma-x/v1/body\", \"96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7\"]",
+        "--out",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/soma-production-release.json"
+      ],
+      "start_utc": "2026-09-27T14:03:18.534753+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 100 %\n",
+      "binary_sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
+      "exit_code": 0
+    },
+    {
+      "name": "gem-production-release",
+      "command": [
+        "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/bin/python",
+        "tool/scripts/profile_webgpu.py",
+        "--chrome",
+        "/home/mosure/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell",
+        "--origin",
+        "http://127.0.0.1:8866",
+        "--module",
+        "http://127.0.0.1:8866/.cache/gaps-2026-09-27/final-web/burn_gemx/burn_gemx.js",
+        "--function",
+        "profile_gem_webgpu",
+        "--args",
+        "[\"http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/gemx/v1/suite.json\", \"http://127.0.0.1:8866/.cache/gem-real-reference.png\", \"{\\\"crop\\\": {\\\"center\\\": [960.0, 640.0], \\\"size\\\": 1250.0}, \\\"camera\\\": {\\\"focal\\\": [2704.163456597992, 2704.163456597992], \\\"center\\\": [1125.0, 750.0]}}\"]",
+        "--out",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/gem-production-release.json"
+      ],
+      "start_utc": "2026-09-27T14:03:21.624551+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 13 %\n",
+      "binary_sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
+      "exit_code": 0
+    },
+    {
+      "name": "soma-browser-release",
+      "command": [
+        "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/bin/python",
+        "tool/scripts/profile_webgpu.py",
+        "--chrome",
+        "/home/mosure/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell",
+        "--origin",
+        "http://127.0.0.1:8866",
+        "--module",
+        "http://127.0.0.1:8866/.cache/gaps-2026-09-27/final-web/burn_soma/burn_soma.js",
+        "--function",
+        "validate_soma_webgpu",
+        "--args",
+        "[\"http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/soma-x/v1/body\", \"http://127.0.0.1:8866/.cache/soma-raw/reference.json\", \"96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7\"]",
+        "--out",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/soma-browser-release.json"
+      ],
+      "start_utc": "2026-09-27T14:04:35.266833+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1581 MiB, 11 %\n",
+      "binary_sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
+      "exit_code": 0
+    },
+    {
+      "name": "gem-browser-release",
+      "command": [
+        "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/bin/python",
+        "tool/scripts/profile_webgpu.py",
+        "--chrome",
+        "/home/mosure/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell",
+        "--origin",
+        "http://127.0.0.1:8866",
+        "--module",
+        "http://127.0.0.1:8866/.cache/gaps-2026-09-27/final-web/burn_gemx/burn_gemx.js",
+        "--function",
+        "validate_gem_webgpu",
+        "--args",
+        "[\"http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/gemx/v1/suite.json\", \"http://127.0.0.1:8866/.cache/gem-real-reference.json\", \"http://127.0.0.1:8866/.cache/gem-real-reference.png\"]",
+        "--out",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/gem-browser-release.json"
+      ],
+      "start_utc": "2026-09-27T14:04:38.482684+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1594 MiB, 66 %\n",
+      "binary_sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
+      "exit_code": 0
+    },
+    {
+      "name": "browser-transport-release",
+      "command": [
+        "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/bin/python",
+        "tool/scripts/test_browser_transport.py",
+        "--chrome",
+        "/home/mosure/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell",
+        "--base",
+        "http://127.0.0.1:8866",
+        "--wasm-out",
+        ".cache/gaps-2026-09-27/final-web/burn_ardy",
+        "--out",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/browser-transport-release.json"
+      ],
+      "start_utc": "2026-09-27T14:05:51.329748+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 96 %\n",
+      "binary_sha256": "021044895e95be79dc2f110367607e684119afbc8ce75f6f0eec94844e0acec7",
+      "exit_code": 0
+    },
+    {
+      "name": "burn_ardy-hardware-release",
+      "command": [
+        "target/debug/build/burn_ardy/b0f0db8815552fad/out/burn_ardy-b0f0db8815552fad",
+        "full_clip_batch",
+        "--ignored",
+        "--nocapture"
+      ],
+      "start_utc": "2026-09-27T14:05:51.828667+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1595 MiB, 24 %\n",
+      "binary_sha256": "ebe59834f1b8e3a9a520620d63647ed3c55a57003c65660e8d782ffaf0b88216",
+      "exit_code": 0
+    },
+    {
+      "name": "bevy_burn_human-hardware-release",
+      "command": [
+        "target/debug/build/bevy_burn_human/6ce52b1c8454cd1c/out/bevy_burn_human-6ce52b1c8454cd1c",
+        "gpu_handoff_preserves",
+        "--ignored",
+        "--nocapture"
+      ],
+      "start_utc": "2026-09-27T14:05:59.288560+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 99 %\n",
+      "binary_sha256": "d73001794ff80e7060725e58eaa79371324643e720cd530c09f8f267bddede71",
+      "exit_code": 0
+    },
+    {
+      "name": "burn_llama-hardware-release",
+      "command": [
+        "target/debug/build/burn_llama/0d5d83092c951fa3/out/burn_llama-0d5d83092c951fa3",
+        "incremental_bpe",
+        "--ignored",
+        "--nocapture"
+      ],
+      "start_utc": "2026-09-27T14:06:00.355928+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 4 %\n",
+      "binary_sha256": "bbe4be4aded6151bdcb791bcab97b0659525cf485c7b534359cb60ed534d1256",
+      "exit_code": 0
+    }
+  ],
+  "pipeline_runs": [
+    {
+      "name": "ardy",
+      "label": "final-stability-release",
+      "command": [
+        "/media/mosure/hyper1/repos/burn_human/target/debug/ardy-validate",
+        "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model/ardy/core-rp-20fps-h40/v1",
+        ".cache/ardy-reference-final/reference.safetensors",
+        "wgpu"
+      ],
+      "binary_sha256": "f290e684877f2877760fece2df112b7ded39e26e98a1c35ced3a1130abe18374",
+      "start_utc": "2026-09-27T13:59:30.997652+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 98 %\n",
+      "exit_code": 0,
+      "elapsed_seconds": 5.490435327985324
+    },
+    {
+      "name": "soma",
+      "label": "final-stability-release",
+      "command": [
+        "/media/mosure/hyper1/repos/burn_human/target/debug/soma-validate",
+        "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model/soma-x/v1/body",
+        ".cache/soma-raw/reference.json",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/native-release-pipelines/soma.json"
+      ],
+      "binary_sha256": "2fa1af73913373852a732863532fe4a83430929fae576f239a8531e6d9e6e351",
+      "start_utc": "2026-09-27T13:59:36.580839+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 99 %\n",
+      "exit_code": 0,
+      "elapsed_seconds": 1.8453455959679559
+    },
+    {
+      "name": "gemx",
+      "label": "final-stability-release",
+      "command": [
+        "/media/mosure/hyper1/repos/burn_human/target/debug/gem-validate",
+        "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model/gemx/v1/suite.json",
+        ".cache/gem-real-reference.png",
+        ".cache/gem-real-reference.json",
+        "/media/mosure/hyper1/repos/burn_human/.cache/gaps-2026-09-27/native-release-pipelines/gemx.json"
+      ],
+      "binary_sha256": "dcc6c663f3ea787c3963a834fe2f1f04b018033bd83ac50d8e85ec514cb5f157",
+      "start_utc": "2026-09-27T13:59:38.508257+00:00",
+      "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1576 MiB, 66 %\n",
+      "exit_code": 0,
+      "elapsed_seconds": 30.319845944992267
+    }
+  ]
+}

@@ -32,13 +32,25 @@ jobs:
       - name: install wasm32-unknown-unknown
         run: rustup target add wasm32-unknown-unknown
 
-      - name: install wasm-bindgen-cli
-        run: cargo install wasm-bindgen-cli
+      - name: setup Python for build metadata
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: install the locked wasm-bindgen-cli version
+        run: |
+          python3 - <<'PYBINDGEN'
+          import subprocess, tomllib
+          with open('Cargo.lock', 'rb') as lock:
+              packages = tomllib.load(lock)['package']
+          version = next(p['version'] for p in packages if p['name'] == 'wasm-bindgen')
+          subprocess.run(['cargo', 'install', 'wasm-bindgen-cli', '--version', version, '--locked'], check=True)
+          PYBINDGEN
 
       # - name: install wasm-opt
       #   run: cargo install wasm-opt --locked
 
-      - name: build wasm artifacts
+      - name: build the WebGPU studio (explicit feature)
         run: cargo build -p bevy_burn_human --target wasm32-unknown-unknown --release --no-default-features --features studio --bin bevy_burn_human --locked
 
       # - name: optimize wasm artifacts
@@ -46,6 +58,19 @@ jobs:
 
       - name: generate bindings with wasm-bindgen
         run: wasm-bindgen --out-dir ./crates/bevy_burn_human/www/out/ --target web ./target/wasm32-unknown-unknown/release/bevy_burn_human.wasm
+
+      - name: record the deployed studio build
+        run: |
+          python3 - <<'PYBUILD'
+          import json, os, pathlib
+          path = pathlib.Path('crates/bevy_burn_human/www/build.json')
+          path.write_text(json.dumps({
+              'commit': os.environ['GITHUB_SHA'],
+              'features': ['studio'],
+              'target': 'wasm32-unknown-unknown',
+              'profile': 'release',
+          }, indent=2) + '\n')
+          PYBUILD
 
       - name: copy assets
         run: |

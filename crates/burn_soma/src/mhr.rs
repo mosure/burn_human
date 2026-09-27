@@ -82,8 +82,10 @@ impl<B: Backend> MhrSomaTransfer<B> {
         ensure!(actual == expected, "Transfer tensor inventory mismatch");
         let mut weights = TensorBank::new(device);
         let mut indices = BTreeMap::new();
+        let mut uploads = burn_human_inference::weights::UploadBudget::default();
         for object in &manifest.objects {
             for (name, data) in read_tensors(source, object).await? {
+                let bytes = data.bytes.len();
                 if data.dtype == burn::tensor::DType::I32 {
                     let values = data
                         .to_vec::<i32>()
@@ -107,6 +109,8 @@ impl<B: Backend> MhrSomaTransfer<B> {
                 } else {
                     weights.insert(name, data)?;
                 }
+                uploads.record::<B>(device, bytes).await?;
+                burn_human_inference::cooperative::yield_to_browser().await;
             }
         }
         Ok(Self { weights, indices })

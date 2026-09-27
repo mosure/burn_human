@@ -12,20 +12,22 @@ temporary conditioning covers at most 200 frames regardless of clip duration.
 Progress reports completed frames per actor and permits cancellation between
 windows. Text embeddings can be cached and reused; text encoding is separate.
 
-Keep the batch size and backend fixed when comparing seeded clips. Floating-point
-differences can cross ARDY's discrete motion-code rounding boundaries, producing
-different poses even with identical seeds. Batch/serial continuous numerical
-hooks and complete-clip differences are reported separately in the release
-evidence; batching does not promise identical clips to serial generation.
+The unfused WGPU backend pins matmul and reduction strategies to keep motion
+codes stable as actor count changes. Qualification gates both continuous values
+and discrete codes, then compares complete serial/batch clips and actor order.
+Use `burn_human_inference::gpu::WgpuBackend` for this path; other backends and
+adapters require their own numerical qualification. Seeds are not a promise of
+bitwise equivalence across different devices or software versions.
 
 ```toml
-burn_ardy = { version = "0.1.3", features = ["wgpu"] }
+burn_ardy = { version = "0.1.4", features = ["wgpu"] }
+burn_human_inference = { version = "0.1.4", features = ["wgpu"] }
 ```
 
 The model owns its immutable CDN catalog and loading policy:
 
 ```rust,ignore
-let model = burn_ardy::Ardy::<burn::backend::Wgpu>::load_pretrained(
+let model = burn_ardy::Ardy::<burn_human_inference::gpu::WgpuBackend>::load_pretrained(
     &device,
     |done, total| { /* progress */ },
 ).await?;
@@ -39,4 +41,4 @@ Model weights are distributed separately under their upstream terms; consult the
 
 See [CDN preparation and validation](https://github.com/mosure/burn_human/blob/main/docs/cdn.md), [inference guide](https://github.com/mosure/burn_human/blob/main/docs/motion.md), and [numerical/performance evidence](https://github.com/mosure/burn_human/tree/main/docs/evidence/portable-2026-09-26).
 
-Performance and GPU residency are described in the [performance guide](https://github.com/mosure/burn_human/blob/main/docs/performance.md). Native WGPU uses kernel autotuning; WebGPU uses the portable kernel configuration validated in the repository. Burn graph fusion is not enabled by these crates.
+Performance and GPU residency are described in the [performance guide](https://github.com/mosure/burn_human/blob/main/docs/performance.md). ARDY's sensitive WGPU kernels use fixed strategies on native and WebGPU. Burn graph fusion is not enabled by these crates. Browser loading uses WebCrypto for authenticated hashes and yields between tensor uploads; generation yields between transformer stages without extra device readbacks. The `denoise_async`, `encode_async`, `decode_async` and `sample_window_async` APIs expose cooperative scheduling; synchronous counterparts remain available.

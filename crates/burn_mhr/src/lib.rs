@@ -185,7 +185,7 @@ impl<B: Backend> Mhr<B> {
                         .map(|v| [v[0] as u32, v[1] as u32, v[2] as u32])
                         .collect();
                 } else {
-                    weights.insert(name, data)?;
+                    weights.insert_async(name, data).await?;
                 }
             }
             progress(i + 1, manifest.objects.len());

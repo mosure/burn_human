@@ -53,7 +53,14 @@ impl ModelSource {
     }
     pub async fn asset(&self, asset: &burn_human_motion::artifacts::Asset) -> Result<Vec<u8>> {
         let bytes = read_bounded(&format!("{}/{}", self.base, asset.path), asset.size).await?;
+        #[cfg(not(target_arch = "wasm32"))]
         asset.verify(&bytes)?;
+        #[cfg(target_arch = "wasm32")]
+        ensure!(
+            bytes.len() == asset.size && browser::digest(&bytes).await? == asset.sha256,
+            "asset size/digest mismatch: {}",
+            asset.path
+        );
         Ok(bytes)
     }
 }
@@ -96,6 +103,10 @@ pub async fn read_bounded(location: &str, limit: usize) -> Result<Vec<u8>> {
 
 #[cfg(not(target_arch = "wasm32"))]
 impl PartReader for ModelSource {
+    async fn read_verified_part(&mut self, part: &Part) -> Result<Vec<u8>> {
+        self.read_part(part).await
+    }
+
     async fn read_part(&mut self, part: &Part) -> Result<Vec<u8>> {
         ensure!(part.size <= MAX_PART_BYTES, "part exceeds byte limit");
         let cached = self.cache.as_ref().map(|p| p.join(part.path()));
@@ -154,6 +165,13 @@ fn cache_part(path: &std::path::Path, bytes: &[u8]) -> std::io::Result<()> {
 #[cfg(target_arch = "wasm32")]
 mod browser {
     use wasm_bindgen::prelude::*;
+    pub async fn digest(bytes: &[u8]) -> anyhow::Result<String> {
+        motion_digest(bytes)
+            .await
+            .map_err(|e| anyhow::anyhow!("SHA-256: {}", error_message(e)))?
+            .as_string()
+            .ok_or_else(|| anyhow::anyhow!("SHA-256 returned a non-string digest"))
+    }
     pub fn error_message(error: JsValue) -> String {
         error
             .as_string()
@@ -187,8 +205,11 @@ async function bounded(response, limit) {
 }
 async function authentic(data, digest, size) {
   if (data.length !== size) return false;
+  return await motion_digest(data) === digest;
+}
+export async function motion_digest(data) {
   const hash = new Uint8Array(await crypto.subtle.digest('SHA-256',data));
-  return Array.from(hash,b=>b.toString(16).padStart(2,'0')).join('') === digest;
+  return Array.from(hash,b=>b.toString(16).padStart(2,'0')).join('');
 }
 export async function motion_read(url, limit) {
   return bounded(await fetch(url),limit);
@@ -196,20 +217,26 @@ export async function motion_read(url, limit) {
 let partIndex = null;
 let partBytes = 0;
 const cacheBudget = 8 * 1024 * 1024 * 1024;
-export async function motion_part(url, size, digest) {
+export async function motion_part(url, size, digest, yieldTask) {
   let cache = null;
   try {cache = await caches.open('burn-human-motion-parts-v1');} catch (_) {}
   if (cache) {
     try {
       const hit = await cache.match(url);
       if (hit) {
-        try {const b=await bounded(hit,size);if(await authentic(b,digest,size))return b;}catch(_){}
+        try {
+          const b=await bounded(hit,size);
+          await yieldTask();
+          if(await authentic(b,digest,size)) {await yieldTask();return b;}
+        } catch(_) {}
         await cache.delete(url);
       }
     } catch (_) {cache = null;}
   }
   const data = await motion_read(url,size);
+  await yieldTask();
   if (!await authentic(data,digest,size)) throw new Error('Artifact digest mismatch');
+  await yieldTask();
   if (cache) {
     try {
       // Build the FIFO inventory once per page, not once per large part.
@@ -232,10 +259,13 @@ export async function motion_part(url, size, digest) {
       partIndex.set(key,data.length); partBytes += data.length;
     } catch (_) {}
   }
+  await yieldTask();
   return data;
 }
 "#)]
     extern "C" {
+        #[wasm_bindgen(catch)]
+        pub async fn motion_digest(bytes: &[u8]) -> Result<JsValue, JsValue>;
         #[wasm_bindgen(catch)]
         pub async fn motion_read(url: &str, limit: usize) -> Result<js_sys::Uint8Array, JsValue>;
         #[wasm_bindgen(catch)]
@@ -243,6 +273,7 @@ export async function motion_part(url, size, digest) {
             url: &str,
             size: usize,
             digest: &str,
+            yield_task: &js_sys::Function,
         ) -> Result<js_sys::Uint8Array, JsValue>;
     }
 }
@@ -256,17 +287,28 @@ pub async fn read_bounded(location: &str, limit: usize) -> Result<Vec<u8>> {
 }
 #[cfg(target_arch = "wasm32")]
 impl PartReader for ModelSource {
+    async fn read_verified_part(&mut self, part: &Part) -> Result<Vec<u8>> {
+        self.read_part(part).await
+    }
+
     async fn read_part(&mut self, part: &Part) -> Result<Vec<u8>> {
         ensure!(part.size <= MAX_PART_BYTES, "part exceeds byte limit");
         let bytes = browser::motion_part(
             &format!("{}/{}", self.base, part.path()),
             part.size,
             &part.sha256,
+            &crate::cooperative::yield_callback(),
         )
         .await
         .map_err(|e| anyhow::anyhow!("artifact fetch: {}", browser::error_message(e)))?
         .to_vec();
-        part.verify(&bytes)?;
+        // motion_part authenticates both network and cache responses before
+        // returning. Multipart assembly and extracted tensors retain their
+        // independent digest checks.
         Ok(bytes)
+    }
+
+    async fn digest(&mut self, bytes: &[u8]) -> Result<String> {
+        browser::digest(bytes).await
     }
 }

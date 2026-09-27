@@ -1,0 +1,169 @@
+{
+  "report": {
+    "artifacts": {
+      "denoiser": {
+        "base": "http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/gemx/v1/denoiser",
+        "sha256": "8849a57736ee9c5119a1598a5a931b8d0f6892f93eba340765553ac78b89b2f3"
+      },
+      "mhr": {
+        "base": "http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/soma-x/v1/mhr",
+        "sha256": "c7d6e4fc479b8ca68ab1ba6736923bcd93d9f61252c3009ace1ebef6bb5eff65"
+      },
+      "sam_decoder": {
+        "base": "http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/gemx/v1/sam-decoder",
+        "sha256": "35c5b33c1041f9950af97def56335e7d3929eec6a6ce6180989b8423fb3f4b3e"
+      },
+      "sam_vision": {
+        "base": "http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/gemx/v1/sam-vision",
+        "sha256": "66fc185473d361d1934fbec7d427a3be4602bc410bec6427b4a7e3d48c18c90b"
+      },
+      "soma": {
+        "base": "http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/soma-x/v1/body",
+        "sha256": "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7"
+      },
+      "transfer": {
+        "base": "http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/soma-x/v1/transfer",
+        "sha256": "0eaabd1e7fd976c37c9f99e609c2d713b814f56497c2c903b854a7d1d3abb6f8"
+      },
+      "vitpose": {
+        "base": "http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/gemx/v1/vitpose",
+        "sha256": "d868f3d06eb7ff2d7acf014c430b1b3a8b6bee269bc407e78a97127d77349e1d"
+      }
+    },
+    "inference_seconds": [
+      1.7687,
+      0.5158,
+      0.4909,
+      0.5193
+    ],
+    "passed": true,
+    "phases": [
+      {
+        "end_ms": 211.7,
+        "name": "device",
+        "start_ms": 0
+      },
+      {
+        "end_ms": 68173,
+        "name": "load",
+        "start_ms": 211.7
+      },
+      {
+        "end_ms": 68213.6,
+        "name": "image",
+        "start_ms": 68173
+      },
+      {
+        "end_ms": 69982.4,
+        "name": "cold_inference",
+        "start_ms": 68213.6
+      },
+      {
+        "end_ms": 70498.3,
+        "name": "warm_inference",
+        "start_ms": 69982.4
+      },
+      {
+        "end_ms": 70989.2,
+        "name": "warm_inference",
+        "start_ms": 70498.3
+      },
+      {
+        "end_ms": 71508.5,
+        "name": "warm_inference",
+        "start_ms": 70989.2
+      }
+    ],
+    "scope": "production load, image decode and synchronized image inference; WASM startup and checkpoint reconstruction hooks excluded"
+  },
+  "elapsed_ms": 71542.60000002384,
+  "adapter": {
+    "vendor": "nvidia",
+    "architecture": "blackwell",
+    "fallback": false
+  },
+  "event_loop": {
+    "scope": "production load, image decode and synchronized image inference; WASM startup and checkpoint reconstruction hooks excluded",
+    "frames": 3608,
+    "p50_ms": 16.69999999999709,
+    "p95_ms": 33.40000000000873,
+    "p99_ms": 50.100000000000364,
+    "max_ms": 100,
+    "long_tasks_ms": []
+  },
+  "event_loop_by_phase": [
+    {
+      "end_ms": 211.7,
+      "name": "device",
+      "start_ms": 0,
+      "max_gap_ms": 16.700000000000045,
+      "p95_gap_ms": 16.700000000000045,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 68173,
+      "name": "load",
+      "start_ms": 211.7,
+      "max_gap_ms": 100,
+      "p95_gap_ms": 49.89999999999782,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 68213.6,
+      "name": "image",
+      "start_ms": 68173,
+      "max_gap_ms": 83.30000000000291,
+      "p95_gap_ms": 83.30000000000291,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 69982.4,
+      "name": "cold_inference",
+      "start_ms": 68213.6,
+      "max_gap_ms": 83.30000000000291,
+      "p95_gap_ms": 16.70000000001164,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 70498.3,
+      "name": "warm_inference",
+      "start_ms": 69982.4,
+      "max_gap_ms": 16.80000000000291,
+      "p95_gap_ms": 16.80000000000291,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 70989.2,
+      "name": "warm_inference",
+      "start_ms": 70498.3,
+      "max_gap_ms": 16.80000000000291,
+      "p95_gap_ms": 16.80000000000291,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 71508.5,
+      "name": "warm_inference",
+      "start_ms": 70989.2,
+      "max_gap_ms": 16.80000000000291,
+      "p95_gap_ms": 16.80000000000291,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    }
+  ],
+  "diagnostics": null,
+  "wasm_linear_memory_peak_bytes": 231407616,
+  "browser": "153.0.8010.12",
+  "module": "http://127.0.0.1:8866/.cache/gaps-2026-09-27/final-web/burn_gemx/burn_gemx.js",
+  "function": "profile_gem_webgpu",
+  "args": [
+    "http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/gemx/v1/suite.json",
+    "http://127.0.0.1:8866/.cache/gem-real-reference.png",
+    "{\"crop\": {\"center\": [960.0, 640.0], \"size\": 1250.0}, \"camera\": {\"focal\": [2704.163456597992, 2704.163456597992], \"center\": [1125.0, 750.0]}}"
+  ]
+}

@@ -1,9 +1,10 @@
 use anyhow::{Result, ensure};
-use burn::backend::{Wgpu, wgpu::WgpuDevice};
+use burn::backend::wgpu::WgpuDevice;
 use burn_ardy::{
     Ardy,
     validation::batch::{Suite, validate},
 };
+use burn_human_inference::gpu::WgpuBackend as Wgpu;
 
 fn main() -> Result<()> {
     pollster::block_on(async {

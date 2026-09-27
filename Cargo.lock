@@ -619,7 +619,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_burn_human"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "anyhow",
  "bevy",
@@ -2118,6 +2118,7 @@ dependencies = [
  "burn-tch",
  "burn-vision",
  "burn-wgpu",
+ "cubecl",
 ]
 
 [[package]]
@@ -2508,14 +2509,16 @@ dependencies = [
 
 [[package]]
 name = "burn_ardy"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "burn",
+ "burn-cubecl",
  "burn-store",
  "burn_human_inference",
  "burn_human_motion",
  "console_error_panic_hook",
+ "cubek",
  "getrandom 0.4.3",
  "glam 0.32.1",
  "memmap2",
@@ -2531,7 +2534,7 @@ dependencies = [
 
 [[package]]
 name = "burn_gemx"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "anyhow",
  "burn",
@@ -2570,12 +2573,13 @@ dependencies = [
 
 [[package]]
 name = "burn_human_inference"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "burn",
  "burn-store",
  "burn_human_motion",
+ "bytes",
  "getrandom 0.4.3",
  "half",
  "js-sys",
@@ -2591,7 +2595,7 @@ dependencies = [
 
 [[package]]
 name = "burn_human_motion"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "glam 0.32.1",
@@ -2619,7 +2623,7 @@ dependencies = [
 
 [[package]]
 name = "burn_llama"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "burn",
@@ -2640,7 +2644,7 @@ dependencies = [
 
 [[package]]
 name = "burn_mhr"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "burn",
@@ -2656,7 +2660,7 @@ dependencies = [
 
 [[package]]
 name = "burn_soma"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "anyhow",
  "burn",

@@ -1,7 +1,5 @@
-use burn::backend::{
-    Wgpu,
-    wgpu::{WgpuDevice, graphics::WebGpu, init_setup_async},
-};
+use burn::backend::wgpu::{WgpuDevice, graphics::WebGpu, init_setup_async};
+use burn_human_inference::gpu::WgpuBackend as Wgpu;
 use burn_human_inference::transport::read_bounded;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]

@@ -2,17 +2,17 @@
 
 | Crate | Release | Responsibility |
 | --- | --- | --- |
-| `burn_ardy` | 0.1.3 | Batched ARDY Core27 motion, trajectory conditioning, checkpoint loading |
-| `burn_llama` | 0.1.1 | Llama 3 8B / LLM2Vec text conditioning, paged vocabulary |
-| `burn_soma` | 0.1.2 | SOMA-X identity, rig, correctives, skinning and optional MHR transfer |
-| `burn_gemx` | 0.1.2 | GEM-X image inference and composition of seven component releases |
-| `burn_mhr` | 0.1.1 | MHR evaluation and its independent checkpoint |
-| `burn_human_inference` | 0.1.3 | Model-neutral transport, bounded cache, Burnpack/tensor verification |
+| `burn_ardy` | 0.1.4 | Batched ARDY Core27 motion, trajectory conditioning, checkpoint loading |
+| `burn_llama` | 0.1.2 | Llama 3 8B / LLM2Vec text conditioning, paged vocabulary |
+| `burn_soma` | 0.1.3 | SOMA-X identity, rig, correctives, skinning and optional MHR transfer |
+| `burn_gemx` | 0.1.3 | GEM-X image inference and composition of seven component releases |
+| `burn_mhr` | 0.1.2 | MHR evaluation and its independent checkpoint |
+| `burn_human_inference` | 0.1.4 | Model-neutral transport, bounded cache, Burnpack/tensor verification |
 
 `burn_llama` replaces `burn_ardy_text` 0.1.0; `burn_gemx` replaces `burn_gem`
 0.1.0. Their implementations live in the newly named crates. The previously
 published packages remain available. `burn_human` 0.5.1 supplies Anny;
-`bevy_burn_human` 0.6.0 integrates the model crates with its default `studio`
+`bevy_burn_human` 0.6.1 integrates the model crates with its default `studio`
 feature. All use published Burn 0.21 / Bevy 0.19 dependencies
 and the same wgpu 29 version, without patches.
 
@@ -121,7 +121,7 @@ dependencies. Serve JSON as `application/json`, parts as
 bytes without transformations, authentication or HTML error wrappers.
 Keep `UPLOAD.md`, `release.json` and `SHA256SUMS` outside the model prefixes.
 
-The public suite will be:
+The public suite is:
 `https://aberration.technology/model/gemx/v1/suite.json`.
 The public deployment passed complete native shard verification and real
 WebGPU inference with cold, warm and corrupted-cache loads. See

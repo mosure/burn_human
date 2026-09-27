@@ -115,9 +115,6 @@ mod tests {
                 .generate_batch(&requests, &embeddings, |_| true)
                 .await
                 .unwrap();
-            // Keep the batch shape fixed: changing it can change FSQ codes at
-            // rounding boundaries. The real-checkpoint CLI separately gates
-            // continuous batch/serial hooks and reports decoded-clip drift.
             let reversed = model
                 .generate_batch(
                     &[requests[1].clone(), requests[0].clone()],
@@ -127,21 +124,27 @@ mod tests {
                 .await
                 .unwrap();
             for i in 0..2 {
-                let single = &reversed[1 - i];
-                let mut max_position = 0.0f32;
-                let mut max_rotation = 0.0f32;
-                for (a, b) in batch[i].frames.iter().zip(&single.frames) {
-                    max_position =
-                        max_position.max(a.root_translation.distance(b.root_translation));
-                    for (a, b) in a.local_rotations.iter().zip(&b.local_rotations) {
-                        let dot = a.as_dquat().normalize().dot(b.as_dquat().normalize());
-                        max_rotation = max_rotation.max((2.0 * dot.abs().min(1.0).acos()) as f32);
+                let serial = model
+                    .generate(&requests[i], &embeddings[i], |_| true)
+                    .await
+                    .unwrap();
+                for single in [&reversed[1 - i], &serial] {
+                    let mut max_position = 0.0f32;
+                    let mut max_rotation = 0.0f32;
+                    for (a, b) in batch[i].frames.iter().zip(&single.frames) {
+                        max_position =
+                            max_position.max(a.root_translation.distance(b.root_translation));
+                        for (a, b) in a.local_rotations.iter().zip(&b.local_rotations) {
+                            let dot = a.as_dquat().normalize().dot(b.as_dquat().normalize());
+                            max_rotation =
+                                max_rotation.max((2.0 * dot.abs().min(1.0).acos()) as f32);
+                        }
                     }
+                    println!(
+                        "actor {i}: maximum root error {max_position} m, rotation error {max_rotation} rad"
+                    );
+                    assert!(max_position < 0.000001 && max_rotation < 0.000001);
                 }
-                println!(
-                    "actor {i}: maximum root error {max_position} m, rotation error {max_rotation} rad"
-                );
-                assert!(max_position < 0.0001 && max_rotation < 0.00001);
             }
             assert_ne!(
                 batch[0].frames[0].root_translation,
@@ -172,8 +175,9 @@ impl<B: Backend> Ardy<B> {
     /// cover at most 200 frames. Returned clips remain in request order.
     /// The callback receives completed frames per actor and can cancel before
     /// each window; its final notification does not cancel completed results.
-    /// Keep batch size/backend fixed for seeded comparisons: floating-point
-    /// differences can cross FSQ rounding boundaries and change decoded poses.
+    /// The unfused WGPU backend pins numerically sensitive kernels so changing
+    /// actor count does not select a different accumulation strategy. Other
+    /// backends and adapters require their own numerical qualification.
     pub async fn generate_batch(
         &self,
         requests: &[MotionRequest],
@@ -182,6 +186,7 @@ impl<B: Backend> Ardy<B> {
     ) -> Result<Vec<MotionClip>> {
         validate_batch(requests, embeddings)?;
         ensure!(progress(0), "generation cancelled");
+        burn_human_inference::cooperative::yield_to_browser().await;
         let first = &requests[0];
         let batch = requests.len();
         let device = &self.weights.device;
@@ -233,7 +238,7 @@ impl<B: Backend> Ardy<B> {
                     headings[b] = s.atan2(c);
                 }
                 let history = resident.as_ref().expect("resident history").clone();
-                let encoded = self.encode(history.clone())?;
+                let encoded = self.encode_async(history.clone()).await?;
                 let root = (history.slice([0..batch, 0..history_frames, 0..5])
                     - Tensor::from_data(
                         TensorData::new(translations.clone(), [batch, 1, 5]),
@@ -301,13 +306,14 @@ impl<B: Backend> Ardy<B> {
                 .reshape([batch, frames, 5])
                 + Tensor::from_data(TensorData::new(translations, [batch, 1, 5]), device);
             let output = self
-                .decode(Tensor::cat(
+                .decode_async(Tensor::cat(
                     vec![
                         root.reshape([batch, frames / 4, 20]),
                         hybrid.slice([0..batch, 0..frames / 4, 20..148]),
                     ],
                     2,
-                ))?
+                ))
+                .await?
                 .slice([0..batch, history_frames..frames, 0..330]);
             if first.history_frames > 0 {
                 let history = resident.take().map_or_else(

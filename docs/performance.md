@@ -1,13 +1,19 @@
 # GPU inference and rendering
 
 ARDY, GEM-X and SOMA use Burn 0.21 on native WGPU and browser WebGPU. Native
-WGPU enables kernel autotuning, including backend-selected attention. WebGPU
+WGPU enables kernel autotuning for GEM-X and SOMA, including backend-selected attention. WebGPU
 keeps the portable kernel configuration: the tested WebGPU autotuning trial
 failed SOMA shape/pose parity.
 First use of a new shape can compile and benchmark kernels; warm timings must
 be reported separately. These crates do **not** enable Burn graph fusion:
 the tested native Burn 0.21 fusion configuration also failed SOMA numerical parity.
 Downstream applications should qualify any additional backend features.
+
+ARDY pins its dense matmul, attention and reduction strategies on the unfused
+WGPU backend. Shape-dependent autotuning previously changed accumulation order
+enough to cross discrete FSQ code boundaries when batching actors. Fixed
+strategies avoid that source of drift and its first-use benchmark work, while
+retaining parallel GPU execution. Shader compilation still occurs on first use.
 
 ## Keep outputs on the device
 
@@ -66,20 +72,38 @@ requires the same device/queue, f32 data and the explicit backend above.
   per actor, even for a 12,000-frame request.
 
 Native viewer jobs run on one persistent worker. Browser ARDY generation,
-Llama text encoding and GEM-X inference yield real browser tasks between DDIM
-steps, transformer blocks and vision blocks, respectively.
-`sample_window_async` and `Vision::forward_async` expose the same
+Llama text encoding and GEM-X inference yield real browser tasks between ARDY
+transformer stages, Llama attention/feed-forward stages and vision blocks, respectively.
+ARDY's `denoise_async`, `encode_async`, `decode_async`, `sample_window_async`
+and GEM-X's `Vision::forward_async` expose the same
 scheduling for other applications. These yields do not wait for GPU completion.
 Synchronous variants remain available for throughput/validation callers.
+Browser transport delegates SHA-256 to WebCrypto for parts, assembled objects,
+tensors and metadata. Already authenticated parts are not hashed twice, and
+single-part objects reuse their allocation. Burnpack tensor views share that
+authenticated allocation through upload, avoiding object and per-tensor staging
+copies. Tensor inventory, finite values,
+exact sizes and all independent digest checks remain mandatory. Browser finite
+checks scan at most 1 MiB per task. The loader awaits upload completion after
+each accumulated 32 MiB of tensor data; individual tensors may be larger. This
+loading backpressure prevents a later small upload from flushing gigabytes at
+once. It does not add per-layer inference fences or tensor readback.
+
+Llama initializes its BPE tables in groups of 2,048 entries while retaining the
+upstream pretokenizer, chat processor and rank/leftmost merge policy. Its
+`PromptTokenizer::from_bytes_async` is used by model loading; the synchronous
+Hugging Face constructor remains available. A pinned-tokenizer regression
+compares exact token IDs on Unicode, punctuation and long adversarial inputs.
 Kernel compilation, identity fitting and necessary output reads can still add
 latency; this is not a guarantee of stall-free execution on every adapter.
 
 ## Qualification
 
-The [batch and portable release qualification](evidence/batch-2026-09-27/README.md)
-covers full ARDY clips, Llama scheduling and optional studio builds. Batch size
-can change floating-point accumulation and cross ARDY's discrete FSQ rounding
-boundaries; seeded clips are not guaranteed to match serial execution exactly.
+The [stability and startup qualification](evidence/stability-2026-09-27/README.md)
+supersedes the batch-size reproducibility limitation in the earlier
+[batch release](evidence/batch-2026-09-27/README.md). Continuous values, discrete
+FSQ codes and full serial/batch clips are separate enforced gates. Qualification
+is adapter-specific; it does not promise cross-device bitwise reproducibility.
 
 See [measured results and limitations](evidence/performance-2026-09-26/README.md).
 `tool/scripts/profile_pipelines.py` runs the three synchronized checkpoint

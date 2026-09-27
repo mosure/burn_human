@@ -1,6 +1,6 @@
 [package]
 name = "burn_llama"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 license = "Apache-2.0"
 description = "Portable Llama 3 LLM2Vec text conditioning for ARDY using Burn"
@@ -27,21 +27,21 @@ required-features = ["tools"]
 
 [features]
 default = []
-wgpu = ["burn/wgpu"]
+wgpu = ["burn/wgpu", "burn_human_inference/wgpu"]
 ndarray = ["burn/ndarray"]
 tools = ["dep:pollster", "dep:burn_ardy", "wgpu"]
 web-validation = ["wgpu", "dep:wasm-bindgen", "dep:wasm-bindgen-futures", "dep:console_error_panic_hook"]
 
 [dependencies]
 anyhow = "1"
-burn_ardy = { path = "../burn_ardy", version = "0.1.3", default-features = false, optional = true }
+burn_ardy = { path = "../burn_ardy", version = "0.1.4", default-features = false, features = ["wgpu"], optional = true }
 burn = { version = "0.21", default-features = false, features = ["std"] }
-burn_human_motion = { path = "../burn_human_motion", version = "0.1.0" }
-burn_human_inference = { path = "../burn_human_inference", version = "0.1.3", features = ["transport"] }
+burn_human_motion = { path = "../burn_human_motion", version = "0.1.1" }
+burn_human_inference = { path = "../burn_human_inference", version = "0.1.4", features = ["transport"] }
 half = "2"
 tokenizers = { version = "0.22.2", default-features = false, features = ["fancy-regex"] }
 serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+serde_json = { version = "1", features = ["raw_value"] }
 pollster = { version = "0.4", optional = true }
 web-time = "1"
 

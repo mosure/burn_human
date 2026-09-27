@@ -3,6 +3,82 @@ use burn_human_inference::transport::{ModelSource, read_bounded};
 use burn_human_motion::artifacts::{Part, PartReader, sha256};
 
 #[test]
+fn object_integrity_survives_async_digest_and_single_part_shortcut() -> anyhow::Result<()> {
+    use burn_human_motion::artifacts::{Object, read_object};
+    use std::{collections::VecDeque, task::Poll};
+
+    struct RawReader(VecDeque<Vec<u8>>);
+    impl PartReader for RawReader {
+        async fn read_part(&mut self, _: &Part) -> anyhow::Result<Vec<u8>> {
+            self.0
+                .pop_front()
+                .ok_or_else(|| anyhow::anyhow!("missing part"))
+        }
+        async fn digest(&mut self, bytes: &[u8]) -> anyhow::Result<String> {
+            // Exercise a digest that really suspends, as browser crypto does.
+            let mut pending = true;
+            std::future::poll_fn(|cx| {
+                if std::mem::take(&mut pending) {
+                    cx.waker().wake_by_ref();
+                    Poll::Pending
+                } else {
+                    Poll::Ready(())
+                }
+            })
+            .await;
+            Ok(sha256(bytes))
+        }
+    }
+    pollster::block_on(async {
+        for chunks in [
+            vec![b"abcdefgh".to_vec()],
+            vec![b"abcd".to_vec(), b"efgh".to_vec()],
+        ] {
+            let object = Object {
+                stage: "integrity".into(),
+                size: 8,
+                sha256: sha256(b"abcdefgh"),
+                parts: chunks
+                    .iter()
+                    .map(|v| Part {
+                        size: v.len(),
+                        sha256: sha256(v),
+                    })
+                    .collect(),
+                tensors: vec![],
+            };
+            let make_reader = || RawReader(chunks.clone().into());
+            assert_eq!(read_object(&mut make_reader(), &object).await?, b"abcdefgh");
+            let mut corrupt = make_reader();
+            corrupt.0[0][0] ^= 1;
+            assert!(read_object(&mut corrupt, &object).await.is_err());
+            let mut truncated = make_reader();
+            truncated.0[0].pop();
+            assert!(read_object(&mut truncated, &object).await.is_err());
+            let mut wrong_object = object.clone();
+            wrong_object.sha256 = "0".repeat(64);
+            assert!(
+                read_object(&mut make_reader(), &wrong_object)
+                    .await
+                    .is_err()
+            );
+            if object.parts.len() > 1 {
+                let mut reordered = object.clone();
+                reordered.parts.reverse();
+                let mut reordered_reader = make_reader();
+                reordered_reader.0.make_contiguous().reverse();
+                assert!(
+                    read_object(&mut reordered_reader, &reordered)
+                        .await
+                        .is_err()
+                );
+            }
+        }
+        Ok(())
+    })
+}
+
+#[test]
 fn sequential_shards_reuse_one_http_connection() -> anyhow::Result<()> {
     use std::io::{BufRead, BufReader, Write};
     let listener = std::net::TcpListener::bind("127.0.0.1:0")?;

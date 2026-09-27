@@ -97,7 +97,7 @@ impl<B: Backend> SampleState<B> {
             guidance,
         })
     }
-    fn advance(
+    async fn advance<const COOPERATIVE: bool>(
         mut self,
         model: &Ardy<B>,
         (mapped, alpha, previous): (usize, f32, f32),
@@ -105,15 +105,17 @@ impl<B: Backend> SampleState<B> {
         let [batch, _, dim] = self.x.dims();
         let start = self.history_frames / 4;
         let x3 = Tensor::cat(vec![self.x.clone(), self.x.clone(), self.x.clone()], 0);
-        let pred = model.denoise(
-            x3,
-            self.text.clone(),
-            self.heading.clone(),
-            self.observed.clone(),
-            self.mask.clone(),
-            self.history_frames,
-            mapped,
-        )?;
+        let pred = model
+            .denoise_impl::<COOPERATIVE>(
+                x3,
+                self.text.clone(),
+                self.heading.clone(),
+                self.observed.clone(),
+                self.mask.clone(),
+                self.history_frames,
+                mapped,
+            )
+            .await?;
         let uncond = pred
             .clone()
             .slice([2 * batch..3 * batch, start..start + 10, 0..dim]);
@@ -156,14 +158,14 @@ impl<B: Backend> Ardy<B> {
         let mut state =
             SampleState::new(x, text, heading, observed, mask, history_frames, guidance)?;
         for (i, step) in schedule(steps)?.into_iter().rev().enumerate() {
-            state = state.advance(self, step)?;
+            state = crate::scheduling::immediate(state.advance::<false>(self, step))?;
             progress(i + 1);
         }
         Ok(state.finish())
     }
 
     /// Cooperative variant used by interactive applications. Yields browser
-    /// tasks between DDIM steps without waiting for GPU completion.
+    /// tasks between transformer stages and steps without waiting for GPU completion.
     #[allow(clippy::too_many_arguments)]
     pub async fn sample_window_async(
         &self,
@@ -180,7 +182,9 @@ impl<B: Backend> Ardy<B> {
         let mut state =
             SampleState::new(x, text, heading, observed, mask, history_frames, guidance)?;
         for (i, step) in schedule(steps)?.into_iter().rev().enumerate() {
-            state = state.advance(self, step)?;
+            state = state
+                .advance::<{ crate::scheduling::COOPERATIVE }>(self, step)
+                .await?;
             progress(i + 1);
             burn_human_inference::cooperative::yield_to_browser().await;
         }

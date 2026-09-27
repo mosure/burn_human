@@ -1,0 +1,139 @@
+{
+  "report": {
+    "model_manifest_sha256": "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7",
+    "passed": true,
+    "phases": [
+      {
+        "end_ms": 635.7,
+        "name": "device",
+        "start_ms": 0
+      },
+      {
+        "end_ms": 1434.1,
+        "name": "load",
+        "start_ms": 635.7
+      },
+      {
+        "end_ms": 1566.8,
+        "name": "identity",
+        "start_ms": 1434.1
+      },
+      {
+        "end_ms": 1683.8,
+        "name": "cold_pose",
+        "start_ms": 1566.8
+      },
+      {
+        "end_ms": 1689.4,
+        "name": "warm_pose",
+        "start_ms": 1683.8
+      },
+      {
+        "end_ms": 1694,
+        "name": "warm_pose",
+        "start_ms": 1689.4
+      },
+      {
+        "end_ms": 1698.3000000000002,
+        "name": "warm_pose",
+        "start_ms": 1694
+      }
+    ],
+    "pose_seconds": [
+      0.1169,
+      0.0055,
+      0.0046,
+      0.0043
+    ],
+    "scope": "production load, identity and synchronized pose; WASM startup and reference parsing excluded"
+  },
+  "elapsed_ms": 1730.5,
+  "adapter": {
+    "vendor": "nvidia",
+    "architecture": "blackwell",
+    "fallback": false
+  },
+  "event_loop": {
+    "scope": "production load, identity and synchronized pose; WASM startup and reference parsing excluded",
+    "frames": 99,
+    "p50_ms": 16.699999999999818,
+    "p95_ms": 16.799999999999955,
+    "p99_ms": 50,
+    "max_ms": 50,
+    "long_tasks_ms": []
+  },
+  "event_loop_by_phase": [
+    {
+      "end_ms": 635.7,
+      "name": "device",
+      "start_ms": 0,
+      "max_gap_ms": 16.799999999999955,
+      "p95_gap_ms": 16.799999999999955,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 1434.1,
+      "name": "load",
+      "start_ms": 635.7,
+      "max_gap_ms": 50,
+      "p95_gap_ms": 33.40000000000009,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 1566.8,
+      "name": "identity",
+      "start_ms": 1434.1,
+      "max_gap_ms": 33.40000000000009,
+      "p95_gap_ms": 33.40000000000009,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 1683.8,
+      "name": "cold_pose",
+      "start_ms": 1566.8,
+      "max_gap_ms": 16.700000000000273,
+      "p95_gap_ms": 16.700000000000273,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 1689.4,
+      "name": "warm_pose",
+      "start_ms": 1683.8,
+      "max_gap_ms": 16.699999999999818,
+      "p95_gap_ms": 16.699999999999818,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 1694,
+      "name": "warm_pose",
+      "start_ms": 1689.4,
+      "max_gap_ms": 16.699999999999818,
+      "p95_gap_ms": 16.699999999999818,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 1698.3000000000002,
+      "name": "warm_pose",
+      "start_ms": 1694,
+      "max_gap_ms": 16.699999999999818,
+      "p95_gap_ms": 16.699999999999818,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    }
+  ],
+  "diagnostics": null,
+  "wasm_linear_memory_peak_bytes": 130547712,
+  "browser": "153.0.8010.12",
+  "module": "http://127.0.0.1:8866/.cache/gaps-2026-09-27/final-web/burn_soma/burn_soma.js",
+  "function": "profile_soma_webgpu",
+  "args": [
+    "http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/soma-x/v1/body",
+    "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7"
+  ]
+}

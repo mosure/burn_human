@@ -1,9 +1,9 @@
 use anyhow::{Result, ensure};
 use burn::{
     prelude::Backend,
-    tensor::{Bytes, DType, Tensor, TensorData},
+    tensor::{AllocationProperty, Bytes, DType, Tensor, TensorData},
 };
-use burn_human_motion::artifacts::{Object, PartReader, read_object, sha256};
+use burn_human_motion::artifacts::{Object, PartReader, read_object};
 use burn_store::{BurnpackStore, ModuleStore};
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -13,10 +13,18 @@ pub async fn read_tensors(
     object: &Object,
 ) -> Result<BTreeMap<String, TensorData>> {
     let bytes = read_object(reader, object).await?;
-    let mut pack = BurnpackStore::from_bytes(Some(Bytes::from_bytes_vec(bytes)));
+    crate::cooperative::yield_to_browser().await;
+    // Each tensor borrows its authenticated object's allocation. The reader
+    // and tensor data retain it through shared ownership until upload completes.
+    let mut pack = BurnpackStore::from_bytes(Some(Bytes::from_shared(
+        bytes::Bytes::from(bytes),
+        AllocationProperty::Native,
+    )))
+    .zero_copy(true);
     let snapshots = pack
         .get_all_snapshots()
         .map_err(|e| anyhow::anyhow!("Burnpack: {e}"))?;
+    crate::cooperative::yield_to_browser().await;
     let mut seen = BTreeSet::new();
     let mut tensors = BTreeMap::new();
     for snapshot in snapshots.values() {
@@ -38,10 +46,10 @@ pub async fn read_tensors(
             data.dtype == crate::dtype(&spec.dtype)?
                 && data.shape.as_slice() == spec.shape
                 && Some(data.bytes.len()) == spec.byte_len()
-                && sha256(&data.bytes) == spec.sha256,
+                && reader.digest(&data.bytes).await? == spec.sha256,
             "tensor shape/dtype/digest mismatch: {name}"
         );
-        ensure_finite(&data)?;
+        ensure_finite_async(&data).await?;
         tensors.insert(name, data);
     }
     ensure!(
@@ -53,8 +61,31 @@ pub async fn read_tensors(
 }
 
 pub fn ensure_finite(data: &TensorData) -> Result<()> {
-    let bytes = &data.bytes;
-    let finite = match data.dtype {
+    let (bytes, dtype) = finite_values(data)?;
+    ensure!(finite_bytes(bytes, dtype), "non-finite tensor data");
+    Ok(())
+}
+
+fn finite_values(data: &TensorData) -> Result<(&[u8], DType)> {
+    if matches!(data.dtype, DType::QFloat(_)) {
+        let n = data
+            .shape
+            .iter()
+            .try_fold(1usize, |n, d| n.checked_mul(*d))
+            .ok_or_else(|| anyhow::anyhow!("quantized shape overflow"))?;
+        Ok((
+            data.bytes
+                .get(n / 2..)
+                .ok_or_else(|| anyhow::anyhow!("truncated quantized scales"))?,
+            DType::F32,
+        ))
+    } else {
+        Ok((&data.bytes, data.dtype))
+    }
+}
+
+fn finite_bytes(bytes: &[u8], dtype: DType) -> bool {
+    match dtype {
         DType::F32 => bytes
             .as_chunks::<4>()
             .0
@@ -65,24 +96,68 @@ pub fn ensure_finite(data: &TensorData) -> Result<()> {
             .0
             .iter()
             .all(|b| half::f16::from_bits(u16::from_le_bytes(*b)).is_finite()),
-        DType::QFloat(_) => {
-            let n: usize = data.shape.iter().product();
-            bytes[n / 2..]
-                .as_chunks::<4>()
-                .0
-                .iter()
-                .all(|b| f32::from_le_bytes(*b).is_finite())
-        }
         _ => true,
-    };
-    ensure!(finite, "non-finite tensor data");
-    Ok(())
+    }
+}
+
+async fn ensure_finite_async(data: &TensorData) -> Result<()> {
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        ensure_finite(data)
+    }
+    #[cfg(target_arch = "wasm32")]
+    {
+        let (bytes, dtype) = finite_values(data)?;
+        // Large vision matrices contain millions of scalars. Keep validation
+        // bounded per task without copying data or weakening the finite check.
+        for chunk in bytes.chunks(1024 * 1024) {
+            ensure!(finite_bytes(chunk, dtype), "non-finite tensor data");
+            crate::cooperative::yield_to_browser().await;
+        }
+        Ok(())
+    }
+}
+
+/// Bound pending browser GPU uploads so a later tiny write does not flush
+/// gigabytes of queued weights in one synchronous WebGPU call. This is loading
+/// backpressure only; it adds no tensor readback or per-layer inference fence.
+#[derive(Default)]
+pub struct UploadBudget {
+    #[cfg(all(target_arch = "wasm32", feature = "wgpu"))]
+    pending: usize,
+}
+
+impl UploadBudget {
+    pub async fn record<B: Backend>(&mut self, device: &B::Device, bytes: usize) -> Result<()> {
+        #[cfg(all(target_arch = "wasm32", feature = "wgpu"))]
+        {
+            use burn::{
+                backend::wgpu::{WgpuDevice, WgpuRuntime},
+                cubecl::Runtime,
+            };
+            use std::any::Any;
+            self.pending += bytes;
+            if self.pending >= 32 * 1024 * 1024 {
+                if let Some(device) = (device as &dyn Any).downcast_ref::<WgpuDevice>() {
+                    WgpuRuntime::client(device)
+                        .sync()
+                        .await
+                        .map_err(|e| anyhow::anyhow!("GPU upload completion: {e}"))?;
+                }
+                self.pending = 0;
+            }
+        }
+        #[cfg(not(all(target_arch = "wasm32", feature = "wgpu")))]
+        let _ = (device, bytes);
+        Ok(())
+    }
 }
 
 pub struct TensorBank<B: Backend> {
     floats: BTreeMap<String, (Tensor<B, 1>, Vec<usize>)>,
     quantized: BTreeMap<String, Tensor<B, 2>>,
     pub device: B::Device,
+    uploads: UploadBudget,
 }
 
 impl<B: Backend> TensorBank<B> {
@@ -91,6 +166,7 @@ impl<B: Backend> TensorBank<B> {
             floats: BTreeMap::new(),
             quantized: BTreeMap::new(),
             device: device.clone(),
+            uploads: UploadBudget::default(),
         }
     }
 
@@ -120,9 +196,17 @@ impl<B: Backend> TensorBank<B> {
         object: &Object,
     ) -> Result<()> {
         for (name, data) in read_tensors(reader, object).await? {
-            self.insert(name, data)?;
+            self.insert_async(name, data).await?;
+            crate::cooperative::yield_to_browser().await;
         }
         Ok(())
+    }
+
+    /// Upload a verified tensor with bounded pending browser transfers.
+    pub async fn insert_async(&mut self, name: String, data: TensorData) -> Result<()> {
+        let bytes = data.bytes.len();
+        self.insert(name, data)?;
+        self.uploads.record::<B>(&self.device, bytes).await
     }
 
     pub fn contains(&self, name: &str) -> bool {

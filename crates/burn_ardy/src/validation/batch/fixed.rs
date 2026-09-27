@@ -21,9 +21,8 @@ async fn values<B: Backend>(tensor: Tensor<B, 3>) -> Result<Vec<f32>> {
     Ok(data)
 }
 
-// Compare identical continuous inputs before FSQ rounding. Changed matmul batch
-// shapes can cross a discrete code boundary; completed clips then diverge.
-// Decoder parity uses identical hybrids so its inputs cannot diverge.
+// Gate continuous values and discrete FSQ codes independently. Decoder parity
+// uses identical hybrids so its inputs cannot diverge before the comparison.
 pub(super) async fn validate<B: Backend>(
     model: &Ardy<B>,
     requests: &[MotionRequest],
@@ -149,11 +148,18 @@ pub(super) async fn validate<B: Backend>(
         sample_max <= 0.02 && decode_max <= 0.002 && denoise_max <= 0.002,
         "fixed-input batch mismatch: denoised={denoise_max} sampled={sample_max} decoded={decode_max}"
     );
+    ensure!(
+        changed_codes == 0
+            && sample_max <= 0.000001
+            && decode_max <= 0.000001
+            && denoise_max <= 0.000001,
+        "batch-dependent math: denoised={denoise_max} sampled={sample_max} decoded={decode_max} changed_fsq_codes={changed_codes}"
+    );
     eprintln!(
         "fixed inputs: denoised={denoise_max} sampled={sample_max} decoded={decode_max}; changed FSQ codes={changed_codes}"
     );
     Ok(
-        json!({"denoised_max_abs":denoise_max,"sampled_max_abs":sample_max,"same_input_decoded_max_abs":decode_max,"tolerance":{"denoised":0.002,"sampled":0.02,"decoded":0.002},
+        json!({"denoised_max_abs":denoise_max,"sampled_max_abs":sample_max,"same_input_decoded_max_abs":decode_max,"tolerance":{"denoised":0.000001,"sampled":0.000001,"decoded":0.000001,"changed_fsq_codes":0},
         "changed_fsq_codes":changed_codes,"max_fsq_code_delta":max_code_delta,"fsq_code_count":batch*10*128}),
     )
 }

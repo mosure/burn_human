@@ -181,8 +181,10 @@ impl<B: Backend> Soma<B> {
         let mut template = vec![];
         let mut faces = vec![];
         let mut corrective_indices = BTreeMap::new();
+        let mut uploads = burn_human_inference::weights::UploadBudget::default();
         for (i, object) in manifest.objects.iter().enumerate() {
             for (name, data) in read_tensors(source, object).await? {
+                let bytes = data.bytes.len();
                 if name == "fit.vertices" {
                     let flat = data
                         .to_vec::<f32>()
@@ -221,6 +223,8 @@ impl<B: Backend> Soma<B> {
                 } else {
                     weights.insert(name, data)?;
                 }
+                uploads.record::<B>(device, bytes).await?;
+                burn_human_inference::cooperative::yield_to_browser().await;
             }
             progress(i + 1, manifest.objects.len());
         }

@@ -1,6 +1,7 @@
 use anyhow::{Result, ensure};
-use burn::backend::{Wgpu, wgpu::WgpuDevice};
+use burn::backend::wgpu::WgpuDevice;
 use burn_ardy::Ardy;
+use burn_human_inference::gpu::WgpuBackend as Wgpu;
 use burn_human_motion::{
     MotionRequest, TextEmbedding,
     artifacts::{DirectoryReader, Manifest},

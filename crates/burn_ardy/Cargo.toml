@@ -1,6 +1,6 @@
 [package]
 name = "burn_ardy"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2024"
 description = "ARDY Core motion inference on Burn, native WGPU and WebGPU"
 license = "Apache-2.0"
@@ -13,18 +13,20 @@ crate-type = ["rlib", "cdylib"]
 [features]
 default = ["ndarray", "transport"]
 ndarray = ["burn/ndarray"]
-wgpu = ["burn/wgpu", "burn_human_inference/wgpu"]
+wgpu = ["burn/wgpu", "burn_human_inference/wgpu", "dep:burn-cubecl", "dep:cubek"]
 tools = ["transport", "validation", "dep:memmap2", "dep:pollster"]
 validation = ["dep:safetensors", "dep:web-time"]
 web-validation = ["validation", "transport", "wgpu", "dep:console_error_panic_hook", "dep:wasm-bindgen", "dep:wasm-bindgen-futures"]
 transport = ["burn_human_inference/transport"]
 
 [dependencies]
-burn_human_inference = { path = "../burn_human_inference", version = "0.1.3" }
+burn_human_inference = { path = "../burn_human_inference", version = "0.1.4" }
 anyhow = "1"
 burn = { version = "0.21", default-features = false, features = ["std"] }
 burn-store = { version = "0.21", default-features = false, features = ["std", "burnpack"] }
-burn_human_motion = { path = "../burn_human_motion", version = "0.1.0" }
+burn-cubecl = { version = "0.21", default-features = false, optional = true }
+cubek = { version = "0.2", default-features = false, features = ["matmul", "reduce", "stdlib"], optional = true }
+burn_human_motion = { path = "../burn_human_motion", version = "0.1.1" }
 glam = "0.32"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

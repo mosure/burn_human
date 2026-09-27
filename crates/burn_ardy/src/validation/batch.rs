@@ -23,10 +23,35 @@ pub struct Case {
     pub reference: Vec<MotionClip>,
 }
 
+#[derive(Clone, Copy, Serialize)]
+struct ClipLimits {
+    fk_max_m: f32,
+    fk_rms_m: f64,
+    rotation_max_rad: f64,
+    contact_fraction: f64,
+}
+
+impl ClipLimits {
+    const STABLE: Self = Self {
+        fk_max_m: 0.000001,
+        fk_rms_m: 0.0000001,
+        rotation_max_rad: 0.000001,
+        contact_fraction: 0.0,
+    };
+    fn baseline(fk_max_m: f32, fk_rms_m: f64) -> Self {
+        Self {
+            fk_max_m,
+            fk_rms_m,
+            rotation_max_rad: 0.05,
+            contact_fraction: 0.01,
+        }
+    }
+}
+
 fn compare(
     actual: &MotionClip,
     expected: &MotionClip,
-    limits: Option<(f32, f64)>,
+    limits: Option<ClipLimits>,
 ) -> Result<Value> {
     actual.validate()?;
     expected.validate()?;
@@ -67,9 +92,12 @@ fn compare(
     }
     let rms = (sum / count as f64).sqrt();
     let contact_fraction = contacts as f64 / (actual.frames.len() * 4) as f64;
-    if let Some((max_m, rms_m)) = limits {
+    if let Some(limits) = limits {
         ensure!(
-            max <= max_m && rms <= rms_m && rotation_max <= 0.05 && contact_fraction <= 0.01,
+            max <= limits.fk_max_m
+                && rms <= limits.fk_rms_m
+                && rotation_max <= limits.rotation_max_rad
+                && contact_fraction <= limits.contact_fraction,
             "clip parity failed: FK max={max}m rms={rms}m rotation={rotation_max}rad contact_fraction={contact_fraction}"
         );
     }
@@ -147,7 +175,7 @@ pub async fn validate<B: Backend>(model: &Ardy<B>, suite: Suite) -> Result<Value
             .zip(&case.reference)
             .enumerate()
             .map(|(i, (a, b))| {
-                compare(a, b, Some((max_m, rms_m)))
+                compare(a, b, Some(ClipLimits::baseline(max_m, rms_m)))
                     .with_context(|| format!("{} serial actor {i}", case.name))
             })
             .collect::<Result<Vec<_>>>()?;
@@ -159,6 +187,15 @@ pub async fn validate<B: Backend>(model: &Ardy<B>, suite: Suite) -> Result<Value
                 compare(a, b, None).with_context(|| format!("{} batch actor {i}", case.name))
             })
             .collect::<Result<Vec<_>>>()?;
+        let batch_vs_serial = batch
+            .iter()
+            .zip(&serial_clips)
+            .enumerate()
+            .map(|(i, (a, b))| {
+                compare(a, b, Some(ClipLimits::STABLE))
+                    .with_context(|| format!("{} batch vs serial actor {i}", case.name))
+            })
+            .collect::<Result<Vec<_>>>()?;
         let reverse_requests: Vec<_> = case.requests.iter().rev().cloned().collect();
         let reverse_embeddings: Vec<_> = embeddings.iter().rev().cloned().collect();
         let reversed = model
@@ -168,7 +205,7 @@ pub async fn validate<B: Backend>(model: &Ardy<B>, suite: Suite) -> Result<Value
             .iter()
             .rev()
             .zip(&batch)
-            .map(|(a, b)| compare(a, b, Some((0.0001, 0.00002))))
+            .map(|(a, b)| compare(a, b, Some(ClipLimits::STABLE)))
             .collect::<Result<Vec<_>>>()?;
         let mut serial_seconds = Vec::new();
         let mut batch_seconds = Vec::new();
@@ -199,7 +236,7 @@ pub async fn validate<B: Backend>(model: &Ardy<B>, suite: Suite) -> Result<Value
         );
         reports.push(json!({"name":case.name,"actors":case.requests.len(),"frames_per_actor":frames,
             "history_frames":case.requests[0].history_frames,"progress":progress,
-            "fixed_inputs":fixed_inputs,"serial_vs_baseline":serial_parity,"batch_vs_baseline_diagnostic":batch_parity,"permutation":permutation,
+            "fixed_inputs":fixed_inputs,"serial_vs_baseline":serial_parity,"batch_vs_baseline_diagnostic":batch_parity,"batch_vs_serial":batch_vs_serial,"permutation":permutation,
             "warm_serial_seconds":serial_seconds,"warm_batch_seconds":batch_seconds,
             "throughput_speedup":serial_seconds[1]/batch_seconds[1],
             "batch_generated_frames_per_second":(frames*case.requests.len()) as f64/batch_seconds[1]}));

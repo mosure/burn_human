@@ -225,6 +225,8 @@ impl<B: Backend> Pipeline<B> {
     ) -> Result<ResidentPoseEstimate<B>> {
         crop.validate()?;
         camera.validate()?;
+        // Image decoding in the caller may already have consumed this task.
+        burn_human_inference::cooperative::yield_to_browser().await;
         let mut timings = std::collections::BTreeMap::new();
         let start = web_time::Instant::now();
         progress("2D keypoints");

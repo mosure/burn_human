@@ -1,7 +1,7 @@
 [package]
 name = "bevy_burn_human"
 description = "bevy plugin for burn_human morphable models"
-version = "0.6.0"
+version = "0.6.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 homepage = "https://github.com/mosure/burn_human"
@@ -54,14 +54,14 @@ bevy = { version = "0.19.1", default-features = false, features = [
     "zstd_rust",
 ] }
 burn_human = { version = "0.5.1", path = "../../" }
-burn_human_motion = { version = "0.1.0", path = "../burn_human_motion", optional = true }
-burn_human_inference = { version = "0.1.3", path = "../burn_human_inference", features = ["wgpu"], optional = true }
+burn_human_motion = { version = "0.1.1", path = "../burn_human_motion", optional = true }
+burn_human_inference = { version = "0.1.4", path = "../burn_human_inference", features = ["wgpu"], optional = true }
 wgpu = { version = "29", default-features = false, optional = true }
 bytemuck = { version = "1", features = ["derive"], optional = true }
-burn_ardy = { version = "0.1.3", path = "../burn_ardy", default-features = false, features = ["wgpu", "transport"], optional = true }
-burn_llama = { version = "0.1.1", path = "../burn_llama", features = ["wgpu"], optional = true }
-burn_soma = { version = "0.1.2", path = "../burn_soma", features = ["wgpu", "mhr"], optional = true }
-burn_gemx = { version = "0.1.2", path = "../burn_gemx", features = ["wgpu"], optional = true }
+burn_ardy = { version = "0.1.4", path = "../burn_ardy", default-features = false, features = ["wgpu", "transport"], optional = true }
+burn_llama = { version = "0.1.2", path = "../burn_llama", features = ["wgpu"], optional = true }
+burn_soma = { version = "0.1.3", path = "../burn_soma", features = ["wgpu", "mhr"], optional = true }
+burn_gemx = { version = "0.1.3", path = "../burn_gemx", features = ["wgpu"], optional = true }
 burn = { version = "0.21", default-features = false, features = ["std", "wgpu"], optional = true }
 serde_json = { version = "1", optional = true }
 serde = { version = "1", features = ["derive"], optional = true }

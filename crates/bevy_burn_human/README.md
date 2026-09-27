@@ -10,12 +10,12 @@ WebGPU. Weights load on demand from verified, bounded Burnpack parts.
 SOMA controls and image-pose UI; it requires Bevy Egui and the render plugins.
 The repository's demo shows the complete plugin setup and required Anny assets.
 
-Version `0.6.0` enables the `studio` feature by default. Applications that only
+The `studio` feature is enabled by default. Applications that only
 need `BurnHumanPlugin` can disable default features to omit ARDY, Llama, SOMA,
 GEM-X and the studio UI dependencies. Add `native` for native multithreading:
 
 ```toml
-bevy_burn_human = { version = "0.6.0", default-features = false, features = ["native"] }
+bevy_burn_human = { version = "0.6.1", default-features = false, features = ["native"] }
 ```
 
 Existing applications with `default-features = false` that use the motion module
@@ -26,6 +26,9 @@ For a browser studio build, explicitly enable `studio` while disabling `native`:
 ```sh
 cargo build -p bevy_burn_human --target wasm32-unknown-unknown --release --no-default-features --features studio --bin bevy_burn_human
 ```
+
+The GitHub Pages workflow uses this explicit studio build. Its deployed
+`build.json` records the source commit, features and target for verification.
 
 For the interactive workflows, camera and controls, see the
 [studio guide](https://github.com/mosure/burn_human/blob/main/docs/studio.md).

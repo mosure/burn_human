@@ -1,7 +1,7 @@
 //! Mandatory real-checkpoint parity runner. Missing artifacts are errors.
 use anyhow::{Result, ensure};
 use burn::{
-    backend::{NdArray, Wgpu, wgpu::WgpuDevice},
+    backend::{NdArray, wgpu::WgpuDevice},
     prelude::Backend,
 };
 use burn_ardy::transport::ModelSource;
@@ -9,6 +9,7 @@ use burn_ardy::{
     Ardy,
     validation::{Fixture, validate},
 };
+use burn_human_inference::gpu::WgpuBackend as Wgpu;
 use std::time::Instant;
 
 async fn run<B: Backend>(

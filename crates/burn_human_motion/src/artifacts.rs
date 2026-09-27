@@ -248,6 +248,25 @@ impl Manifest {
 #[allow(async_fn_in_trait)]
 pub trait PartReader {
     async fn read_part(&mut self, part: &Part) -> Result<Vec<u8>>;
+
+    /// Return a part whose exact size and SHA-256 have been authenticated.
+    /// A transport that already verifies responses/cache hits can avoid a
+    /// redundant hash here. The default also protects raw custom readers.
+    async fn read_verified_part(&mut self, part: &Part) -> Result<Vec<u8>> {
+        let data = self.read_part(part).await?;
+        ensure!(
+            data.len() == part.size && self.digest(&data).await? == part.sha256,
+            "artifact part size/digest mismatch: {}",
+            part.sha256
+        );
+        Ok(data)
+    }
+
+    /// Platform SHA-256 implementation. Browser transports can hash off the
+    /// main thread; custom readers retain the portable, checked implementation.
+    async fn digest(&mut self, bytes: &[u8]) -> Result<String> {
+        Ok(sha256(bytes))
+    }
 }
 
 pub async fn read_object(reader: &mut impl PartReader, object: &Object) -> Result<Vec<u8>> {
@@ -255,19 +274,38 @@ pub async fn read_object(reader: &mut impl PartReader, object: &Object) -> Resul
         object.size <= MAX_OBJECT_BYTES,
         "logical object exceeds memory budget"
     );
+    if let [part] = object.parts.as_slice() {
+        ensure!(
+            part.size == object.size && part.size <= MAX_PART_BYTES,
+            "transport/object size mismatch"
+        );
+        let bytes = reader.read_verified_part(part).await?;
+        // Reuse the authenticated allocation. Most small objects need neither
+        // an assembly copy nor a second hash of the identical byte sequence.
+        ensure!(
+            bytes.len() == object.size
+                && (part.sha256 == object.sha256 || reader.digest(&bytes).await? == object.sha256),
+            "logical object size/digest mismatch"
+        );
+        return Ok(bytes);
+    }
     let mut bytes = Vec::with_capacity(object.size);
     for part in &object.parts {
         ensure!(
             part.size <= MAX_PART_BYTES,
             "transport part exceeds memory budget"
         );
-        let data = reader.read_part(part).await?;
-        part.verify(&data)?;
+        let data = reader.read_verified_part(part).await?;
+        ensure!(
+            data.len() == part.size,
+            "artifact part size mismatch: {}",
+            part.sha256
+        );
         ensure!(bytes.len() + data.len() <= object.size, "object overflow");
         bytes.extend_from_slice(&data);
     }
     ensure!(
-        bytes.len() == object.size && sha256(&bytes) == object.sha256,
+        bytes.len() == object.size && reader.digest(&bytes).await? == object.sha256,
         "logical object size/digest mismatch"
     );
     Ok(bytes)
