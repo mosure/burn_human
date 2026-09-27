@@ -1,6 +1,6 @@
 [package]
 name = "burn_ardy"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 description = "ARDY Core motion inference on Burn, native WGPU and WebGPU"
 license = "Apache-2.0"
@@ -13,14 +13,14 @@ crate-type = ["rlib", "cdylib"]
 [features]
 default = ["ndarray", "transport"]
 ndarray = ["burn/ndarray"]
-wgpu = ["burn/wgpu"]
+wgpu = ["burn/wgpu", "burn_human_inference/cooperative"]
 tools = ["transport", "validation", "dep:memmap2", "dep:pollster"]
 validation = ["dep:safetensors", "dep:web-time"]
 web-validation = ["validation", "transport", "wgpu", "dep:console_error_panic_hook", "dep:wasm-bindgen", "dep:wasm-bindgen-futures"]
-transport = ["dep:burn_human_inference", "burn_human_inference/transport"]
+transport = ["burn_human_inference/transport"]
 
 [dependencies]
-burn_human_inference = { path = "../burn_human_inference", version = "0.1.1", optional = true }
+burn_human_inference = { path = "../burn_human_inference", version = "0.1.3" }
 anyhow = "1"
 burn = { version = "0.21", default-features = false, features = ["std"] }
 burn-store = { version = "0.21", default-features = false, features = ["std", "burnpack"] }
@@ -57,3 +57,6 @@ required-features = ["tools", "wgpu"]
 name = "ardy-validate"
 path = "src/bin/validate.rs"
 required-features = ["tools", "wgpu", "ndarray"]
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+burn = { version = "0.21", default-features = false, features = ["autotune"] }

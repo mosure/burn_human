@@ -1,0 +1,195 @@
+{
+  "report": {
+    "adapter": "",
+    "backend": "browser-webgpu-f32",
+    "batched_performance": {
+      "cfg_batch": 12,
+      "includes_decoder": false,
+      "includes_text_encoder": false,
+      "median_generated_frames_per_second": 660.0660066006601,
+      "parity": [
+        {
+          "hook": "sampled",
+          "max_abs": 0.00015333294868469238,
+          "max_abs_tolerance": 0.019999999552965164,
+          "rmse": 2.177505880273971e-05
+        },
+        {
+          "hook": "sampled",
+          "max_abs": 0.00015333294868469238,
+          "max_abs_tolerance": 0.019999999552965164,
+          "rmse": 2.177505880273971e-05
+        },
+        {
+          "hook": "sampled",
+          "max_abs": 0.00015333294868469238,
+          "max_abs_tolerance": 0.019999999552965164,
+          "rmse": 2.177505880273971e-05
+        },
+        {
+          "hook": "sampled",
+          "max_abs": 0.00015333294868469238,
+          "max_abs_tolerance": 0.019999999552965164,
+          "rmse": 2.177505880273971e-05
+        }
+      ],
+      "requests": 4,
+      "warm_window_seconds": [
+        0.2107,
+        0.2424,
+        0.2457
+      ]
+    },
+    "fixture_sha256": "072cd33189a21efb19dc63dac02d7bc0a8f1aeb211a8bf7b00b4318bd23d043f",
+    "fk_max_error_m": 4.76837158203125e-07,
+    "load_seconds": 12.2418,
+    "manifest_sha256": "6e03294854771ca3ed6641251c77ab75bd2542d778c02886ea795d8d77655cd8",
+    "model_revision": "abe6c43beb28c867c950acb824b9c4ef3d63fb76",
+    "parity": [
+      {
+        "hook": "local_root",
+        "max_abs": 1.52587890625e-05,
+        "max_abs_tolerance": 0.0020000000949949026,
+        "rmse": 4.504029842722612e-06
+      },
+      {
+        "hook": "denoised",
+        "max_abs": 8.134543895721436e-05,
+        "max_abs_tolerance": 0.0020000000949949026,
+        "rmse": 7.185617626170037e-06
+      },
+      {
+        "hook": "sampled",
+        "max_abs": 0.00015333294868469238,
+        "max_abs_tolerance": 0.019999999552965164,
+        "rmse": 2.177505880273971e-05
+      },
+      {
+        "hook": "sampled",
+        "max_abs": 0.00015333294868469238,
+        "max_abs_tolerance": 0.019999999552965164,
+        "rmse": 2.177505880273971e-05
+      },
+      {
+        "hook": "decoded",
+        "max_abs": 0.000702977180480957,
+        "max_abs_tolerance": 0.0020000000949949026,
+        "rmse": 3.492028424450619e-05
+      },
+      {
+        "hook": "encoded",
+        "max_abs": 2.384185791015625e-07,
+        "max_abs_tolerance": 0.0020000000949949026,
+        "rmse": 4.191227757163435e-08
+      }
+    ],
+    "performance": {
+      "cfg_batch": 3,
+      "diffusion_steps": 10,
+      "frames_per_window": 40,
+      "future_frames": 8,
+      "history_frames": 8,
+      "includes_decoder": false,
+      "includes_text_encoder": false,
+      "median_frames_per_second": 192.12295869356387,
+      "synchronization": "full_output_readback",
+      "warm_window_seconds": [
+        0.195,
+        0.2082,
+        0.2445
+      ]
+    },
+    "semantic_quality": "not_measured_random_embeddings",
+    "source_revision": "693f74d13b3d04a0a22ce127ee79c929dd89756b"
+  },
+  "elapsed_ms": 15772.699999928474,
+  "adapter": {
+    "vendor": "nvidia",
+    "architecture": "blackwell",
+    "fallback": false
+  },
+  "event_loop": {
+    "scope": "load, cold compilation, parity, warm inference",
+    "frames": 548,
+    "p50_ms": 16.699999999999818,
+    "p95_ms": 83.29999999999927,
+    "p99_ms": 216.60000000000036,
+    "max_ms": 250.0999999999999,
+    "long_tasks_ms": [
+      102,
+      242,
+      91,
+      231,
+      93,
+      259,
+      89,
+      217,
+      92,
+      231,
+      90,
+      240,
+      91,
+      218,
+      93,
+      222,
+      92,
+      143,
+      77,
+      100,
+      79,
+      78,
+      93,
+      77,
+      80,
+      93,
+      77,
+      88,
+      78,
+      92,
+      78,
+      77,
+      90,
+      77,
+      101,
+      104,
+      107,
+      93,
+      215,
+      93,
+      218,
+      90,
+      225,
+      92,
+      219,
+      92,
+      220,
+      93,
+      227,
+      91,
+      217,
+      92,
+      223,
+      91,
+      146,
+      66,
+      101,
+      89,
+      74,
+      72,
+      72,
+      83,
+      73,
+      66,
+      69
+    ]
+  },
+  "wasm_linear_memory_peak_bytes": 292618240,
+  "browser": "153.0.8010.12",
+  "module": "http://127.0.0.1:8866/.cache/perf-2026-09-26/candidate-web/ardy/burn_ardy.js",
+  "function": "validate_webgpu",
+  "args": [
+    "http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/ardy/core-rp-20fps-h40/v1",
+    "http://127.0.0.1:8866/.cache/ardy-reference-final/reference.safetensors",
+    "6e03294854771ca3ed6641251c77ab75bd2542d778c02886ea795d8d77655cd8"
+  ]
+}

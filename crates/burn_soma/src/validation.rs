@@ -25,7 +25,13 @@ struct Case {
 fn error(a: impl IntoIterator<Item = f32>, b: impl IntoIterator<Item = f32>) -> f32 {
     a.into_iter()
         .zip(b)
-        .map(|(a, b)| (a - b).abs())
+        .map(|(a, b)| {
+            if a.is_finite() && b.is_finite() {
+                (a - b).abs()
+            } else {
+                f32::INFINITY
+            }
+        })
         .fold(0.0, f32::max)
 }
 pub async fn validate<B: Backend>(soma: &Soma<B>, reference: &[u8]) -> Result<serde_json::Value> {

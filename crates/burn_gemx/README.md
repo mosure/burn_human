@@ -5,7 +5,7 @@ GEM-X inference in Rust/Burn 0.21, with native WGPU and browser WebGPU support.
 Fast single-person, single-frame image pose inference. The crate owns DINOv3/ViTPose, SAM body features and GEM regression, and composes `burn_mhr` and `burn_soma` for reconstruction. It loads all seven required artifact bundles.
 
 ```toml
-burn_gemx = { version = "0.1.1", features = ["wgpu"] }
+burn_gemx = { version = "0.1.2", features = ["wgpu"] }
 ```
 
 The model owns its immutable CDN catalog and loading policy:
@@ -21,8 +21,10 @@ let model = burn_gemx::pipeline::Pipeline::<burn::backend::Wgpu>::load_pretraine
 
 Physical Burnpack parts target 20 MiB and are authenticated before use. A logical object is bounded to 64 MiB; the loader does not concatenate the whole model in host/WASM memory. Shared transport uses a bounded 8 GiB native disk cache or browser CacheStorage, verifies cache hits and repairs corrupt entries. The cache can evict other models' older parts. GPU residency is separate from host/storage bounds.
 
-Model weights are distributed separately under their upstream terms; consult the manifest-bound license metadata. The CDN release is prepared for upload; deployment and public download qualification are tracked separately in the repository.
+Model weights are distributed separately under their upstream terms; consult the manifest-bound license metadata. The public CDN release has passed native and browser download/cache qualification; see the repository evidence for device and test coverage.
 
 See [CDN preparation and validation](https://github.com/mosure/burn_human/blob/main/docs/cdn.md), [inference guide](https://github.com/mosure/burn_human/blob/main/docs/motion.md), and [numerical/performance evidence](https://github.com/mosure/burn_human/tree/main/docs/evidence/portable-2026-09-26).
 
 This crate replaces `burn_gem` 0.1.0.
+
+Performance and GPU residency are described in the [performance guide](https://github.com/mosure/burn_human/blob/main/docs/performance.md). Native WGPU uses kernel autotuning; WebGPU uses the portable kernel configuration validated in the repository. Burn graph fusion is not enabled by these crates.

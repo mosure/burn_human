@@ -29,7 +29,13 @@ struct Layer {
 fn error(a: impl IntoIterator<Item = f32>, b: impl IntoIterator<Item = f32>) -> f32 {
     a.into_iter()
         .zip(b)
-        .map(|(a, b)| (a - b).abs())
+        .map(|(a, b)| {
+            if a.is_finite() && b.is_finite() {
+                (a - b).abs()
+            } else {
+                f32::INFINITY
+            }
+        })
         .fold(0.0, f32::max)
 }
 fn main() -> Result<()> {
@@ -95,17 +101,31 @@ fn main() -> Result<()> {
             layers.push(serde_json::json!({"parameters_max":params,"shape_max":shape,"keypoints_max_m":keypoints,"camera_max":camera}));
         }
         let mut warm = vec![];
+        let fast_token = model
+            .forward_token(image.clone(), &mhr, reference.crop, reference.camera)
+            .await?
+            .into_data_async()
+            .await?
+            .to_vec::<f32>()
+            .unwrap();
+        let fast_token_max = error(fast_token, token);
+        ensure!(
+            fast_token_max < 0.003,
+            "GPU feedback differs from diagnostic SAM path: {fast_token_max}"
+        );
         for _ in 0..3 {
             let start = web_time::Instant::now();
             model
-                .forward(image.clone(), &mhr, reference.crop, reference.camera)
+                .forward_token(image.clone(), &mhr, reference.crop, reference.camera)
                 .await?
-                .token
                 .into_data_async()
                 .await?;
             warm.push(start.elapsed().as_secs_f64());
         }
         let report = serde_json::json!({"manifest":manifest.content_sha256,"mhr_manifest":mhr_manifest.content_sha256,"backend":"native-wgpu-f32","ray_max":ray_max,"token_max":max,"token_rmse":rmse,"layers":layers,"cold_seconds":cold,"warm_seconds":warm});
+        let mut report = report;
+        report["production_vs_diagnostic_token_max"] = fast_token_max.into();
+        report["warm_path"] = "production_gpu_feedback".into();
         std::fs::write(&args[3], serde_json::to_vec_pretty(&report)?)?;
         println!("{report}");
         ensure!(

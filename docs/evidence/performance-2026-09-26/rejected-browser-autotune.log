@@ -1,0 +1,228 @@
+warning [Invalid ShaderModule "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While validating compute stage ([Invalid ShaderModule "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"], entryPoint: "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1").
+ - While calling [Device].CreateComputePipeline([ComputePipelineDescriptor ""matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1""]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While Validating GetBindGroupLayout (0) on [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]
+
+warning [Invalid BindGroupLayout (unlabeled)] is invalid due to a previous error.
+ - While validating [BindGroupDescriptor] against [Invalid BindGroupLayout (unlabeled)]
+ - While calling [Device].CreateBindGroup([BindGroupDescriptor]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While encoding [ComputePassEncoder (unlabeled)].SetPipeline([Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]).
+ - While finishing [CommandEncoder "CubeCL Tasks Encoder"].
+
+warning [Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"] is invalid due to a previous error.
+ - While calling [Queue].Submit([[Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"]])
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While Validating GetBindGroupLayout (0) on [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]
+
+warning [Invalid BindGroupLayout (unlabeled)] is invalid due to a previous error.
+ - While validating [BindGroupDescriptor] against [Invalid BindGroupLayout (unlabeled)]
+ - While calling [Device].CreateBindGroup([BindGroupDescriptor]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While encoding [ComputePassEncoder (unlabeled)].SetPipeline([Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]).
+ - While finishing [CommandEncoder "CubeCL Tasks Encoder"].
+
+warning [Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"] is invalid due to a previous error.
+ - While calling [Queue].Submit([[Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"]])
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While Validating GetBindGroupLayout (0) on [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]
+
+warning [Invalid BindGroupLayout (unlabeled)] is invalid due to a previous error.
+ - While validating [BindGroupDescriptor] against [Invalid BindGroupLayout (unlabeled)]
+ - While calling [Device].CreateBindGroup([BindGroupDescriptor]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While encoding [ComputePassEncoder (unlabeled)].SetPipeline([Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]).
+ - While finishing [CommandEncoder "CubeCL Tasks Encoder"].
+
+warning [Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"] is invalid due to a previous error.
+ - While calling [Queue].Submit([[Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"]])
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While Validating GetBindGroupLayout (0) on [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]
+
+warning [Invalid BindGroupLayout (unlabeled)] is invalid due to a previous error.
+ - While validating [BindGroupDescriptor] against [Invalid BindGroupLayout (unlabeled)]
+ - While calling [Device].CreateBindGroup([BindGroupDescriptor]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While encoding [ComputePassEncoder (unlabeled)].SetPipeline([Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]).
+ - While finishing [CommandEncoder "CubeCL Tasks Encoder"].
+
+warning [Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"] is invalid due to a previous error.
+ - While calling [Queue].Submit([[Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"]])
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While Validating GetBindGroupLayout (0) on [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]
+
+warning [Invalid BindGroupLayout (unlabeled)] is invalid due to a previous error.
+ - While validating [BindGroupDescriptor] against [Invalid BindGroupLayout (unlabeled)]
+ - While calling [Device].CreateBindGroup([BindGroupDescriptor]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While encoding [ComputePassEncoder (unlabeled)].SetPipeline([Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]).
+ - While finishing [CommandEncoder "CubeCL Tasks Encoder"].
+
+warning [Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"] is invalid due to a previous error.
+ - While calling [Queue].Submit([[Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"]])
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While Validating GetBindGroupLayout (0) on [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]
+
+warning [Invalid BindGroupLayout (unlabeled)] is invalid due to a previous error.
+ - While validating [BindGroupDescriptor] against [Invalid BindGroupLayout (unlabeled)]
+ - While calling [Device].CreateBindGroup([BindGroupDescriptor]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While encoding [ComputePassEncoder (unlabeled)].SetPipeline([Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]).
+ - While finishing [CommandEncoder "CubeCL Tasks Encoder"].
+
+warning [Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"] is invalid due to a previous error.
+ - While calling [Queue].Submit([[Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"]])
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While Validating GetBindGroupLayout (0) on [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]
+
+warning [Invalid BindGroupLayout (unlabeled)] is invalid due to a previous error.
+ - While validating [BindGroupDescriptor] against [Invalid BindGroupLayout (unlabeled)]
+ - While calling [Device].CreateBindGroup([BindGroupDescriptor]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While encoding [ComputePassEncoder (unlabeled)].SetPipeline([Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]).
+ - While finishing [CommandEncoder "CubeCL Tasks Encoder"].
+
+warning [Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"] is invalid due to a previous error.
+ - While calling [Queue].Submit([[Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"]])
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While Validating GetBindGroupLayout (0) on [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]
+
+warning [Invalid BindGroupLayout (unlabeled)] is invalid due to a previous error.
+ - While validating [BindGroupDescriptor] against [Invalid BindGroupLayout (unlabeled)]
+ - While calling [Device].CreateBindGroup([BindGroupDescriptor]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While encoding [ComputePassEncoder (unlabeled)].SetPipeline([Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]).
+ - While finishing [CommandEncoder "CubeCL Tasks Encoder"].
+
+warning [Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"] is invalid due to a previous error.
+ - While calling [Queue].Submit([[Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"]])
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While Validating GetBindGroupLayout (0) on [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]
+
+warning [Invalid BindGroupLayout (unlabeled)] is invalid due to a previous error.
+ - While validating [BindGroupDescriptor] against [Invalid BindGroupLayout (unlabeled)]
+ - While calling [Device].CreateBindGroup([BindGroupDescriptor]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While encoding [ComputePassEncoder (unlabeled)].SetPipeline([Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]).
+ - While finishing [CommandEncoder "CubeCL Tasks Encoder"].
+
+warning [Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"] is invalid due to a previous error.
+ - While calling [Queue].Submit([[Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"]])
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While Validating GetBindGroupLayout (0) on [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]
+
+warning [Invalid BindGroupLayout (unlabeled)] is invalid due to a previous error.
+ - While validating [BindGroupDescriptor] against [Invalid BindGroupLayout (unlabeled)]
+ - While calling [Device].CreateBindGroup([BindGroupDescriptor]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While encoding [ComputePassEncoder (unlabeled)].SetPipeline([Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]).
+ - While finishing [CommandEncoder "CubeCL Tasks Encoder"].
+
+warning [Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"] is invalid due to a previous error.
+ - While calling [Queue].Submit([[Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"]])
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While Validating GetBindGroupLayout (0) on [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]
+
+warning [Invalid BindGroupLayout (unlabeled)] is invalid due to a previous error.
+ - While validating [BindGroupDescriptor] against [Invalid BindGroupLayout (unlabeled)]
+ - While calling [Device].CreateBindGroup([BindGroupDescriptor]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While encoding [ComputePassEncoder (unlabeled)].SetPipeline([Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]).
+ - While finishing [CommandEncoder "CubeCL Tasks Encoder"].
+
+warning [Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"] is invalid due to a previous error.
+ - While calling [Queue].Submit([[Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"]])
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While Validating GetBindGroupLayout (0) on [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]
+
+warning [Invalid BindGroupLayout (unlabeled)] is invalid due to a previous error.
+ - While validating [BindGroupDescriptor] against [Invalid BindGroupLayout (unlabeled)]
+ - While calling [Device].CreateBindGroup([BindGroupDescriptor]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While encoding [ComputePassEncoder (unlabeled)].SetPipeline([Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]).
+ - While finishing [CommandEncoder "CubeCL Tasks Encoder"].
+
+warning [Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"] is invalid due to a previous error.
+ - While calling [Queue].Submit([[Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"]])
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While Validating GetBindGroupLayout (0) on [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]
+
+warning [Invalid BindGroupLayout (unlabeled)] is invalid due to a previous error.
+ - While validating [BindGroupDescriptor] against [Invalid BindGroupLayout (unlabeled)]
+ - While calling [Device].CreateBindGroup([BindGroupDescriptor]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While encoding [ComputePassEncoder (unlabeled)].SetPipeline([Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]).
+ - While finishing [CommandEncoder "CubeCL Tasks Encoder"].
+
+warning [Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"] is invalid due to a previous error.
+ - While calling [Queue].Submit([[Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"]])
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While Validating GetBindGroupLayout (0) on [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]
+
+warning [Invalid BindGroupLayout (unlabeled)] is invalid due to a previous error.
+ - While validating [BindGroupDescriptor] against [Invalid BindGroupLayout (unlabeled)]
+ - While calling [Device].CreateBindGroup([BindGroupDescriptor]).
+
+warning [Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"] is invalid due to a previous error.
+ - While encoding [ComputePassEncoder (unlabeled)].SetPipeline([Invalid ComputePipeline "matmul_entry_lhs_f32_lhs_size_1_rhs_f32_rhs_size_1_acc_f32_acc_size_1"]).
+ - While finishing [CommandEncoder "CubeCL Tasks Encoder"].
+
+warning [Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"] is invalid due to a previous error.
+ - While calling [Queue].Submit([[Invalid CommandBuffer "CubeCL Tasks Encoder" from CommandEncoder "CubeCL Tasks Encoder"]])
+
+Traceback (most recent call last):
+  File "/media/mosure/hyper1/repos/burn_human/tool/scripts/profile_webgpu.py", line 62, in <module>
+    asyncio.run(main())
+  File "/home/mosure/.cache/burn_image/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/home/mosure/.cache/burn_image/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mosure/.cache/burn_image/python/cpython-3.12.13-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/media/mosure/hyper1/repos/burn_human/tool/scripts/profile_webgpu.py", line 31, in main
+    result = await page.evaluate('''async({module, func, args}) => {
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/lib/python3.12/site-packages/playwright/async_api/_generated.py", line 9421, in evaluate
+    await self._impl_obj.evaluate(
+  File "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/lib/python3.12/site-packages/playwright/_impl/_page.py", line 474, in evaluate
+    return await self._main_frame.evaluate(expression, arg)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/lib/python3.12/site-packages/playwright/_impl/_frame.py", line 346, in evaluate
+    await self._channel.send(
+  File "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 76, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/mosure/hyper1/repos/burn_human/.cache/ardy-venv/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 632, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.Error: Page.evaluate: SOMA numerical parity failed for shape_pose

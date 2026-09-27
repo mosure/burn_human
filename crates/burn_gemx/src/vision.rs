@@ -28,6 +28,8 @@ pub struct VisionConfig {
 pub struct Vision<B: Backend> {
     weights: TensorBank<B>,
     pub config: VisionConfig,
+    rope_cos: Tensor<B, 4>,
+    rope_sin: Tensor<B, 4>,
 }
 impl<B: Backend> Vision<B> {
     pub async fn load(
@@ -118,11 +120,41 @@ impl<B: Backend> Vision<B> {
             weights.load_object(source, o).await?;
             progress(i + 1, manifest.objects.len());
         }
-        Ok(Self { weights, config })
+        let count = config.height / 16 * config.width / 16;
+        let angles = weights
+            .tensor::<2>("rope.angles")
+            .reshape([1, 1, count, 64]);
+        let rope_cos = angles.clone().cos();
+        let rope_sin = angles.sin();
+        Ok(Self {
+            weights,
+            config,
+            rope_cos,
+            rope_sin,
+        })
     }
 
-    /// ImageNet-normalized RGB. Batches are bounded because full attention is quadratic.
+    /// ImageNet-normalized RGB, with a bounded batch of up to eight images.
     pub fn forward(&self, input: Tensor<B, 4>) -> Result<Tensor<B, 4>> {
+        let mut x = self.begin(input)?;
+        for i in 0..32 {
+            x = self.block(x, i);
+        }
+        Ok(self.finish(x))
+    }
+
+    /// Equivalent inference with cooperative browser scheduling between blocks.
+    /// No tensor readback or device-completion wait is inserted.
+    pub async fn forward_async(&self, input: Tensor<B, 4>) -> Result<Tensor<B, 4>> {
+        let mut x = self.begin(input)?;
+        for i in 0..32 {
+            x = self.block(x, i);
+            burn_human_inference::cooperative::yield_to_browser().await;
+        }
+        Ok(self.finish(x))
+    }
+
+    fn begin(&self, input: Tensor<B, 4>) -> Result<Tensor<B, 3>> {
         let [batch, c, h, w] = input.dims();
         ensure!(
             (1..=8).contains(&batch) && c == 3 && h == self.config.height && w == self.config.width,
@@ -130,7 +162,6 @@ impl<B: Backend> Vision<B> {
         );
         let (h, w) = (h / 16, w / 16);
         let count = h * w;
-        let n = count + 5;
         let bank = &self.weights;
         let patch = module::conv2d(
             input,
@@ -140,7 +171,7 @@ impl<B: Backend> Vision<B> {
         )
         .reshape([batch, 1280, count])
         .swap_dims(1, 2);
-        let mut x = Tensor::cat(
+        let x = Tensor::cat(
             vec![
                 bank.tensor::<3>("cls_token").expand([batch, 1, 1280]),
                 bank.tensor::<3>("storage_tokens").expand([batch, 4, 1280]),
@@ -148,9 +179,13 @@ impl<B: Backend> Vision<B> {
             ],
             1,
         );
-        let angles = bank.tensor::<2>("rope.angles").reshape([1, 1, count, 64]);
-        let cos = angles.clone().cos();
-        let sin = angles.sin();
+        Ok(x)
+    }
+
+    fn block(&self, mut x: Tensor<B, 3>, i: usize) -> Tensor<B, 3> {
+        let [batch, n, _] = x.dims();
+        let count = n - 5;
+        let bank = &self.weights;
         let rope = |t: Tensor<B, 4>| {
             let prefix = t.clone().slice([0..batch, 0..20, 0..5, 0..64]);
             let body = t.slice([0..batch, 0..20, 5..n, 0..64]);
@@ -161,9 +196,15 @@ impl<B: Backend> Vision<B> {
                 ],
                 3,
             );
-            Tensor::cat(vec![prefix, body * cos.clone() + half * sin.clone()], 2)
+            Tensor::cat(
+                vec![
+                    prefix,
+                    body * self.rope_cos.clone() + half * self.rope_sin.clone(),
+                ],
+                2,
+            )
         };
-        for i in 0..32 {
+        {
             let p = format!("blocks.{i}");
             let z = norm(bank, &format!("{p}.norm1"), x.clone(), 1e-6);
             let qkv = bank
@@ -186,12 +227,19 @@ impl<B: Backend> Vision<B> {
             x = x + bank.affine(&format!("{p}.mlp.w3"), z)
                 * bank.tensor::<1>(&format!("{p}.ls2.gamma")).unsqueeze();
         }
+        x
+    }
+
+    fn finish(&self, x: Tensor<B, 3>) -> Tensor<B, 4> {
+        let [batch, n, _] = x.dims();
+        let (h, w) = (self.config.height / 16, self.config.width / 16);
+        let bank = &self.weights;
         let x = norm(bank, "norm", x, 1e-6)
             .slice([0..batch, 5..n, 0..1280])
             .reshape([batch, h, w, 1280])
             .permute([0, 3, 1, 2]);
         if self.config.kind != "vitpose" {
-            return Ok(x);
+            return x;
         }
         let mut x = x;
         for i in 0..2 {
@@ -202,11 +250,11 @@ impl<B: Backend> Vision<B> {
                 ConvTransposeOptions::new([2, 2], [1, 1], [0, 0], [1, 1], 1),
             ));
         }
-        Ok(module::conv2d(
+        module::conv2d(
             x,
             bank.tensor("head.final.weight"),
             Some(bank.tensor("head.final.bias")),
             ConvOptions::new([1, 1], [0, 0], [1, 1], 1),
-        ))
+        )
     }
 }

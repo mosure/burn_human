@@ -619,7 +619,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_burn_human"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "anyhow",
  "bevy",
@@ -629,9 +629,11 @@ dependencies = [
  "burn_ardy",
  "burn_gemx",
  "burn_human",
+ "burn_human_inference",
  "burn_human_motion",
  "burn_llama",
  "burn_soma",
+ "bytemuck",
  "console_error_panic_hook",
  "fastrand",
  "image",
@@ -643,6 +645,7 @@ dependencies = [
  "serde_json",
  "wasm-bindgen",
  "wasm-bindgen-futures",
+ "wgpu",
 ]
 
 [[package]]
@@ -2505,7 +2508,7 @@ dependencies = [
 
 [[package]]
 name = "burn_ardy"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "burn",
@@ -2528,7 +2531,7 @@ dependencies = [
 
 [[package]]
 name = "burn_gemx"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "burn",
@@ -2567,7 +2570,7 @@ dependencies = [
 
 [[package]]
 name = "burn_human_inference"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "anyhow",
  "burn",
@@ -2583,6 +2586,7 @@ dependencies = [
  "ureq 3.4.2",
  "wasm-bindgen",
  "wasm-bindgen-futures",
+ "wgpu",
 ]
 
 [[package]]
@@ -2652,7 +2656,7 @@ dependencies = [
 
 [[package]]
 name = "burn_soma"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "burn",

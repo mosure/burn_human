@@ -122,6 +122,21 @@ pub async fn validate<B: Backend>(
         )
     };
     hooks.push(compare("sampled", sample()?, &fixture, 0.02).await?);
+    // The interactive scheduler must preserve the same checkpoint computation.
+    let cooperative = model
+        .sample_window_async(
+            x.clone(),
+            fixture.tensor("text", &device)?,
+            fixture.tensor("heading", &device)?,
+            fixture.tensor("observed", &device)?,
+            fixture.tensor("mask", &device)?,
+            8,
+            10,
+            [2.0, 1.5],
+            |_| {},
+        )
+        .await?;
+    hooks.push(compare("sampled", cooperative, &fixture, 0.02).await?);
     hooks.push(
         compare(
             "decoded",

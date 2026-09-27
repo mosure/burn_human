@@ -1,0 +1,80 @@
+[
+  {
+    "variant": "baseline",
+    "history": 0,
+    "frames": 80,
+    "seconds": 10.104708421975374,
+    "command": [
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/baseline/bin/ardy-run",
+      "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model/ardy/core-rp-20fps-h40/v1",
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/history/request-0.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/ardy-burn-quality/embedding-path.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/history/baseline-0.json"
+    ]
+  },
+  {
+    "variant": "candidate",
+    "history": 0,
+    "frames": 80,
+    "seconds": 16.810697779990733,
+    "command": [
+      "/media/mosure/hyper1/repos/burn_human/target/debug/ardy-run",
+      "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model/ardy/core-rp-20fps-h40/v1",
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/history/request-0.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/ardy-burn-quality/embedding-path.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/history/candidate-0.json"
+    ]
+  },
+  {
+    "variant": "baseline",
+    "history": 40,
+    "frames": 120,
+    "seconds": 4.685812700074166,
+    "command": [
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/baseline/bin/ardy-run",
+      "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model/ardy/core-rp-20fps-h40/v1",
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/history/request-40.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/ardy-burn-quality/embedding-path.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/history/baseline-40.json"
+    ]
+  },
+  {
+    "variant": "candidate",
+    "history": 40,
+    "frames": 120,
+    "seconds": 11.617946072015911,
+    "command": [
+      "/media/mosure/hyper1/repos/burn_human/target/debug/ardy-run",
+      "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model/ardy/core-rp-20fps-h40/v1",
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/history/request-40.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/ardy-burn-quality/embedding-path.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/history/candidate-40.json"
+    ]
+  },
+  {
+    "variant": "baseline",
+    "history": 160,
+    "frames": 240,
+    "seconds": 6.593336222926155,
+    "command": [
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/baseline/bin/ardy-run",
+      "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model/ardy/core-rp-20fps-h40/v1",
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/history/request-160.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/ardy-burn-quality/embedding-path.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/history/baseline-160.json"
+    ]
+  },
+  {
+    "variant": "candidate",
+    "history": 160,
+    "frames": 240,
+    "seconds": 7.854508213000372,
+    "command": [
+      "/media/mosure/hyper1/repos/burn_human/target/debug/ardy-run",
+      "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model/ardy/core-rp-20fps-h40/v1",
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/history/request-160.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/ardy-burn-quality/embedding-path.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/history/candidate-160.json"
+    ]
+  }
+]

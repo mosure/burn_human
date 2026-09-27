@@ -1,0 +1,32 @@
+{
+  "burn_human_inference": {
+    "version": "0.1.3",
+    "files": 16,
+    "archive_bytes": 56749,
+    "no_models_or_cache": true
+  },
+  "burn_ardy": {
+    "version": "0.1.2",
+    "files": 22,
+    "archive_bytes": 66271,
+    "no_models_or_cache": true
+  },
+  "burn_soma": {
+    "version": "0.1.2",
+    "files": 17,
+    "archive_bytes": 61975,
+    "no_models_or_cache": true
+  },
+  "burn_gemx": {
+    "version": "0.1.2",
+    "files": 26,
+    "archive_bytes": 80048,
+    "no_models_or_cache": true
+  },
+  "bevy_burn_human": {
+    "version": "0.5.3",
+    "files": 21,
+    "archive_bytes": 108601,
+    "no_models_or_cache": true
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "baseline_source": "cb5c564c8042135466b461534e0e84902cbc8af2",
+  "profile": "same native dev profile; application opt-level=1, dependency overrides from Cargo.toml; CARGO_PROFILE_DEV_DEBUG=0",
+  "protocol": "before-2, candidate-1, before-3, candidate-2; each validator synchronizes full output; warm samples pooled equally",
+  "hardware": "shared RTX PRO 6000 Blackwell Workstation Edition, 96 GiB; driver 610.43.02",
+  "limitations": [
+    "Desktop and unrelated processes were not stopped. CPU compilation also overlapped some runs.",
+    "One device, fixed real-checkpoint fixtures, small sample counts; no minimum hardware or cross-device guarantee.",
+    "No model load/download or Llama encoding is included in warm native table. ARDY also excludes decoding.",
+    "No end-to-end presentation latency is inferred from kernel/validator timing."
+  ]
+}

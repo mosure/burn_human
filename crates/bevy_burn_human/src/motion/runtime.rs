@@ -6,11 +6,9 @@ use bevy::{
         renderer::{RenderAdapter, RenderDevice, RenderInstance, RenderQueue},
     },
 };
-use burn::backend::{
-    Wgpu,
-    wgpu::{WgpuDevice, WgpuSetup, init_device},
-};
+use burn::backend::wgpu::{WgpuDevice, WgpuSetup, init_device};
 use burn_ardy::{Ardy, transport::read_bounded};
+use burn_human_inference::gpu::WgpuBackend as Wgpu;
 use burn_human_motion::{
     ImageCondition, MotionClip, MotionRequest, TextEmbedding, soma::SomaAnimation,
 };
@@ -90,6 +88,10 @@ pub(super) fn initialize_device(app: &mut App) {
     let runtime = app.world().resource::<MotionRuntime>();
     let mut state = runtime.0.lock().unwrap();
     if let Some(setup) = setup {
+        state.body.processor = Some(Arc::new(super::surface::SurfaceProcessor::new(
+            setup.device.clone(),
+            setup.queue.clone(),
+        )));
         state.adapter = setup.adapter.get_info().name;
         if state.adapter.is_empty() {
             state.adapter = format!("{:?}", setup.backend);
@@ -108,18 +110,38 @@ where
     F: FnOnce() -> Fu + Send + 'static,
     Fu: Future<Output = Result<()>> + 'static,
 {
-    std::thread::spawn(move || {
-        let result =
-            std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| pollster::block_on(job())));
-        let error = match result {
-            Ok(Ok(())) => None,
-            Ok(Err(e)) => Some(e.to_string()),
-            Err(_) => Some("GPU job failed; see the console for device diagnostics".into()),
-        };
-        if let Some(e) = error {
-            runtime.0.lock().unwrap().status = MotionStatus::Failed(e);
-        }
+    // One serial worker matches the runtime's single-flight policy. Live rig
+    // edits reuse the thread instead of starting an OS thread for every pose.
+    type Job = Box<dyn FnOnce() + Send>;
+    static WORKER: std::sync::OnceLock<std::sync::mpsc::Sender<Job>> = std::sync::OnceLock::new();
+    let worker = WORKER.get_or_init(|| {
+        let (sender, receiver) = std::sync::mpsc::channel::<Job>();
+        std::thread::Builder::new()
+            .name("human-inference".into())
+            .spawn(move || {
+                for job in receiver {
+                    job();
+                }
+            })
+            .expect("start inference worker");
+        sender
     });
+    worker
+        .send(Box::new(move || {
+            let result =
+                std::panic::catch_unwind(std::panic::AssertUnwindSafe(
+                    || pollster::block_on(job()),
+                ));
+            let error = match result {
+                Ok(Ok(())) => None,
+                Ok(Err(e)) => Some(e.to_string()),
+                Err(_) => Some("GPU job failed; see the console for device diagnostics".into()),
+            };
+            if let Some(e) = error {
+                runtime.0.lock().unwrap().status = MotionStatus::Failed(e);
+            }
+        }))
+        .expect("inference worker is alive");
 }
 #[cfg(target_arch = "wasm32")]
 pub(super) fn spawn_job<F, Fu>(runtime: MotionRuntime, job: F)

@@ -1,35 +1,44 @@
 //! SOMA/GEM model ownership and background evaluation, separate from ARDY playback.
+use super::surface::{GpuSurface, SurfaceProcessor, Topology};
 use super::{MotionRuntime, MotionStatus, runtime::spawn_job};
 use anyhow::{Result, ensure};
-use burn::backend::Wgpu;
 use burn_gemx::{
     camera::{Camera, Crop},
-    pipeline::{Pipeline, PipelineArtifacts, PoseEstimate},
+    pipeline::{Pipeline, PipelineArtifacts},
 };
+use burn_human_inference::gpu::WgpuBackend as Wgpu;
 use burn_soma::{
     BindConvention, IdentityParameters, PreparedIdentity, Soma, SomaPose, mhr::MhrIdentity,
 };
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum BodyIdentity {
     Native(IdentityParameters),
     Image(MhrIdentity),
 }
-pub struct Surface {
-    pub vertices: Vec<[f32; 3]>,
-    pub faces: Vec<[u32; 3]>,
+pub(super) struct Surface {
+    pub gpu: GpuSurface,
     pub joints: Vec<[f32; 3]>,
     pub parents: Vec<usize>,
     pub camera_space: bool,
 }
+pub(super) struct BodyEstimate {
+    pub identity: MhrIdentity,
+    pub pose: SomaPose,
+    pub keypoints_2d: Vec<[f32; 3]>,
+}
 #[derive(Default)]
 pub(super) struct BodyState {
+    pub processor: Option<Arc<SurfaceProcessor>>,
+    pub soma_topology: Option<Arc<Topology>>,
+    pub gem_topology: Option<Arc<Topology>>,
     pub soma: Option<Soma<Wgpu>>,
     pub gem: Option<Pipeline<Wgpu>>,
     pub prepared: Option<(String, PreparedIdentity<Wgpu>)>,
     pub surface: Option<Surface>,
-    pub estimate: Option<PoseEstimate>,
+    pub estimate: Option<BodyEstimate>,
     pub estimate_input: Option<(u64, Crop, Camera)>,
     pub joint_names: Vec<String>,
     pub scale_names: Vec<String>,
@@ -44,6 +53,9 @@ pub(super) fn load_soma(runtime: &MotionRuntime, base: String, digest: String) {
     let Some(device) = state.device.clone() else {
         return;
     };
+    let Some(processor) = state.body.processor.clone() else {
+        return;
+    };
     state.status = MotionStatus::Working("Loading SOMA".into());
     drop(state);
     let shared = runtime.0.clone();
@@ -55,12 +67,25 @@ pub(super) fn load_soma(runtime: &MotionRuntime, base: String, digest: String) {
         })
         .await?;
         let id = soma.prepare_identity(IdentityParameters::default()).await?;
-        let surface = evaluate(&soma, &id, &SomaPose::default(), false).await?;
+        let topology = processor.topology(18056, &soma.faces)?;
+        let surface = evaluate(
+            &soma,
+            &id,
+            &SomaPose::default(),
+            false,
+            &processor,
+            topology.clone(),
+        )
+        .await?;
         let mut state = shared.lock().unwrap();
         state.body.joint_names = soma.rig.public_names[1..].to_vec();
         state.body.scale_names = soma.rig.scale_names.clone();
         state.body.soma = Some(soma);
-        state.body.prepared = None;
+        state.body.prepared = Some((
+            identity_key(&BodyIdentity::Native(IdentityParameters::default()))?,
+            id,
+        ));
+        state.body.soma_topology = Some(topology);
         state.body.surface = Some(surface);
         state.body.estimate = None;
         state.body.estimate_input = None;
@@ -75,6 +100,9 @@ pub(super) fn load_gem(runtime: &MotionRuntime, location: String) {
         return;
     }
     let Some(device) = state.device.clone() else {
+        return;
+    };
+    let Some(processor) = state.body.processor.clone() else {
         return;
     };
     state.status = MotionStatus::Working("Loading image pose models".into());
@@ -96,10 +124,13 @@ pub(super) fn load_gem(runtime: &MotionRuntime, location: String) {
                 MotionStatus::Working(format!("Loading {stage} {i}/{n}"))
         })
         .await?;
+        let topology = processor.topology(18056, &gem.soma.faces)?;
         let mut state = shared.lock().unwrap();
         state.body.joint_names = gem.soma.rig.public_names[1..].to_vec();
         state.body.scale_names = gem.soma.rig.scale_names.clone();
         state.body.gem = Some(gem);
+        state.body.gem_topology = Some(topology);
+        state.body.prepared = None;
         state.status = MotionStatus::Ready;
         Ok(())
     });
@@ -113,6 +144,12 @@ pub(super) fn estimate(runtime: &MotionRuntime, crop: Crop, camera: Camera) {
         return;
     };
     let image_revision = state.image_revision;
+    let Some(processor) = state.body.processor.clone() else {
+        return;
+    };
+    let Some(topology) = state.body.gem_topology.clone() else {
+        return;
+    };
     let Some(gem) = state.body.gem.take() else {
         return;
     };
@@ -124,27 +161,36 @@ pub(super) fn estimate(runtime: &MotionRuntime, crop: Crop, camera: Camera) {
             let rgba = image::RgbaImage::from_raw(input.width, input.height, input.rgba)
                 .ok_or_else(|| anyhow::anyhow!("Invalid input image"))?;
             let rgb = image::DynamicImage::ImageRgba8(rgba).into_rgb8();
-            gem.estimate(&rgb, crop, camera, |s| {
-                shared.lock().unwrap().status = MotionStatus::Working(s.into())
-            })
-            .await
+            let prediction = gem
+                .estimate_resident(&rgb, crop, camera, |s| {
+                    shared.lock().unwrap().status = MotionStatus::Working(s.into())
+                })
+                .await?;
+            let gpu = processor.prepare(prediction.vertices, topology).await?;
+            let mut joints = vec![[0.0; 3]];
+            joints.extend(prediction.joints);
+            let surface = Surface {
+                gpu,
+                joints,
+                parents: gem.soma.rig.public_parents.clone(),
+                camera_space: true,
+            };
+            let key = identity_key(&BodyIdentity::Image(prediction.identity.clone()))?;
+            let estimate = BodyEstimate {
+                identity: prediction.identity,
+                pose: prediction.pose,
+                keypoints_2d: prediction.keypoints_2d,
+            };
+            Ok::<_, anyhow::Error>((surface, estimate, (key, prediction.prepared)))
         }
         .await;
         let mut state = shared.lock().unwrap();
         match result {
-            Ok(pose) => {
-                let mut joints = vec![[0.0; 3]];
-                joints.extend(pose.joints.clone());
-                state.body.surface = Some(Surface {
-                    vertices: pose.vertices.clone(),
-                    faces: gem.soma.faces.clone(),
-                    joints,
-                    parents: gem.soma.rig.public_parents.clone(),
-                    camera_space: true,
-                });
-                state.body.estimate = Some(pose);
+            Ok((surface, estimate, prepared)) => {
+                state.body.surface = Some(surface);
+                state.body.estimate = Some(estimate);
                 state.body.estimate_input = Some((image_revision, crop, camera));
-                state.body.prepared = None;
+                state.body.prepared = Some(prepared);
                 state.body.revision += 1;
                 state.status = MotionStatus::Ready;
             }
@@ -159,6 +205,18 @@ pub(super) fn apply(runtime: &MotionRuntime, identity: BodyIdentity, pose: SomaP
     if state.status.busy() {
         return;
     }
+    let Some(processor) = state.body.processor.clone() else {
+        return;
+    };
+    let use_native = matches!(identity, BodyIdentity::Native(_)) && state.body.soma.is_some();
+    let topology = if use_native {
+        &state.body.soma_topology
+    } else {
+        &state.body.gem_topology
+    };
+    let Some(topology) = topology.clone() else {
+        return;
+    };
     let soma = state.body.soma.take();
     let gem = state.body.gem.take();
     let prepared = state.body.prepared.take();
@@ -168,11 +226,13 @@ pub(super) fn apply(runtime: &MotionRuntime, identity: BodyIdentity, pose: SomaP
     spawn_job(runtime.clone(), move || async move {
         let mut cached = prepared;
         let result = async {
-            let model = soma
-                .as_ref()
-                .or_else(|| gem.as_ref().map(|g| &g.soma))
-                .ok_or_else(|| anyhow::anyhow!("Load SOMA or GEM-X first"))?;
-            let key = serde_json::to_string(&identity)?;
+            let model = if use_native {
+                soma.as_ref()
+            } else {
+                gem.as_ref().map(|g| &g.soma)
+            }
+            .ok_or_else(|| anyhow::anyhow!("Load SOMA or GEM-X first"))?;
+            let key = identity_key(&identity)?;
             ensure!(
                 !matches!(identity, BodyIdentity::Image(_)) || !pose.apply_correctives,
                 "Use canonical SOMA identity for pose correctives"
@@ -195,11 +255,24 @@ pub(super) fn apply(runtime: &MotionRuntime, identity: BodyIdentity, pose: SomaP
                 };
                 cached = Some((key, id));
             }
+            if let BodyIdentity::Native(parameters) = &identity {
+                // Bone ratios affect pose translations, not the PCA rest mesh
+                // or fitted bind. Reuse that work while dragging bone controls.
+                cached
+                    .as_mut()
+                    .unwrap()
+                    .1
+                    .parameters
+                    .bone_scales
+                    .clone_from(&parameters.bone_scales);
+            }
             evaluate(
                 model,
                 &cached.as_ref().unwrap().1,
                 &pose,
                 matches!(identity, BodyIdentity::Image(_)),
+                &processor,
+                topology,
             )
             .await
         }
@@ -223,20 +296,13 @@ async fn evaluate(
     id: &PreparedIdentity<Wgpu>,
     pose: &SomaPose,
     camera_space: bool,
+    processor: &SurfaceProcessor,
+    topology: Arc<Topology>,
 ) -> Result<Surface> {
     let output = soma.pose_batch(id, std::slice::from_ref(pose))?;
-    let vertices = output
-        .vertices
-        .into_data_async()
-        .await?
-        .to_vec::<f32>()
-        .map_err(|e| anyhow::anyhow!("SOMA vertices: {e}"))?
-        .as_chunks::<3>()
-        .0
-        .to_vec();
+    let gpu = processor.prepare(output.vertices, topology).await?;
     Ok(Surface {
-        vertices,
-        faces: soma.faces.clone(),
+        gpu,
         joints: output.transforms[0]
             .iter()
             .map(|m| m.w_axis.truncate().to_array())
@@ -244,4 +310,12 @@ async fn evaluate(
         parents: soma.rig.public_parents.clone(),
         camera_space,
     })
+}
+
+fn identity_key(identity: &BodyIdentity) -> Result<String> {
+    let mut identity = identity.clone();
+    if let BodyIdentity::Native(parameters) = &mut identity {
+        parameters.bone_scales.fill(1.0);
+    }
+    Ok(serde_json::to_string(&identity)?)
 }

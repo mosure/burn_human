@@ -1,0 +1,48 @@
+[
+  {
+    "name": "ardy",
+    "label": "candidate-1",
+    "command": [
+      "/media/mosure/hyper1/repos/burn_human/target/debug/ardy-validate",
+      "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model/ardy/core-rp-20fps-h40/v1",
+      "/media/mosure/hyper1/repos/burn_human/.cache/ardy-reference-final/reference.safetensors",
+      "wgpu"
+    ],
+    "binary_sha256": "97269d11e1531542e249e28b1b901e20c6eff1c17f583f44e0ee0a1b6ee03009",
+    "start_utc": "2026-09-26T23:31:45.066433+00:00",
+    "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1569 MiB, 34 %\n",
+    "exit_code": 0,
+    "elapsed_seconds": 9.231983472011052
+  },
+  {
+    "name": "soma",
+    "label": "candidate-1",
+    "command": [
+      "/media/mosure/hyper1/repos/burn_human/target/debug/soma-validate",
+      "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model/soma-x/v1/body",
+      "/media/mosure/hyper1/repos/burn_human/.cache/soma-raw/reference.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/candidate-1/soma.json"
+    ],
+    "binary_sha256": "b95614c6ce8b080901f6c4932056e3d98785de77ff34a9d287430adeba0137ea",
+    "start_utc": "2026-09-26T23:31:54.392937+00:00",
+    "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1569 MiB, 38 %\n",
+    "exit_code": 0,
+    "elapsed_seconds": 2.384047732921317
+  },
+  {
+    "name": "gemx",
+    "label": "candidate-1",
+    "command": [
+      "/media/mosure/hyper1/repos/burn_human/target/debug/gem-validate",
+      "/media/mosure/hyper1/repos/burn_human/.artifacts/cdn-upload-human-v1/aberration.technology/model/gemx/v1/suite.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/gem-real-reference.png",
+      "/media/mosure/hyper1/repos/burn_human/.cache/gem-real-reference.json",
+      "/media/mosure/hyper1/repos/burn_human/.cache/perf-2026-09-26/candidate-1/gemx.json"
+    ],
+    "binary_sha256": "2b2132cc0f7396dfc68e9f98ed0c15974a8e233b0704915e102d4c90bd0c072a",
+    "start_utc": "2026-09-26T23:31:56.916661+00:00",
+    "gpu_before": "name, driver_version, memory.used [MiB], utilization.gpu [%]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 1569 MiB, 18 %\n",
+    "exit_code": 0,
+    "elapsed_seconds": 58.235349552938715
+  }
+]

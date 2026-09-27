@@ -11,6 +11,7 @@ use std::collections::{BTreeMap, BTreeSet};
 pub struct Weights<B: Backend> {
     tensors: BTreeMap<String, (Tensor<B, 1>, Vec<usize>)>,
     pub device: B::Device,
+    pub(crate) constants: crate::constants::Constants<B>,
 }
 
 impl<B: Backend> Weights<B> {
@@ -96,6 +97,7 @@ impl<B: Backend> Weights<B> {
             Self {
                 tensors,
                 device: device.clone(),
+                constants: crate::constants::Constants::new(&config, device),
             },
             config,
         ))

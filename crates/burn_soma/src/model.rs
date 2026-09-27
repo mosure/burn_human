@@ -405,6 +405,7 @@ impl<B: Backend> Soma<B> {
         identity: &PreparedIdentity<B>,
         poses: &[SomaPose],
     ) -> Result<SomaOutput<B>> {
+        identity.parameters.validate()?;
         ensure!(
             !poses.is_empty() && poses.len() <= 256,
             "SOMA pose batch must contain 1..256 poses"
@@ -494,22 +495,28 @@ impl<B: Backend> Soma<B> {
             if self.rig.corrective_tanh {
                 z = z.tanh();
             }
-            let mut offsets = Tensor::<B, 2>::zeros([batch, 54168], &self.weights.device);
+            // Scatter along the leading coordinate dimension so each unique
+            // sparse coordinate is independent. select_assign on [batch, xyz]
+            // serializes the entire sparse list in one GPU thread per pose.
+            let mut offsets = Tensor::<B, 2>::zeros([54168, batch], &self.weights.device);
             for group in &self.rig.corrective_groups {
                 let start = group.joint * 24;
                 let values = self.weights.linear(
                     &format!("corrective.output.{}.weight", group.joint),
                     z.clone().slice([0..batch, start..start + 24]),
                 );
-                offsets = offsets.select_assign(
-                    1,
-                    self.corrective_indices[&group.joint].clone(),
-                    values,
+                // Indices are verified unique within each group at load time.
+                // Groups execute in order, preserving overlapping contributions.
+                offsets = offsets.scatter_nd(
+                    self.corrective_indices[&group.joint]
+                        .clone()
+                        .reshape([group.columns, 1]),
+                    values.transpose(),
                     IndexingUpdateOp::Add,
                 );
             }
-            vertices =
-                vertices + offsets.reshape([batch, 18056, 3]) * identity.parameters.global_scale;
+            vertices = vertices
+                + offsets.transpose().reshape([batch, 18056, 3]) * identity.parameters.global_scale;
         }
         let vertices = self.skin(
             vertices,

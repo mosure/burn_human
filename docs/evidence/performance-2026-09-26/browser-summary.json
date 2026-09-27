@@ -1,0 +1,60 @@
+{
+  "baseline-ardy": {
+    "median_ms": 192.6,
+    "samples_ms": [
+      188.1,
+      192.6,
+      245.60000000000002
+    ],
+    "wasm_peak_mib": 239.0
+  },
+  "candidate-ardy": {
+    "median_ms": 208.2,
+    "samples_ms": [
+      195.0,
+      208.2,
+      244.5
+    ],
+    "wasm_peak_mib": 279.0625
+  },
+  "baseline-soma": {
+    "median_ms": 11.799999999999999,
+    "samples_ms": [
+      11.299999999999999,
+      11.799999999999999,
+      11.799999999999999,
+      15.100000000000001,
+      15.2
+    ],
+    "wasm_peak_mib": 131.4375
+  },
+  "candidate-soma": {
+    "median_ms": 3.7,
+    "samples_ms": [
+      3.5,
+      3.7,
+      3.7,
+      3.8,
+      4.2
+    ],
+    "wasm_peak_mib": 131.4375
+  },
+  "baseline-gemx": {
+    "median_ms": 558.6,
+    "samples_ms": [
+      558.6,
+      538.0,
+      559.8
+    ],
+    "wasm_peak_mib": 942.5625
+  },
+  "candidate-gemx": {
+    "median_ms": 531.6999999999999,
+    "samples_ms": [
+      531.6999999999999,
+      527.4,
+      535.8000000000001
+    ],
+    "wasm_peak_mib": 1180.5
+  }
+}

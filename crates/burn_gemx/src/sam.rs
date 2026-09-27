@@ -230,6 +230,90 @@ impl<B: Backend> SamBody<B> {
         );
         Ok(norm(&self.weights, "ray_cond_emb.norm", out, 1e-6))
     }
+    #[allow(clippy::too_many_arguments)]
+    fn feedback(
+        &self,
+        mut x: Tensor<B, 3>,
+        mut pe: Tensor<B, 3>,
+        image: Tensor<B, 3>,
+        keypoints: Tensor<B, 3>,
+        cam: [f32; 3],
+        crop: Crop,
+        camera: Camera,
+    ) -> Result<(Tensor<B, 3>, Tensor<B, 3>)> {
+        let device = &self.weights.device;
+        let vector = |v: Vec<f32>| {
+            let n = v.len();
+            Tensor::<B, 3>::from_data(TensorData::new(v, [1, 1, n]), device)
+        };
+        let bs = -crop.size * cam[0] + 1e-8;
+        ensure!(bs.is_finite() && bs.abs() > 1e-8, "Degenerate SAM camera");
+        let keypoints = keypoints * vector(vec![1.0, -1.0, -1.0]);
+        let translated = keypoints.clone()
+            + vector(vec![
+                cam[1] + 2.0 * (crop.center[0] - camera.center[0]) / bs,
+                -cam[2] + 2.0 * (crop.center[1] - camera.center[1]) / bs,
+                2.0 * camera.focal[0] / bs,
+            ]);
+        let depth = translated.clone().slice([0..1, 0..70, 2..3]);
+        let xy = (translated.slice([0..1, 0..70, 0..2]) / depth.clone()
+            * vector(camera.focal.to_vec())
+            + vector(vec![
+                camera.center[0] - crop.center[0],
+                camera.center[1] - crop.center[1],
+            ]))
+            / crop.size;
+        let valid = depth
+            .greater_equal_elem(1e-5)
+            .bool_and(xy.clone().greater_equal_elem(-0.5).all_dim(2))
+            .bool_and(xy.clone().lower_equal_elem(0.5).all_dim(2));
+        // A masked NaN still propagates through multiplication by zero. Match
+        // the diagnostic path's skipped projections before indexing/embedding.
+        let xy = xy.mask_fill(valid.clone().bool_not().expand([1, 70, 2]), 0.0);
+        let pixel = (xy.clone() + 0.5) * 32.0 - 0.5;
+        let floor = pixel.clone().floor();
+        let fraction = pixel - floor.clone();
+        let ix = floor.clone().slice([0..1, 0..70, 0..1]).int();
+        let iy = floor.slice([0..1, 0..70, 1..2]).int();
+        let fx = fraction.clone().slice([0..1, 0..70, 0..1]);
+        let fy = fraction.slice([0..1, 0..70, 1..2]);
+        let mut sampled = Tensor::zeros([1, 70, 1280], device);
+        for (dx, dy, factor) in [
+            (0, 0, (fx.clone().neg() + 1.0) * (fy.clone().neg() + 1.0)),
+            (1, 0, fx.clone() * (fy.clone().neg() + 1.0)),
+            (0, 1, (fx.clone().neg() + 1.0) * fy.clone()),
+            (1, 1, fx * fy),
+        ] {
+            let a = ix.clone() + dx;
+            let b = iy.clone() + dy;
+            let inside = valid
+                .clone()
+                .bool_and(a.clone().greater_equal_elem(0))
+                .bool_and(a.clone().lower_elem(32))
+                .bool_and(b.clone().greater_equal_elem(0))
+                .bool_and(b.clone().lower_elem(32));
+            let indices = (b.clamp(0, 31) * 32 + a.clamp(0, 31)).reshape([70]);
+            sampled = sampled + image.clone().select(1, indices) * factor * inside.float();
+        }
+        let old = x.clone().slice([0..1, 3..73, 0..1024]);
+        x = x.slice_assign(
+            [0..1, 3..73, 0..1024],
+            old + self.weights.affine("keypoint_feat_linear", sampled),
+        );
+        pe = pe.slice_assign(
+            [0..1, 3..73, 0..1024],
+            self.mlp("keypoint_posemb_linear", xy, false) * valid.float(),
+        );
+        let pelvis = (keypoints.clone().slice([0..1, 9..10, 0..3])
+            + keypoints.clone().slice([0..1, 10..11, 0..3]))
+            * 0.5;
+        pe = pe.slice_assign(
+            [0..1, 73..143, 0..1024],
+            self.mlp("keypoint3d_posemb_linear", keypoints - pelvis, false),
+        );
+        Ok((x, pe))
+    }
+
     /// One person's image crop. Five intermediate MHR projections update the
     /// following layer's 2D/3D keypoint tokens; the sixth supplies final diagnostics.
     pub async fn forward(
@@ -238,6 +322,32 @@ impl<B: Backend> SamBody<B> {
         mhr: &Mhr<B>,
         crop: Crop,
         camera: Camera,
+    ) -> Result<SamOutput<B>> {
+        self.forward_impl(embedding, mhr, crop, camera, true).await
+    }
+
+    /// Production path: retain keypoint feedback on device and omit diagnostic
+    /// heads after the final decoder block (GEM-X consumes only the body token).
+    pub async fn forward_token(
+        &self,
+        embedding: Tensor<B, 4>,
+        mhr: &Mhr<B>,
+        crop: Crop,
+        camera: Camera,
+    ) -> Result<Tensor<B, 3>> {
+        Ok(self
+            .forward_impl(embedding, mhr, crop, camera, false)
+            .await?
+            .token)
+    }
+
+    async fn forward_impl(
+        &self,
+        embedding: Tensor<B, 4>,
+        mhr: &Mhr<B>,
+        crop: Crop,
+        camera: Camera,
+        diagnostics: bool,
     ) -> Result<SamOutput<B>> {
         let w = &self.weights;
         let device = &w.device;
@@ -297,23 +407,21 @@ impl<B: Backend> SamBody<B> {
             x = x + self.attn(&format!("{p}.cross_attn"), q, v.clone() + ip, v);
             let z = norm(w, &format!("{p}.ln3"), x.clone(), 1e-6);
             x = x + self.mlp(&format!("{p}.ffn"), z, true);
+            if i == 5 && !diagnostics {
+                break;
+            }
             let token = norm(w, "decoder.norm_final", x.clone(), 1e-6).slice([0..1, 0..1, 0..1024]);
             let raw = self.mlp("head_pose.proj", token.clone(), false)
                 + w.tensor::<2>("init_pose.weight").unsqueeze();
-            let raw = raw
+            let cam = self.mlp("head_camera.proj", token, false)
+                + w.tensor::<2>("init_camera.weight").unsqueeze();
+            let predictions = Tensor::cat(vec![raw, cam], 2)
                 .into_data_async()
                 .await?
                 .to_vec::<f32>()
                 .map_err(|e| anyhow::anyhow!("SAM head: {e}"))?;
-            let parameters = self.head.parameters(&raw)?;
-            let cam = self.mlp("head_camera.proj", token, false)
-                + w.tensor::<2>("init_camera.weight").unsqueeze();
-            let cam = cam
-                .into_data_async()
-                .await?
-                .to_vec::<f32>()
-                .map_err(|e| anyhow::anyhow!("SAM camera: {e}"))?;
-            let cam: [f32; 3] = cam.try_into().unwrap();
+            let parameters = self.head.parameters(&predictions[..519])?;
+            let cam: [f32; 3] = predictions[519..].try_into().unwrap();
             let output = mhr.evaluate(std::slice::from_ref(&parameters))?;
             let joints: Vec<f32> = output.skeleton_world[0]
                 .iter()
@@ -325,6 +433,10 @@ impl<B: Backend> SamBody<B> {
                 .tensor::<2>("head_pose.keypoint_mapping")
                 .unsqueeze::<3>()
                 .matmul(mesh);
+            if !diagnostics {
+                (x, pe) = self.feedback(x, pe, image.clone(), kp, cam, crop, camera)?;
+                continue;
+            }
             let values = kp
                 .into_data_async()
                 .await?

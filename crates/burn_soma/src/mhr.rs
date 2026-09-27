@@ -147,16 +147,17 @@ impl<B: Backend> MhrSomaTransfer<B> {
             .expand([batch, 691, 124])
             .matmul(boundary)
             + self.weights.tensor::<2>("transfer.bias").unsqueeze::<3>();
-        let residual = solved
-            - target
-                .clone()
-                .select(1, self.indices["transfer.unknown"].clone());
-        Ok(target.select_assign(
-            1,
-            self.indices["transfer.unknown"].clone(),
-            residual,
-            IndexingUpdateOp::Add,
-        ) * 0.01)
+        // Unknown vertices are unique. A leading-axis scatter updates them in
+        // parallel and directly assigns the solve, without a read/subtract/add.
+        Ok(target
+            .swap_dims(0, 1)
+            .scatter_nd(
+                self.indices["transfer.unknown"].clone().reshape([691, 1]),
+                solved.swap_dims(0, 1),
+                IndexingUpdateOp::Assign,
+            )
+            .swap_dims(0, 1)
+            * 0.01)
     }
 
     pub async fn prepare_identity(

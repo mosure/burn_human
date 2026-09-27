@@ -28,8 +28,8 @@ impl<B: Backend> Ardy<B> {
         Ok(Self { config, weights })
     }
 
-    /// Post-norm transformer with Burn's fused attention primitive. No explicit
-    /// sequence-by-sequence score tensor is constructed by this implementation.
+    /// Post-norm transformer using the backend's attention dispatch. WGPU
+    /// autotuning can select fused attention; portable fallbacks remain available.
     fn transformer(
         &self,
         name: &str,
@@ -96,7 +96,11 @@ impl<B: Backend> Ardy<B> {
         let [batch, time, dim] = x.dims();
         let device = &self.weights.device;
         let text = self.weights.linear(&format!("{name}.embed_text"), text);
-        let step_pe = position_encoding::<B>(1, dim, step as isize, device).expand([batch, 1, dim]);
+        let step_pe = self
+            .weights
+            .constants
+            .position(1, dim, step as isize)
+            .expand([batch, 1, dim]);
         let step = self
             .weights
             .linear(&format!("{name}.embed_timestep.time_embed.0"), step_pe);
@@ -114,7 +118,10 @@ impl<B: Backend> Ardy<B> {
                 .weights
                 .tensor::<2>(&format!("{name}.learned_prefix_embedding.embedding.weight"))
                 .unsqueeze_dim(0);
-        let x = x + position_encoding(time, dim, -(history_tokens as isize), device);
+        let x = x + self
+            .weights
+            .constants
+            .position(time, dim, -(history_tokens as isize));
         let input = Tensor::cat(vec![prefix, x], 1);
         let prefix_valid = Tensor::<B, 2, Bool>::from_data(
             TensorData::new(vec![true; batch * 3], [batch, 3]),
@@ -277,7 +284,7 @@ impl<B: Backend> Ardy<B> {
             .slice([0..batch, 0..frames, 5..330])
             .reshape([batch, tokens, 1300]);
         let x = self.weights.linear("encoder.input_proj", body)
-            + position_encoding(tokens, 512, 0, &self.weights.device);
+            + self.weights.constants.position(tokens, 512, 0);
         let x = self.transformer("encoder", x, None, true, 4);
         let x = self.weights.linear("encoder.output_proj", x);
         let half = 63.0f32 * 1.001 / 2.0;
@@ -314,7 +321,7 @@ impl<B: Backend> Ardy<B> {
         let x = activation::relu(self.weights.linear(
             "decoder.external_cond_blocks.0",
             Tensor::cat(vec![x, local], 2),
-        )) + position_encoding(tokens, 512, 0, &self.weights.device);
+        )) + self.weights.constants.position(tokens, 512, 0);
         let x = self.transformer("decoder", x, None, true, 4);
         let output = self
             .weights

@@ -1,0 +1,10 @@
+[
+  {
+    "scope": "SOMA live rotation drags, warmed",
+    "count": 487,
+    "p50_ms": 16.699999999982538,
+    "p95_ms": 16.79999999998836,
+    "max_ms": 33.39999999999418,
+    "long_tasks_ms": []
+  }
+]

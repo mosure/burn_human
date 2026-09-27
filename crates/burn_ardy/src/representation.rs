@@ -1,43 +1,22 @@
-use crate::{
-    Ardy,
-    config::{ArdyConfig, Stats},
-};
+use crate::{Ardy, config::ArdyConfig};
 use anyhow::{Result, ensure};
-use burn::{
-    prelude::Backend,
-    tensor::{Tensor, TensorData},
-};
+use burn::{prelude::Backend, tensor::Tensor};
 use burn_human_motion::{MotionClip, MotionRequest, PoseFrame, rig::rotation_from_6d};
 use glam::{Quat, Vec3};
 
 impl<B: Backend> Ardy<B> {
-    fn statistic(
-        &self,
-        stats: &Stats,
-        indices: impl Iterator<Item = usize>,
-        scale: bool,
-    ) -> Tensor<B, 3> {
-        let data: Vec<f32> = indices
-            .map(|i| if scale { stats.scale(i) } else { stats.mean[i] })
-            .collect();
-        let len = data.len();
-        Tensor::from_data(TensorData::new(data, [1, 1, len]), &self.weights.device)
-    }
     pub fn unnormalize_latent(&self, x: Tensor<B, 3>) -> Tensor<B, 3> {
-        x * self.statistic(&self.config.latent_stats, 0..128, true)
-            + self.statistic(&self.config.latent_stats, 0..128, false)
+        x * self.weights.constants.latent_scale.clone() + self.weights.constants.latent_mean.clone()
     }
     pub fn normalize_latent(&self, x: Tensor<B, 3>) -> Tensor<B, 3> {
-        (x - self.statistic(&self.config.latent_stats, 0..128, false))
-            / self.statistic(&self.config.latent_stats, 0..128, true)
+        (x - self.weights.constants.latent_mean.clone())
+            / self.weights.constants.latent_scale.clone()
     }
     pub fn unnormalize_root(&self, x: Tensor<B, 3>) -> Tensor<B, 3> {
-        x * self.statistic(&self.config.motion_stats, 0..5, true)
-            + self.statistic(&self.config.motion_stats, 0..5, false)
+        x * self.weights.constants.root_scale.clone() + self.weights.constants.root_mean.clone()
     }
     pub fn normalize_root(&self, x: Tensor<B, 3>) -> Tensor<B, 3> {
-        (x - self.statistic(&self.config.motion_stats, 0..5, false))
-            / self.statistic(&self.config.motion_stats, 0..5, true)
+        (x - self.weights.constants.root_mean.clone()) / self.weights.constants.root_scale.clone()
     }
     pub fn local_root(&self, root: Tensor<B, 3>, valid_frames: usize) -> Tensor<B, 3> {
         let [batch, frames, _] = root.dims();
@@ -61,8 +40,8 @@ impl<B: Backend> Ardy<B> {
         )
         .slice_assign([0..batch, valid_frames - 1..valid_frames, 0..3], last);
         let local = Tensor::cat(vec![velocity, slice(0..frames, 1..2)], 2);
-        (local - self.statistic(&self.config.motion_stats, 5..9, false))
-            / self.statistic(&self.config.motion_stats, 5..9, true)
+        (local - self.weights.constants.local_mean.clone())
+            / self.weights.constants.local_scale.clone()
     }
 }
 

@@ -37,23 +37,27 @@ pub fn schedule(steps: usize) -> Result<Vec<(usize, f32, f32)>> {
         .collect())
 }
 
-impl<B: Backend> Ardy<B> {
-    /// Inputs already use the centered window coordinate frame. Only the next
-    /// forty frames are denoised; history is retained byte-for-byte on device.
+struct SampleState<B: Backend> {
+    x: Tensor<B, 3>,
+    text: Tensor<B, 3>,
+    heading: Tensor<B, 2>,
+    observed: Tensor<B, 3>,
+    mask: Tensor<B, 3>,
+    history_frames: usize,
+    guidance: [f32; 2],
+}
+impl<B: Backend> SampleState<B> {
     #[allow(clippy::too_many_arguments)]
-    pub fn sample_window(
-        &self,
-        mut x: Tensor<B, 3>,
+    fn new(
+        x: Tensor<B, 3>,
         text: Tensor<B, 3>,
         heading: Tensor<B, 2>,
         observed: Tensor<B, 3>,
         mask: Tensor<B, 3>,
         history_frames: usize,
-        steps: usize,
         guidance: [f32; 2],
-        mut progress: impl FnMut(usize),
-    ) -> Result<Tensor<B, 3>> {
-        let [batch, tokens, dim] = x.dims();
+    ) -> Result<Self> {
+        let [_, tokens, dim] = x.dims();
         ensure!(
             guidance
                 .iter()
@@ -89,33 +93,104 @@ impl<B: Backend> Ardy<B> {
             0,
         );
         let heading3 = Tensor::cat(vec![heading.clone(), heading.clone(), heading], 0);
-        let start = history_frames / 4;
-        for (i, (mapped, alpha, previous)) in schedule(steps)?.into_iter().rev().enumerate() {
-            let x3 = Tensor::cat(vec![x.clone(), x.clone(), x.clone()], 0);
-            let pred = self.denoise(
-                x3,
-                text3.clone(),
-                heading3.clone(),
-                observed3.clone(),
-                mask3.clone(),
-                history_frames,
-                mapped,
-            )?;
-            let uncond = pred
-                .clone()
-                .slice([2 * batch..3 * batch, start..start + 10, 0..dim]);
-            let clean = uncond.clone()
-                + (pred.clone().slice([0..batch, start..start + 10, 0..dim]) - uncond.clone())
-                    * guidance[0]
-                + (pred.slice([batch..2 * batch, start..start + 10, 0..dim]) - uncond)
-                    * guidance[1];
-            let current = x.clone().slice([0..batch, start..start + 10, 0..dim]);
-            let epsilon = (current / alpha.sqrt() - clean.clone()) / (1.0 / alpha - 1.0).sqrt();
-            let next = clean * previous.sqrt() + epsilon * (1.0 - previous).sqrt();
-            x = x.slice_assign([0..batch, start..start + 10, 0..dim], next);
+        Ok(Self {
+            x,
+            text: text3,
+            heading: heading3,
+            observed: observed3,
+            mask: mask3,
+            history_frames,
+            guidance,
+        })
+    }
+    fn advance(
+        mut self,
+        model: &Ardy<B>,
+        (mapped, alpha, previous): (usize, f32, f32),
+    ) -> Result<Self> {
+        let [batch, _, dim] = self.x.dims();
+        let start = self.history_frames / 4;
+        let x3 = Tensor::cat(vec![self.x.clone(), self.x.clone(), self.x.clone()], 0);
+        let pred = model.denoise(
+            x3,
+            self.text.clone(),
+            self.heading.clone(),
+            self.observed.clone(),
+            self.mask.clone(),
+            self.history_frames,
+            mapped,
+        )?;
+        let uncond = pred
+            .clone()
+            .slice([2 * batch..3 * batch, start..start + 10, 0..dim]);
+        let clean = uncond.clone()
+            + (pred.clone().slice([0..batch, start..start + 10, 0..dim]) - uncond.clone())
+                * self.guidance[0]
+            + (pred.slice([batch..2 * batch, start..start + 10, 0..dim]) - uncond)
+                * self.guidance[1];
+        let current = self.x.clone().slice([0..batch, start..start + 10, 0..dim]);
+        let epsilon = (current / alpha.sqrt() - clean.clone()) / (1.0 / alpha - 1.0).sqrt();
+        let next = clean * previous.sqrt() + epsilon * (1.0 - previous).sqrt();
+        self.x = self
+            .x
+            .slice_assign([0..batch, start..start + 10, 0..dim], next);
+        Ok(self)
+    }
+    fn finish(self) -> Tensor<B, 3> {
+        let [batch, _, dim] = self.x.dims();
+        self.x
+            .slice([0..batch, 0..self.history_frames / 4 + 10, 0..dim])
+    }
+}
+
+impl<B: Backend> Ardy<B> {
+    /// Inputs already use the centered window coordinate frame. Only the next
+    /// forty frames are denoised; history is retained byte-for-byte on device.
+    #[allow(clippy::too_many_arguments)]
+    pub fn sample_window(
+        &self,
+        x: Tensor<B, 3>,
+        text: Tensor<B, 3>,
+        heading: Tensor<B, 2>,
+        observed: Tensor<B, 3>,
+        mask: Tensor<B, 3>,
+        history_frames: usize,
+        steps: usize,
+        guidance: [f32; 2],
+        mut progress: impl FnMut(usize),
+    ) -> Result<Tensor<B, 3>> {
+        let mut state =
+            SampleState::new(x, text, heading, observed, mask, history_frames, guidance)?;
+        for (i, step) in schedule(steps)?.into_iter().rev().enumerate() {
+            state = state.advance(self, step)?;
             progress(i + 1);
         }
-        Ok(x.slice([0..batch, 0..start + 10, 0..dim]))
+        Ok(state.finish())
+    }
+
+    /// Cooperative variant used by interactive applications. Yields browser
+    /// tasks between DDIM steps without waiting for GPU completion.
+    #[allow(clippy::too_many_arguments)]
+    pub async fn sample_window_async(
+        &self,
+        x: Tensor<B, 3>,
+        text: Tensor<B, 3>,
+        heading: Tensor<B, 2>,
+        observed: Tensor<B, 3>,
+        mask: Tensor<B, 3>,
+        history_frames: usize,
+        steps: usize,
+        guidance: [f32; 2],
+        mut progress: impl FnMut(usize),
+    ) -> Result<Tensor<B, 3>> {
+        let mut state =
+            SampleState::new(x, text, heading, observed, mask, history_frames, guidance)?;
+        for (i, step) in schedule(steps)?.into_iter().rev().enumerate() {
+            state = state.advance(self, step)?;
+            progress(i + 1);
+            burn_human_inference::cooperative::yield_to_browser().await;
+        }
+        Ok(state.finish())
     }
 
     /// Generate a complete clip while retaining at most 160 history frames and
@@ -136,6 +211,7 @@ impl<B: Backend> Ardy<B> {
             device,
         );
         let mut result: Vec<f32> = Vec::new();
+        let mut resident_history: Option<Tensor<B, 3>> = None;
         let mut random = NormalNoise::new(request.seed);
         let windows = request.frames.div_ceil(40);
         for window in 0..windows {
@@ -149,8 +225,7 @@ impl<B: Backend> Ardy<B> {
             let mut heading = 0.0;
             let mut x = Tensor::zeros([1, tokens, 148], device);
             if history_frames > 0 {
-                let mut history =
-                    result[(generated - history_frames) * 330..generated * 330].to_vec();
+                let history = &result[(generated - history_frames) * 330..generated * 330];
                 for d in [0, 2] {
                     center[d] = history[(history_frames - 1) * 330 + d]
                         * self.config.motion_stats.scale(d)
@@ -161,24 +236,17 @@ impl<B: Backend> Ardy<B> {
                 let s = history[4] * self.config.motion_stats.scale(4)
                     + self.config.motion_stats.mean[4];
                 heading = s.atan2(c);
-                // Encode before centering, as upstream does (the encoder uses body only).
-                let h = self.encode(Tensor::from_data(
-                    TensorData::new(history.clone(), [1, history_frames, 330]),
-                    device,
-                ))?;
-                for values in history.as_chunks_mut::<330>().0.iter_mut() {
-                    for d in [0, 2] {
-                        values[d] -= center[d] / self.config.motion_stats.scale(d);
-                    }
+                // The host copy supplies clip output/centering only. Re-encode
+                // the bounded resident history instead of uploading it again.
+                let history = resident_history.as_ref().expect("previous window").clone();
+                let h = self.encode(history.clone())?;
+                let mut translation = [0.0; 5];
+                for d in [0, 2] {
+                    translation[d] = center[d] / self.config.motion_stats.scale(d);
                 }
-                let roots: Vec<f32> = history
-                    .as_chunks::<330>()
-                    .0
-                    .iter()
-                    .flat_map(|v| v[..5].iter().copied())
-                    .collect();
-                let root =
-                    Tensor::from_data(TensorData::new(roots, [1, history_frames / 4, 20]), device);
+                let root = (history.slice([0..1, 0..history_frames, 0..5])
+                    - Tensor::from_data(TensorData::new(translation.to_vec(), [1, 1, 5]), device))
+                .reshape([1, history_frames / 4, 20]);
                 let h = Tensor::cat(
                     vec![root, h.slice([0..1, 0..history_frames / 4, 20..148])],
                     2,
@@ -206,17 +274,19 @@ impl<B: Backend> Ardy<B> {
                         center[d] / self.config.motion_stats.scale(d) * msk[f * 330 + d];
                 }
             }
-            let hybrid = self.sample_window(
-                x,
-                text.clone(),
-                Tensor::from_data([[heading]], device),
-                Tensor::from_data(TensorData::new(obs, [1, total, 330]), device),
-                Tensor::from_data(TensorData::new(msk, [1, total, 330]), device),
-                history_frames,
-                request.diffusion_steps,
-                [request.text_guidance, request.trajectory_guidance],
-                |_| {},
-            )?;
+            let hybrid = self
+                .sample_window_async(
+                    x,
+                    text.clone(),
+                    Tensor::from_data([[heading]], device),
+                    Tensor::from_data(TensorData::new(obs, [1, total, 330]), device),
+                    Tensor::from_data(TensorData::new(msk, [1, total, 330]), device),
+                    history_frames,
+                    request.diffusion_steps,
+                    [request.text_guidance, request.trajectory_guidance],
+                    |_| {},
+                )
+                .await?;
             let frames = history_frames + 40;
             let mut translation = [0.0; 5];
             for d in [0, 2] {
@@ -237,6 +307,18 @@ impl<B: Backend> Ardy<B> {
             let output = self
                 .decode(hybrid)?
                 .slice([0..1, history_frames..frames, 0..330]);
+            if request.history_frames > 0 {
+                let history = match resident_history.take() {
+                    Some(previous) => Tensor::cat(vec![previous, output.clone()], 1),
+                    None => output.clone(),
+                };
+                let count = history.dims()[1];
+                resident_history = Some(history.slice([
+                    0..1,
+                    count.saturating_sub(request.history_frames)..count,
+                    0..330,
+                ]));
+            }
             let data = output
                 .into_data_async()
                 .await

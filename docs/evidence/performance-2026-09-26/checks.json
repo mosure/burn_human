@@ -1,0 +1,9 @@
+{
+  "workspace_tests": 33,
+  "hardware_surface_test": "passed, 1 native WGPU test including actual Bevy topology/bounds regression",
+  "clippy": "passed after final bounds fix; workspace, all targets and model tools, -D warnings",
+  "dry_run": "passed after final bounds fix; all 5 selected packages verified together through the temporary registry",
+  "wasm_release": "viewer plus ARDY/SOMA/GEM-X validation exports",
+  "dependency_policy": "one unpatched wgpu 29; native autotuning, browser portable, fusion disabled",
+  "browser_resident_surface": "passed in final rebuilt WebGPU viewer: public CDN SOMA, then GEM-X suite, reference image inference and visible resident mesh after topology change"
+}

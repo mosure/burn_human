@@ -1,0 +1,210 @@
+[
+  {
+    "history_frames": 0,
+    "frames": 80,
+    "joint_position_max_m": 2.1497946135517718e-05,
+    "joint_position_rmse_m": 5.115514261226863e-06,
+    "rotation_angle_max_deg": 0.002973041380888755,
+    "rotation_angle_rmse_deg": 0.00034437837630468826,
+    "baseline": {
+      "frames": 80,
+      "fps": 20.0,
+      "root_distance_m": 8.907038988279545,
+      "root_height_range_m": [
+        0.86869,
+        1.0054656
+      ],
+      "foot_min_height_m": -0.002229437460685338,
+      "foot_contact_samples": 14,
+      "contact_foot_speed_mean_mps": 0.03621273576754425,
+      "root_step_max_m": 1.0228572855243694,
+      "joint_step_max_m": 1.3718511900145443,
+      "window_boundary_root_step_m": [
+        1.0228572855243694
+      ],
+      "window_boundary_joint_step_max_m": [
+        1.3718511900145443
+      ],
+      "root_relative_right_hand_speed_mean_mps": 0.8497866546399242,
+      "waypoint_error_m": [
+        0.004660743201546223,
+        0.9792363561561009
+      ],
+      "waypoint_rmse_m": 0.6924325106987211
+    },
+    "candidate": {
+      "frames": 80,
+      "fps": 20.0,
+      "root_distance_m": 8.907038534740943,
+      "root_height_range_m": [
+        0.86869,
+        1.0054665
+      ],
+      "foot_min_height_m": -0.002229786216422225,
+      "foot_contact_samples": 14,
+      "contact_foot_speed_mean_mps": 0.03621297800146415,
+      "root_step_max_m": 1.0228575772889315,
+      "joint_step_max_m": 1.3718518247425893,
+      "window_boundary_root_step_m": [
+        1.0228575772889315
+      ],
+      "window_boundary_joint_step_max_m": [
+        1.3718518247425893
+      ],
+      "root_relative_right_hand_speed_mean_mps": 0.8497831721493959,
+      "waypoint_error_m": [
+        0.0046628355789336004,
+        0.979237628637593
+      ],
+      "waypoint_rmse_m": 0.692433417512259
+    }
+  },
+  {
+    "history_frames": 40,
+    "frames": 120,
+    "joint_position_max_m": 0.0026942452683862577,
+    "joint_position_rmse_m": 0.0003627419523583878,
+    "rotation_angle_max_deg": 0.8768472753912222,
+    "rotation_angle_rmse_deg": 0.09405192283693166,
+    "baseline": {
+      "frames": 120,
+      "fps": 20.0,
+      "root_distance_m": 3.3186721665698404,
+      "root_height_range_m": [
+        0.9043442,
+        0.93666863
+      ],
+      "foot_min_height_m": -0.006833232650127363,
+      "foot_contact_samples": 205,
+      "contact_foot_speed_mean_mps": 0.03561256732012967,
+      "root_step_max_m": 0.03437366070157363,
+      "joint_step_max_m": 0.14181685253455573,
+      "window_boundary_root_step_m": [
+        0.031268948928602276,
+        0.028952552508575088
+      ],
+      "window_boundary_joint_step_max_m": [
+        0.13107523208444796,
+        0.03648295172038336
+      ],
+      "root_relative_right_hand_speed_mean_mps": 0.31457377394623176,
+      "waypoint_error_m": [
+        0.0028037053425171553,
+        0.03515592236698622,
+        0.026862769129410366,
+        0.04109298399641986
+      ],
+      "waypoint_rmse_m": 0.03022433349203603
+    },
+    "candidate": {
+      "frames": 120,
+      "fps": 20.0,
+      "root_distance_m": 3.3184380230460895,
+      "root_height_range_m": [
+        0.9043364,
+        0.93664634
+      ],
+      "foot_min_height_m": -0.00682324324864747,
+      "foot_contact_samples": 205,
+      "contact_foot_speed_mean_mps": 0.03561955285269478,
+      "root_step_max_m": 0.0343743326107653,
+      "joint_step_max_m": 0.14181956496206566,
+      "window_boundary_root_step_m": [
+        0.0312712044470372,
+        0.028946297339806644
+      ],
+      "window_boundary_joint_step_max_m": [
+        0.13107089297846286,
+        0.036516734438741975
+      ],
+      "root_relative_right_hand_speed_mean_mps": 0.3147202851310087,
+      "waypoint_error_m": [
+        0.0028028083234608037,
+        0.03515293574964827,
+        0.026856340837405613,
+        0.04131455254023701
+      ],
+      "waypoint_rmse_m": 0.03029744181070353
+    }
+  },
+  {
+    "history_frames": 160,
+    "frames": 240,
+    "joint_position_max_m": 0.013461845130760394,
+    "joint_position_rmse_m": 0.0026101234047585208,
+    "rotation_angle_max_deg": 1.6929293050329264,
+    "rotation_angle_rmse_deg": 0.25279283327537017,
+    "baseline": {
+      "frames": 240,
+      "fps": 20.0,
+      "root_distance_m": 6.382009034915706,
+      "root_height_range_m": [
+        0.8981974,
+        0.93717307
+      ],
+      "foot_min_height_m": -0.006833232650127363,
+      "foot_contact_samples": 461,
+      "contact_foot_speed_mean_mps": 0.030011161554627495,
+      "root_step_max_m": 0.03491603091880464,
+      "joint_step_max_m": 0.14181685253455573,
+      "window_boundary_root_step_m": [
+        0.031268948928602276,
+        0.029042356654935864,
+        0.02461668073761366,
+        0.027006396825892603,
+        0.021923769853517492
+      ],
+      "window_boundary_joint_step_max_m": [
+        0.13107523208444796,
+        0.03751418435821661,
+        0.029943380061306705,
+        0.04089090406746086,
+        0.11223444677402261
+      ],
+      "root_relative_right_hand_speed_mean_mps": 0.2667768944657977,
+      "waypoint_error_m": [
+        0.0028037053425171553,
+        0.03515592236698622,
+        0.026578303990520174,
+        0.02182932440663265
+      ],
+      "waypoint_rmse_m": 0.024630901770863613
+    },
+    "candidate": {
+      "frames": 240,
+      "fps": 20.0,
+      "root_distance_m": 6.389022746329882,
+      "root_height_range_m": [
+        0.89813614,
+        0.9371557
+      ],
+      "foot_min_height_m": -0.00682324324864747,
+      "foot_contact_samples": 461,
+      "contact_foot_speed_mean_mps": 0.03003131340378101,
+      "root_step_max_m": 0.035073251801622,
+      "joint_step_max_m": 0.14225731292594523,
+      "window_boundary_root_step_m": [
+        0.0312712044470372,
+        0.029038749321940508,
+        0.02449382725271023,
+        0.027207481135064826,
+        0.02215267909501935
+      ],
+      "window_boundary_joint_step_max_m": [
+        0.13107089297846286,
+        0.03751854800400246,
+        0.029877425692489745,
+        0.04040507617538678,
+        0.11200361834497993
+      ],
+      "root_relative_right_hand_speed_mean_mps": 0.2689792758256936,
+      "waypoint_error_m": [
+        0.0028028083234608037,
+        0.03515293574964827,
+        0.026569769955534037,
+        0.02181249138017052
+      ],
+      "waypoint_rmse_m": 0.024623779573904638
+    }
+  }
+]

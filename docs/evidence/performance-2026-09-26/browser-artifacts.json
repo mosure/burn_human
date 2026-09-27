@@ -1,0 +1,26 @@
+{
+  "baseline-ardy": {
+    "wasm_sha256": "6ac8ecac08397c4d0bd1f27e32b353999738bc78b0d5134c9a47afcb40dd2950",
+    "wasm_bytes": 24647623
+  },
+  "candidate-ardy": {
+    "wasm_sha256": "0332ab9622ee95c5c4d0c2a6098ea9527773f79803da66e9980288a70e226d04",
+    "wasm_bytes": 17121875
+  },
+  "baseline-soma": {
+    "wasm_sha256": "459035d6457a76def2efab52e6e063d7cf4bc22104d827b087a6479f2fe84886",
+    "wasm_bytes": 24080772
+  },
+  "candidate-soma": {
+    "wasm_sha256": "650f2803c8a7c959667df9f85591660cbe6ef2e54860d49b178e557ab7eff38b",
+    "wasm_bytes": 16870127
+  },
+  "baseline-gemx": {
+    "wasm_sha256": "d188194d266075a9344dec1d5705b2ea56a0d75614bd77c522a3ab1b21593263",
+    "wasm_bytes": 47746135
+  },
+  "candidate-gemx": {
+    "wasm_sha256": "096993ea11f4c1e53f221b4db0b150420b6aada3e07ba59a4e51f82ad59feb18",
+    "wasm_bytes": 32955948
+  }
+}

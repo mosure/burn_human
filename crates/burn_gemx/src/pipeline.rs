@@ -126,6 +126,47 @@ pub struct PoseEstimate {
     pub joints: Vec<[f32; 3]>,
     pub timings: std::collections::BTreeMap<String, f64>,
 }
+
+/// Image inference with the fitted mesh retained on its original device.
+/// Renderers can consume `vertices` directly; exporters explicitly call
+/// `into_host`. The prepared identity can be reused for subsequent pose edits.
+pub struct ResidentPoseEstimate<B: Backend> {
+    pub identity: MhrIdentity,
+    pub pose: SomaPose,
+    pub crop: Crop,
+    pub camera: Camera,
+    pub keypoints_2d: Vec<[f32; 3]>,
+    pub vertices: Tensor<B, 3>,
+    pub joints: Vec<[f32; 3]>,
+    pub prepared: burn_soma::PreparedIdentity<B>,
+    /// Enqueue time until a consumer synchronizes `vertices`.
+    pub timings: std::collections::BTreeMap<String, f64>,
+}
+impl<B: Backend> ResidentPoseEstimate<B> {
+    pub async fn into_host(mut self) -> Result<PoseEstimate> {
+        let start = web_time::Instant::now();
+        let vertices = self
+            .vertices
+            .into_data_async()
+            .await?
+            .to_vec::<f32>()
+            .map_err(|e| anyhow::anyhow!("SOMA output: {e}"))?
+            .as_chunks::<3>()
+            .0
+            .to_vec();
+        *self.timings.entry("soma".into()).or_default() += start.elapsed().as_secs_f64();
+        Ok(PoseEstimate {
+            identity: self.identity,
+            pose: self.pose,
+            crop: self.crop,
+            camera: self.camera,
+            keypoints_2d: self.keypoints_2d,
+            vertices,
+            joints: self.joints,
+            timings: self.timings,
+        })
+    }
+}
 impl<B: Backend> Pipeline<B> {
     pub async fn load(
         artifacts: &PipelineArtifacts,
@@ -167,8 +208,21 @@ impl<B: Backend> Pipeline<B> {
         image: &image::RgbImage,
         crop: Crop,
         camera: Camera,
-        mut progress: impl FnMut(&str),
+        progress: impl FnMut(&str),
     ) -> Result<PoseEstimate> {
+        self.estimate_resident(image, crop, camera, progress)
+            .await?
+            .into_host()
+            .await
+    }
+
+    pub async fn estimate_resident(
+        &self,
+        image: &image::RgbImage,
+        crop: Crop,
+        camera: Camera,
+        mut progress: impl FnMut(&str),
+    ) -> Result<ResidentPoseEstimate<B>> {
         crop.validate()?;
         camera.validate()?;
         let mut timings = std::collections::BTreeMap::new();
@@ -180,7 +234,8 @@ impl<B: Backend> Pipeline<B> {
         let flipped = input.clone().flip([3]);
         let heatmaps = self
             .vitpose
-            .forward(Tensor::cat(vec![input, flipped], 0))?
+            .forward_async(Tensor::cat(vec![input, flipped], 0))
+            .await?
             .into_data_async()
             .await?
             .to_vec::<f32>()
@@ -198,10 +253,10 @@ impl<B: Backend> Pipeline<B> {
         let input = image_input::crop_rgb(image, sam_crop, true)?;
         let input =
             Tensor::<B, 4>::from_data(TensorData::new(input, [1, 3, 512, 512]), &self.device);
-        let embedding = self.sam_vision.forward(input)?;
+        let embedding = self.sam_vision.forward_async(input).await?;
         let sam = self
             .sam_decoder
-            .forward(embedding, &self.mhr, sam_crop, camera)
+            .forward_token(embedding, &self.mhr, sam_crop, camera)
             .await?;
         timings.insert("body_features".into(), start.elapsed().as_secs_f64());
         let start = web_time::Instant::now();
@@ -214,20 +269,20 @@ impl<B: Backend> Pipeline<B> {
             cameras: vec![camera],
             angular: vec![[1.0, 0.0, 0.0, 0.0, 1.0, 0.0]],
         };
-        let prediction = self.denoiser.predict(&conditions, sam.token)?;
-        let features = prediction
-            .features
-            .into_data_async()
-            .await?
-            .to_vec::<f32>()
-            .map_err(|e| anyhow::anyhow!("GEM prediction: {e}"))?;
-        let pred_camera = prediction
-            .camera
-            .into_data_async()
-            .await?
-            .to_vec::<f32>()
-            .map_err(|e| anyhow::anyhow!("GEM camera: {e}"))?;
-        let (identity, pose) = self.decode_pose(&features, &pred_camera, crop, camera)?;
+        let prediction = self.denoiser.predict(&conditions, sam)?;
+        let values = Tensor::cat(
+            vec![
+                prediction.features.reshape([585]),
+                prediction.camera.reshape([3]),
+            ],
+            0,
+        )
+        .into_data_async()
+        .await?
+        .to_vec::<f32>()
+        .map_err(|e| anyhow::anyhow!("GEM prediction: {e}"))?;
+        let (features, pred_camera) = values.split_at(585);
+        let (identity, pose) = self.decode_pose(features, pred_camera, crop, camera)?;
         timings.insert("gem".into(), start.elapsed().as_secs_f64());
         let start = web_time::Instant::now();
         progress("SOMA identity and skinning");
@@ -238,30 +293,22 @@ impl<B: Backend> Pipeline<B> {
         let output = self
             .soma
             .pose_batch(&prepared, std::slice::from_ref(&pose))?;
-        let vertices = output
-            .vertices
-            .into_data_async()
-            .await?
-            .to_vec::<f32>()
-            .map_err(|e| anyhow::anyhow!("SOMA output: {e}"))?
-            .as_chunks::<3>()
-            .0
-            .to_vec();
         let joints = output.transforms[0]
             .iter()
             .skip(1)
             .map(|m| m.w_axis.truncate().to_array())
             .collect();
         timings.insert("soma".into(), start.elapsed().as_secs_f64());
-        Ok(PoseEstimate {
+        Ok(ResidentPoseEstimate {
             identity,
             pose,
             crop,
             camera,
             keypoints_2d: observations,
-            vertices,
+            vertices: output.vertices,
             joints,
             timings,
+            prepared,
         })
     }
     pub fn decode_pose(

@@ -1,0 +1,249 @@
+{
+  "report": {
+    "adapter": "",
+    "backend": "browser-webgpu-f32",
+    "load_seconds": 1.4194,
+    "manifest": "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7",
+    "performance": [
+      {
+        "batch": 1,
+        "median_frames_per_second": 270.27027027027026,
+        "warm_seconds": [
+          0.0035,
+          0.0037,
+          0.0037,
+          0.0038,
+          0.0042
+        ]
+      },
+      {
+        "batch": 8,
+        "median_frames_per_second": 2051.2820512820513,
+        "warm_seconds": [
+          0.0039,
+          0.0039,
+          0.0039,
+          0.0041,
+          0.0042
+        ]
+      },
+      {
+        "batch": 32,
+        "median_frames_per_second": 3809.5238095238096,
+        "warm_seconds": [
+          0.0072,
+          0.0084,
+          0.0084,
+          0.0085,
+          0.0087
+        ]
+      }
+    ],
+    "records": [
+      {
+        "bind_max": 4.76837158203125e-07,
+        "identity_seconds": 0.1485,
+        "name": "neutral",
+        "performance": [
+          {
+            "batch": 1,
+            "median_frames_per_second": 227.27272727272725,
+            "warm_seconds": [
+              0.004,
+              0.0041,
+              0.0044,
+              0.0047,
+              0.0051
+            ]
+          },
+          {
+            "batch": 8,
+            "median_frames_per_second": 1333.3333333333333,
+            "warm_seconds": [
+              0.0056,
+              0.0058,
+              0.006,
+              0.0062,
+              0.0069
+            ]
+          },
+          {
+            "batch": 32,
+            "median_frames_per_second": 5333.333333333333,
+            "warm_seconds": [
+              0.0059,
+              0.0059,
+              0.006,
+              0.0063,
+              0.0064
+            ]
+          }
+        ],
+        "rest_max_m": 8.344650268554688e-07,
+        "transform_max": 5.364418029785156e-07,
+        "vertex_max_m": 9.5367431640625e-07
+      },
+      {
+        "bind_max": 4.76837158203125e-07,
+        "identity_seconds": 0.0065,
+        "name": "shape_pose",
+        "performance": [
+          {
+            "batch": 1,
+            "median_frames_per_second": 270.27027027027026,
+            "warm_seconds": [
+              0.0035,
+              0.0037,
+              0.0037,
+              0.0038,
+              0.0042
+            ]
+          },
+          {
+            "batch": 8,
+            "median_frames_per_second": 2051.2820512820513,
+            "warm_seconds": [
+              0.0039,
+              0.0039,
+              0.0039,
+              0.0041,
+              0.0042
+            ]
+          },
+          {
+            "batch": 32,
+            "median_frames_per_second": 3809.5238095238096,
+            "warm_seconds": [
+              0.0072,
+              0.0084,
+              0.0084,
+              0.0085,
+              0.0087
+            ]
+          }
+        ],
+        "rest_max_m": 7.152557373046875e-07,
+        "transform_max": 8.344650268554688e-07,
+        "vertex_max_m": 1.430511474609375e-06
+      },
+      {
+        "bind_max": 8.940696716308594e-07,
+        "identity_seconds": 0.0064,
+        "name": "scales_correctives",
+        "performance": [
+          {
+            "batch": 1,
+            "median_frames_per_second": 185.18518518518516,
+            "warm_seconds": [
+              0.005,
+              0.0052,
+              0.0054,
+              0.0054,
+              0.0064
+            ]
+          },
+          {
+            "batch": 8,
+            "median_frames_per_second": 1333.3333333333333,
+            "warm_seconds": [
+              0.0038,
+              0.004,
+              0.006,
+              0.0081,
+              0.0086
+            ]
+          },
+          {
+            "batch": 32,
+            "median_frames_per_second": 4000,
+            "warm_seconds": [
+              0.0076,
+              0.0079,
+              0.008,
+              0.0086,
+              0.0092
+            ]
+          }
+        ],
+        "rest_max_m": 1.2516975402832031e-06,
+        "transform_max": 1.1920928955078125e-06,
+        "vertex_max_m": 1.7881393432617188e-06
+      },
+      {
+        "bind_max": 4.76837158203125e-07,
+        "identity_seconds": 0.0075,
+        "name": "no_correctives",
+        "performance": [
+          {
+            "batch": 1,
+            "median_frames_per_second": 384.61538461538464,
+            "warm_seconds": [
+              0.0025,
+              0.0025,
+              0.0026,
+              0.0027,
+              0.0028
+            ]
+          },
+          {
+            "batch": 8,
+            "median_frames_per_second": 2758.6206896551726,
+            "warm_seconds": [
+              0.0028,
+              0.0029,
+              0.0029,
+              0.003,
+              0.003
+            ]
+          },
+          {
+            "batch": 32,
+            "median_frames_per_second": 6808.510638297872,
+            "warm_seconds": [
+              0.0046,
+              0.0047,
+              0.0047,
+              0.005,
+              0.0058
+            ]
+          }
+        ],
+        "rest_max_m": 8.344650268554688e-07,
+        "transform_max": 5.960464477539062e-07,
+        "vertex_max_m": 9.5367431640625e-07
+      }
+    ],
+    "reference": "Official SOMA-X Torch, identity fit + canonical rebind + aligned twist + sparse correctives + LBS"
+  },
+  "elapsed_ms": 2975.1999999284744,
+  "adapter": {
+    "vendor": "nvidia",
+    "architecture": "blackwell",
+    "fallback": false
+  },
+  "event_loop": {
+    "scope": "load, cold compilation, parity, warm inference",
+    "frames": 153,
+    "p50_ms": 16.699999999999818,
+    "p95_ms": 33.30000000000018,
+    "p99_ms": 83.29999999999973,
+    "max_ms": 183.29999999999973,
+    "long_tasks_ms": [
+      61,
+      102,
+      186,
+      54,
+      80,
+      85
+    ]
+  },
+  "wasm_linear_memory_peak_bytes": 137822208,
+  "browser": "153.0.8010.12",
+  "module": "http://127.0.0.1:8866/.cache/perf-2026-09-26/candidate-web/soma/burn_soma.js",
+  "function": "validate_soma_webgpu",
+  "args": [
+    "http://127.0.0.1:8866/.artifacts/cdn-upload-human-v1/aberration.technology/model/soma-x/v1/body",
+    "http://127.0.0.1:8866/.cache/soma-raw/reference.json",
+    "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7"
+  ]
+}

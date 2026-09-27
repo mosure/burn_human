@@ -1,0 +1,54 @@
+{
+  "backend": "native-wgpu-f32",
+  "cold_seconds": 5.219231936,
+  "layers": [
+    {
+      "camera_max": 1.1920928955078125e-7,
+      "keypoints_max_m": 4.023313522338867e-7,
+      "parameters_max": 5.960464477539062e-7,
+      "shape_max": 5.960464477539062e-7
+    },
+    {
+      "camera_max": 3.725290298461914e-8,
+      "keypoints_max_m": 4.0046870708465576e-7,
+      "parameters_max": 4.172325134277344e-7,
+      "shape_max": 4.917383193969727e-7
+    },
+    {
+      "camera_max": 1.1920928955078125e-7,
+      "keypoints_max_m": 2.384185791015625e-7,
+      "parameters_max": 5.960464477539062e-7,
+      "shape_max": 5.364418029785156e-7
+    },
+    {
+      "camera_max": 1.1920928955078125e-7,
+      "keypoints_max_m": 2.7567148208618164e-7,
+      "parameters_max": 4.76837158203125e-7,
+      "shape_max": 6.258487701416016e-7
+    },
+    {
+      "camera_max": 2.384185791015625e-7,
+      "keypoints_max_m": 3.650784492492676e-7,
+      "parameters_max": 7.152557373046875e-7,
+      "shape_max": 5.960464477539062e-7
+    },
+    {
+      "camera_max": 1.1175870895385742e-8,
+      "keypoints_max_m": 4.76837158203125e-7,
+      "parameters_max": 7.152557373046875e-7,
+      "shape_max": 4.470348358154297e-7
+    }
+  ],
+  "manifest": "35c5b33c1041f9950af97def56335e7d3929eec6a6ce6180989b8423fb3f4b3e",
+  "mhr_manifest": "c7d6e4fc479b8ca68ab1ba6736923bcd93d9f61252c3009ace1ebef6bb5eff65",
+  "production_vs_diagnostic_token_max": 1.430511474609375e-6,
+  "ray_max": 3.5762786865234375e-6,
+  "token_max": 1.9073486328125e-6,
+  "token_rmse": 4.3193747586383103e-7,
+  "warm_path": "production_gpu_feedback",
+  "warm_seconds": [
+    0.044196005,
+    0.065059389,
+    0.045290088
+  ]
+}

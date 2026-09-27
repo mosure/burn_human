@@ -1,0 +1,32 @@
+{
+  "prompt": "walk forward calmly",
+  "seed": 42,
+  "frames": 80,
+  "history_frames": 0,
+  "diffusion_steps": 10,
+  "text_guidance": 2.0,
+  "trajectory_guidance": 2.0,
+  "waypoints": [
+    {
+      "frame": 0,
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "heading": null,
+      "constrain_height": false
+    },
+    {
+      "frame": 40,
+      "position": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "heading": null,
+      "constrain_height": false
+    }
+  ],
+  "dense_trajectory": true
+}

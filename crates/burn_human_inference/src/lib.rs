@@ -1,4 +1,7 @@
 //! Shared, model-neutral loading and tensor operations. No Bevy or model policy.
+#![recursion_limit = "256"]
+#[cfg(feature = "wgpu")]
+pub mod gpu;
 #[cfg(feature = "transport")]
 pub mod pretrained;
 #[cfg(feature = "transport")]
@@ -25,3 +28,4 @@ pub fn dtype(name: &str) -> anyhow::Result<DType> {
         _ => anyhow::bail!("unsupported tensor dtype {name}"),
     })
 }
+pub mod cooperative;

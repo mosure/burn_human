@@ -1,6 +1,6 @@
 use burn::{
     prelude::Backend,
-    tensor::{Tensor, activation},
+    tensor::{Tensor, module, ops::AttentionModuleOptions},
 };
 use burn_human_inference::weights::TensorBank;
 
@@ -17,6 +17,8 @@ pub fn norm<B: Backend>(
 }
 
 pub fn attention<B: Backend>(q: Tensor<B, 4>, k: Tensor<B, 4>, v: Tensor<B, 4>) -> Tensor<B, 4> {
-    let scale = (q.dims()[3] as f32).sqrt().recip();
-    activation::softmax(q.matmul(k.swap_dims(2, 3)) * scale, 3).matmul(v)
+    // Let the backend select attention kernels. WGPU autotuning can use fused
+    // attention without materializing an N x N matrix; other backends retain
+    // Burn's portable fallback.
+    module::attention(q, k, v, None, None, AttentionModuleOptions::default())
 }

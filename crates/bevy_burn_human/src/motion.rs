@@ -7,6 +7,7 @@ mod body_view;
 mod browser_io;
 mod camera;
 mod runtime;
+mod surface;
 mod trajectory;
 mod ui;
 
@@ -21,6 +22,7 @@ pub use ui::MotionUi;
 pub struct HumanMotionPlugin;
 impl Plugin for HumanMotionPlugin {
     fn build(&self, app: &mut App) {
+        surface::plugin(app);
         app.init_resource::<MotionRuntime>()
             .init_resource::<MotionUi>()
             .init_resource::<MotionPlayback>()
