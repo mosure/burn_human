@@ -2,17 +2,18 @@
 
 | Crate | Release | Responsibility |
 | --- | --- | --- |
-| `burn_ardy` | 0.1.1 | ARDY Core27 motion, trajectory conditioning, checkpoint loading |
-| `burn_llama` | 0.1.0 | Llama 3 8B / LLM2Vec text conditioning, paged vocabulary |
-| `burn_soma` | 0.1.1 | SOMA-X identity, rig, correctives, skinning and optional MHR transfer |
-| `burn_gemx` | 0.1.1 | GEM-X image inference and composition of seven component releases |
+| `burn_ardy` | 0.1.3 | Batched ARDY Core27 motion, trajectory conditioning, checkpoint loading |
+| `burn_llama` | 0.1.1 | Llama 3 8B / LLM2Vec text conditioning, paged vocabulary |
+| `burn_soma` | 0.1.2 | SOMA-X identity, rig, correctives, skinning and optional MHR transfer |
+| `burn_gemx` | 0.1.2 | GEM-X image inference and composition of seven component releases |
 | `burn_mhr` | 0.1.1 | MHR evaluation and its independent checkpoint |
-| `burn_human_inference` | 0.1.2 | Model-neutral transport, bounded cache, Burnpack/tensor verification |
+| `burn_human_inference` | 0.1.3 | Model-neutral transport, bounded cache, Burnpack/tensor verification |
 
 `burn_llama` replaces `burn_ardy_text` 0.1.0; `burn_gemx` replaces `burn_gem`
 0.1.0. Their implementations live in the newly named crates. The previously
-published packages remain available. `burn_human` 0.5.1 and `bevy_burn_human` 0.5.2
-integrate these crates. All use published Burn 0.21 / Bevy 0.19 dependencies
+published packages remain available. `burn_human` 0.5.1 supplies Anny;
+`bevy_burn_human` 0.6.0 integrates the model crates with its default `studio`
+feature. All use published Burn 0.21 / Bevy 0.19 dependencies
 and the same wgpu 29 version, without patches.
 
 ## Loading

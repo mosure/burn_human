@@ -5,7 +5,7 @@ Llama 3 8B / LLM2Vec inference in Rust/Burn 0.21, with native WGPU and browser W
 This release implements ARDY text conditioning with merged adapters, bidirectional attention, Q4 storage and a paged vocabulary. It is not a general-purpose chat/completion API. `AttentionMode::CausalExport` reproduces the source ONNX export for parity.
 
 ```toml
-burn_llama = { version = "0.1.0", features = ["wgpu"] }
+burn_llama = { version = "0.1.1", features = ["wgpu"] }
 ```
 
 The model owns its immutable CDN catalog and loading policy:
@@ -20,6 +20,11 @@ let model = burn_llama::TextEncoder::<burn::backend::Wgpu>::load_pretrained(
 `load_pretrained_from(root, device, progress)` accepts an alternate HTTP root or native model directory while preserving every compiled-in manifest SHA-256. The default root is `https://aberration.technology/model`. Loading is explicit and may require several gigabytes; no model is downloaded just by adding the dependency.
 
 Physical Burnpack parts target 20 MiB and are authenticated before use. A logical object is bounded to 64 MiB; the loader does not concatenate the whole model in host/WASM memory. Shared transport uses a bounded 8 GiB native disk cache or browser CacheStorage, verifies cache hits and repairs corrupt entries. The cache can evict other models' older parts. GPU residency is separate from host/storage bounds.
+
+Browser encoding yields a task between transformer blocks so rendering and input
+can progress while GPU work is queued. This introduces no per-block readback or
+device synchronization. Initial kernel compilation and final embedding readback
+can still add latency. Repeated prompts reuse the bounded embedding cache.
 
 Model weights are distributed separately under their upstream terms; consult the manifest-bound license metadata. The CDN release is prepared for upload; deployment and public download qualification are tracked separately in the repository.
 

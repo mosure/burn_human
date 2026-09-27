@@ -4,8 +4,22 @@ ARDY Core RP 20 FPS / Horizon40 inference in Rust/Burn 0.21, with native WGPU an
 
 The model emits Core27 motion and accepts text embeddings, history and world-space waypoints. Enable `transport` when disabling default features.
 
+`Ardy::generate_batch` generates 1–8 independent actors together. Requests must
+share frame count, history length, DDIM steps and guidance, while prompts, seeds
+and waypoints may differ. Outputs retain request order. The same implementation
+serves `generate` for one actor. GPU history is bounded to 160 frames per actor;
+temporary conditioning covers at most 200 frames regardless of clip duration.
+Progress reports completed frames per actor and permits cancellation between
+windows. Text embeddings can be cached and reused; text encoding is separate.
+
+Keep the batch size and backend fixed when comparing seeded clips. Floating-point
+differences can cross ARDY's discrete motion-code rounding boundaries, producing
+different poses even with identical seeds. Batch/serial continuous numerical
+hooks and complete-clip differences are reported separately in the release
+evidence; batching does not promise identical clips to serial generation.
+
 ```toml
-burn_ardy = { version = "0.1.2", features = ["wgpu"] }
+burn_ardy = { version = "0.1.3", features = ["wgpu"] }
 ```
 
 The model owns its immutable CDN catalog and loading policy:

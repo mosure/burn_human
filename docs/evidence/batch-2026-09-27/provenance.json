@@ -1,0 +1,74 @@
+{
+  "baseline_commit": "d26d7a4afa3b8657e85687e83539cbbdbbfca1f0",
+  "date_utc": "2026-09-27",
+  "rustc": "rustc 1.100.0-nightly (908501772 2026-08-30)\nbinary: rustc\ncommit-hash: 90850177249efe0321573c569aec5d12b257f8d6\ncommit-date: 2026-08-30\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0-nightly\nLLVM version: 23.1.0\n",
+  "gpu": "name, driver_version, memory.total [MiB]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 97887 MiB\n",
+  "native_profile": "repository dev with CARGO_PROFILE_DEV_DEBUG=0",
+  "wasm_profile": "repository release",
+  "cargo_config": "# alternatively, `export CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUNNER=wasm-server-runner`\n\n[target.wasm32-unknown-unknown]\nrunner = \"wasm-server-runner\"\nrustflags = [\n    \"--cfg=web_sys_unstable_apis\",\n    \"--cfg=getrandom_backend=\\\"wasm_js\\\"\",\n    # \"-C\",\n    # \"target-feature=+atomics,+bulk-memory,+mutable-globals\",  # for wasm-bindgen-rayon\n]\n\n[profile.dev]\nopt-level = 3\ndebug = true\ndebug-assertions = false\noverflow-checks = false\n\n[profile.dev.package.burn_human]\nopt-level = 3\n\n[profile.dev.package.bevy_burn_human]\nopt-level = 3\n\n\n# fix spurious network error on windows\n# [source.crates-io]\n# registry = \"https://github.com/rust-lang/crates.io-index\"\n\n[http]\nproxy = \"\"\n\n\n# offline development\n# [source.crates-io]\n# replace-with = \"vendored-sources\"\n\n# [source.vendored-sources]\n# directory = \"vendor\"\n",
+  "native_timing_scope": "repeat after own compilation and browser jobs completed; shared desktop GPU",
+  "artifacts": {
+    "batch-input.json": {
+      "bytes": 245670,
+      "sha256": "356433eb38b5610cafe946a2d546cfc8b2bed815b410da8b6375df55f62a33e6"
+    },
+    "batch-suite.json": {
+      "bytes": 4266305,
+      "sha256": "2c15df002ce9db72a997ebf33fe8844f6165d1b669add72efeb39aa0931fb5a8"
+    },
+    "batch-suite-web.json": {
+      "bytes": 4247728,
+      "sha256": "314208d4cd383b99b3dd8a91d57fa0100e671d6cef8f93ce9ce7d0bc2a7d50b5"
+    },
+    "baseline/batch-reference": {
+      "bytes": 50526776,
+      "sha256": "bbfbfc7be620e9e6e29797f1f98b3c647c135828d888453c927076928d104f92"
+    },
+    "baseline-web/burn_ardy_bg.wasm": {
+      "bytes": 16657928,
+      "sha256": "07070ec12b4100659c75879c1ff4a413ec268d12aeeca128e623b8f5a5674eb7"
+    },
+    "ardy-web/burn_ardy_bg.wasm": {
+      "bytes": 16816741,
+      "sha256": "b722243443f8f33025f6b14f0d9bc1642420427966d94e6947e00047f38ce77f"
+    },
+    "llama-web/burn_llama_bg.wasm": {
+      "bytes": 18744523,
+      "sha256": "545d9da41aeae7e18e542000d4728ad15a97521f67b8b0a7b2a56304de52a995"
+    },
+    "target/debug/ardy-batch-validate": {
+      "bytes": 50912464,
+      "sha256": "6de2341f2ddb5da50af141a9f2ae781a7c6c623fa7720f3d0fee10f1dd11ab2b"
+    },
+    "target/debug/text-validate": {
+      "bytes": 52442840,
+      "sha256": "ade430f6b35eaf27cba2431e30b8ad1fa8a8c4f8c5097d594e2699ca0f3c2429"
+    },
+    "crates/bevy_burn_human/www/out/bevy_burn_human_bg.wasm": {
+      "bytes": 102681380,
+      "sha256": "a7a20bb87455b872be7ae8bbd277ba7bd1f27707b63786c1e21cc86db94942cc"
+    },
+    ".cache/text-reference.json": {
+      "bytes": 581478,
+      "sha256": "fb0e7d8c66f3ffe357d5111740e6ba319bf84ad5819b8cb6ac682e909a490c81"
+    },
+    ".cache/ardy-reference-final/reference.safetensors": {
+      "bytes": 322388,
+      "sha256": "072cd33189a21efb19dc63dac02d7bc0a8f1aeb211a8bf7b00b4318bd23d043f"
+    }
+  },
+  "native_resources": "\tCommand being timed: \"target/debug/ardy-batch-validate .artifacts/cdn-upload-human-v1/aberration.technology/model/ardy/core-rp-20fps-h40/v1 .cache/release-2026-09-27/batch-suite.json .cache/release-2026-09-27/batch-native.json\"\n\tUser time (seconds): 99.50\n\tSystem time (seconds): 3.99\n\tPercent of CPU this job got: 124%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 1:23.14\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 674188\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 361\n\tMinor (reclaiming a frame) page faults: 338783\n\tVoluntary context switches: 881991\n\tInvoluntary context switches: 1053\n\tSwaps: 0\n\tFile system inputs: 6760\n\tFile system outputs: 5191\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n",
+  "gpu_before_native": "name, driver_version, utilization.gpu [%], memory.used [MiB]\nNVIDIA RTX PRO 6000 Blackwell Workstation Edition, 610.43.02, 19 %, 1569 MiB\n",
+  "gates": {
+    "workspace_tests_passed": 35,
+    "workspace_hardware_test_ignored": 1,
+    "explicit_hardware_tests_passed": 2,
+    "core_only_native_tests_passed": 3,
+    "core_only_wasm_check": "passed",
+    "strict_workspace_clippy": "passed",
+    "package_dry_runs": "passed",
+    "native_and_browser_llama_reference_cases": 10
+  },
+  "wgpu_graph": "One wgpu 29.0.4, no patches or replacements",
+  "browser_run": "Final rebuilt WASM module; earlier run retained separately"
+}

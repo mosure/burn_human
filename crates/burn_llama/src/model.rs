@@ -325,6 +325,7 @@ impl<B: Backend> TextEncoder<B> {
                 .weights
                 .linear(&format!("{p}.mlp.down_proj.weight"), gate * up);
             progress(i + 1, self.config.layers);
+            burn_human_inference::cooperative::yield_to_browser().await;
         }
         let pool = Tensor::<B, 3>::from_data(
             TensorData::new(tokens.pool.to_vec(), [1, SEQUENCE, 1]),

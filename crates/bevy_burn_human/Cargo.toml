@@ -1,7 +1,7 @@
 [package]
 name = "bevy_burn_human"
 description = "bevy plugin for burn_human morphable models"
-version = "0.5.3"
+version = "0.6.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 homepage = "https://github.com/mosure/burn_human"
@@ -10,8 +10,19 @@ publish = true
 exclude = ["www"]
 
 [features]
-default = ["native"]
+default = ["native", "studio"]
 native = ["bevy/multi_threaded"]
+studio = [
+    "dep:burn_human_motion", "dep:burn_human_inference", "dep:wgpu", "dep:bytemuck",
+    "dep:burn_ardy", "dep:burn_llama", "dep:burn_soma", "dep:burn_gemx", "dep:burn",
+    "dep:serde_json", "dep:serde", "dep:image", "dep:bevy_egui", "dep:bevy_panorbit_camera",
+    "dep:noise", "dep:fastrand", "dep:rfd",
+]
+
+[[bin]]
+name = "bevy_burn_human"
+path = "src/main.rs"
+required-features = ["studio"]
 
 [dependencies]
 bevy = { version = "0.19.1", default-features = false, features = [
@@ -43,27 +54,27 @@ bevy = { version = "0.19.1", default-features = false, features = [
     "zstd_rust",
 ] }
 burn_human = { version = "0.5.1", path = "../../" }
-burn_human_motion = { version = "0.1.0", path = "../burn_human_motion" }
-burn_human_inference = { version = "0.1.3", path = "../burn_human_inference", features = ["wgpu"] }
-wgpu = { version = "29", default-features = false }
-bytemuck = { version = "1", features = ["derive"] }
-burn_ardy = { version = "0.1.2", path = "../burn_ardy", default-features = false, features = ["wgpu", "transport"] }
-burn_llama = { version = "0.1.0", path = "../burn_llama", features = ["wgpu"] }
-burn_soma = { version = "0.1.2", path = "../burn_soma", features = ["wgpu", "mhr"] }
-burn_gemx = { version = "0.1.2", path = "../burn_gemx", features = ["wgpu"] }
-burn = { version = "0.21", default-features = false, features = ["std", "wgpu"] }
-serde_json = "1"
-serde = { version = "1", features = ["derive"] }
-image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
-bevy_egui = { version = "0.42", default-features = false, features = ["default_fonts", "render"] }
-bevy_panorbit_camera = "0.35.1"
-noise = "0.9"
-fastrand = "2"
+burn_human_motion = { version = "0.1.0", path = "../burn_human_motion", optional = true }
+burn_human_inference = { version = "0.1.3", path = "../burn_human_inference", features = ["wgpu"], optional = true }
+wgpu = { version = "29", default-features = false, optional = true }
+bytemuck = { version = "1", features = ["derive"], optional = true }
+burn_ardy = { version = "0.1.3", path = "../burn_ardy", default-features = false, features = ["wgpu", "transport"], optional = true }
+burn_llama = { version = "0.1.1", path = "../burn_llama", features = ["wgpu"], optional = true }
+burn_soma = { version = "0.1.2", path = "../burn_soma", features = ["wgpu", "mhr"], optional = true }
+burn_gemx = { version = "0.1.2", path = "../burn_gemx", features = ["wgpu"], optional = true }
+burn = { version = "0.21", default-features = false, features = ["std", "wgpu"], optional = true }
+serde_json = { version = "1", optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"], optional = true }
+bevy_egui = { version = "0.42", default-features = false, features = ["default_fonts", "render"], optional = true }
+bevy_panorbit_camera = { version = "0.35.1", optional = true }
+noise = { version = "0.9", optional = true }
+fastrand = { version = "2", optional = true }
 anyhow = "1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 pollster = "0.4"
-rfd = "0.17.2"
+rfd = { version = "0.17.2", optional = true }
 
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]

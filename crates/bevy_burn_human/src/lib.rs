@@ -1221,4 +1221,5 @@ mod tests {
         Ok(())
     }
 }
+#[cfg(feature = "studio")]
 pub mod motion;

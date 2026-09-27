@@ -58,18 +58,28 @@ requires the same device/queue, f32 data and the explicit backend above.
   reuses the inferred prepared identity for subsequent rig edits.
 - **ARDY:** retain checkpoint statistics and positional tables on device.
   Autoregressive generation retains at most the requested 160 history frames
-  on device, avoiding the decoded-history re-upload. A host copy remains for
-  the portable clip and window centering; decoded output is read once/window.
+  on device, avoiding the decoded-history re-upload. `generate_batch` shares
+  dispatches across 1–8 actors with independent prompt/seed/waypoint conditions.
+  Completed windows become portable clip frames immediately. Host history keeps
+  only five root features per frame for centering; decoded output is read once
+  per window for the whole batch. Conditioning buffers cover at most 200 frames
+  per actor, even for a 12,000-frame request.
 
-Native viewer jobs run on one persistent worker. Browser `generate` and
-GEM-X inference yield real browser tasks between DDIM steps and vision blocks,
-respectively. `sample_window_async` and `Vision::forward_async` expose the same
+Native viewer jobs run on one persistent worker. Browser ARDY generation,
+Llama text encoding and GEM-X inference yield real browser tasks between DDIM
+steps, transformer blocks and vision blocks, respectively.
+`sample_window_async` and `Vision::forward_async` expose the same
 scheduling for other applications. These yields do not wait for GPU completion.
 Synchronous variants remain available for throughput/validation callers.
 Kernel compilation, identity fitting and necessary output reads can still add
 latency; this is not a guarantee of stall-free execution on every adapter.
 
 ## Qualification
+
+The [batch and portable release qualification](evidence/batch-2026-09-27/README.md)
+covers full ARDY clips, Llama scheduling and optional studio builds. Batch size
+can change floating-point accumulation and cross ARDY's discrete FSQ rounding
+boundaries; seeded clips are not guaranteed to match serial execution exactly.
 
 See [measured results and limitations](evidence/performance-2026-09-26/README.md).
 `tool/scripts/profile_pipelines.py` runs the three synchronized checkpoint

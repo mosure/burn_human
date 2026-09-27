@@ -15,6 +15,7 @@ jobs:
           toolchain: nightly
       - run: cargo test -p burn_human -p burn_human_motion -p burn_human_inference -p burn_ardy -p burn_llama -p burn_soma -p burn_mhr -p burn_gemx --features burn_ardy/transport,burn_soma/mhr --lib --tests --locked
       - run: cargo clippy -p burn_human_motion -p burn_human_inference -p burn_ardy -p burn_llama -p burn_soma -p burn_mhr -p burn_gemx --all-targets --features burn_ardy/tools,burn_ardy/wgpu,burn_llama/tools,burn_soma/tools,burn_mhr/tools,burn_gemx/tools,burn_human_inference/tools,burn_human_inference/wgpu --locked -- -D warnings
+      - run: cargo test -p bevy_burn_human --no-default-features --lib --locked
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -28,6 +29,7 @@ jobs:
         with:
           toolchain: nightly
       - run: rustup target add wasm32-unknown-unknown
-      - run: cargo check -p bevy_burn_human --target wasm32-unknown-unknown --no-default-features --locked
+      - run: cargo check -p bevy_burn_human --target wasm32-unknown-unknown --no-default-features --lib --locked
+      - run: cargo check -p bevy_burn_human --target wasm32-unknown-unknown --no-default-features --features studio --bin bevy_burn_human --locked
       - run: cargo check -p burn_ardy --target wasm32-unknown-unknown --no-default-features --features web-validation --lib --locked
       - run: cargo check -p burn_llama -p burn_soma -p burn_gemx --target wasm32-unknown-unknown --no-default-features --features burn_llama/web-validation,burn_soma/web-validation,burn_gemx/web-validation --lib --locked

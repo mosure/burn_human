@@ -108,7 +108,27 @@ pub fn trajectory_conditions(
     request.validate()?;
     let mut observed = vec![0.0; request.frames * 330];
     let mut mask = vec![0.0; observed.len()];
+    write_trajectory_window(config, request, 0, &mut observed, &mut mask);
+    Ok((observed, mask))
+}
+
+/// Fill an already-zeroed window without allocating a full-clip condition array.
+/// Callers validate the request once before autoregressive generation starts.
+pub(crate) fn write_trajectory_window(
+    config: &ArdyConfig,
+    request: &MotionRequest,
+    first_frame: usize,
+    observed: &mut [f32],
+    mask: &mut [f32],
+) {
+    debug_assert_eq!(observed.len(), mask.len());
+    debug_assert!(observed.len().is_multiple_of(330));
+    let end_frame = first_frame + observed.len() / 330;
     let mut write = |frame: usize, pos: Vec3, heading: Option<f32>, height: bool| {
+        if !(first_frame..end_frame).contains(&frame) {
+            return;
+        }
+        let frame = frame - first_frame;
         let mut set = |d: usize, v: f32| {
             observed[frame * 330 + d] =
                 (v - config.motion_stats.mean[d]) / config.motion_stats.scale(d);
@@ -135,7 +155,7 @@ pub fn trajectory_conditions(
     if request.dense_trajectory {
         for pair in request.waypoints.windows(2) {
             let (a, b) = (&pair[0], &pair[1]);
-            for frame in a.frame + 1..b.frame {
+            for frame in (a.frame + 1).max(first_frame)..b.frame.min(end_frame) {
                 let t = (frame - a.frame) as f32 / (b.frame - a.frame) as f32;
                 let angle = a
                     .heading
@@ -150,5 +170,70 @@ pub fn trajectory_conditions(
             }
         }
     }
-    Ok((observed, mask))
+}
+
+#[cfg(test)]
+mod window_tests {
+    use super::*;
+    use crate::config::Stats;
+    use burn_human_motion::{RigDefinition, Waypoint};
+
+    #[test]
+    fn window_conditions_preserve_boundaries_and_wrapped_headings() {
+        let config = ArdyConfig {
+            architecture: "unused".into(),
+            fps: 20,
+            horizon: 40,
+            frames_per_token: 4,
+            motion_stats: Stats {
+                mean: vec![0.25; 334],
+                std: vec![2.0; 334],
+            },
+            latent_stats: Stats {
+                mean: vec![],
+                std: vec![],
+            },
+            skeleton: RigDefinition {
+                id: "unused".into(),
+                joints: vec![],
+            },
+        };
+        let mut request = MotionRequest {
+            frames: 12000,
+            waypoints: vec![
+                Waypoint {
+                    frame: 4,
+                    position: Vec3::ZERO,
+                    heading: Some(179f32.to_radians()),
+                    constrain_height: true,
+                },
+                Waypoint {
+                    frame: 20,
+                    position: Vec3::new(2.0, 1.0, 4.0),
+                    heading: Some(-179f32.to_radians()),
+                    constrain_height: true,
+                },
+            ],
+            ..Default::default()
+        };
+        let mut observed = vec![0.0; 24 * 330];
+        let mut mask = vec![0.0; observed.len()];
+        write_trajectory_window(&config, &request, 8, &mut observed, &mut mask);
+        let denorm = |index| {
+            observed[4 * 330 + index] * config.motion_stats.scale(index)
+                + config.motion_stats.mean[index]
+        };
+        assert!((denorm(0) - 1.0).abs() < 1e-6);
+        assert!((denorm(1) - 0.5).abs() < 1e-6);
+        assert!((denorm(2) - 2.0).abs() < 1e-6);
+        assert!(denorm(3) < -0.999);
+        assert_eq!(mask[12 * 330], 1.0); // endpoint at global frame 20
+        assert_eq!(mask[13 * 330], 0.0); // no extrapolation
+        request.dense_trajectory = false;
+        observed.fill(0.0);
+        mask.fill(0.0);
+        write_trajectory_window(&config, &request, 8, &mut observed, &mut mask);
+        assert_eq!(mask[4 * 330], 0.0);
+        assert_eq!(mask[12 * 330], 1.0);
+    }
 }

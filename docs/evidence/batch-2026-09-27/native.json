@@ -1,0 +1,1012 @@
+{
+  "backend": "native-wgpu-f32",
+  "baseline_commit": "d26d7a4afa3b8657e85687e83539cbbdbbfca1f0",
+  "cancellation": {
+    "before_allocation": true,
+    "completed_notification": true,
+    "max_request_batch": 8,
+    "max_request_frames": 12000,
+    "progress": [
+      0,
+      40
+    ]
+  },
+  "cases": [
+    {
+      "actors": 1,
+      "batch_generated_frames_per_second": 176.20685373649673,
+      "batch_vs_baseline_diagnostic": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "fixed_inputs": {
+        "changed_fsq_codes": 0,
+        "denoised_max_abs": 0.0,
+        "fsq_code_count": 1280,
+        "max_fsq_code_delta": 0.0,
+        "same_input_decoded_max_abs": 0.0,
+        "sampled_max_abs": 0.0,
+        "tolerance": {
+          "decoded": 0.002,
+          "denoised": 0.002,
+          "sampled": 0.02
+        }
+      },
+      "frames_per_actor": 40,
+      "history_frames": 0,
+      "name": "single",
+      "permutation": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "progress": [
+        0,
+        40
+      ],
+      "serial_vs_baseline": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "throughput_speedup": 1.0164970935604563,
+      "warm_batch_seconds": [
+        0.224132441,
+        0.227005926,
+        0.229582459
+      ],
+      "warm_serial_seconds": [
+        0.229977875,
+        0.230750864,
+        0.245180598
+      ]
+    },
+    {
+      "actors": 2,
+      "batch_generated_frames_per_second": 154.95091922590294,
+      "batch_vs_baseline_diagnostic": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.000011211536730115768,
+          "fk_rms_m": 4.75490440791328e-6,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 0.00003002142829438638,
+          "root_max_m": 0.000010501925316930283
+        },
+        {
+          "contact_disagreements": 4,
+          "fk_max_m": 0.058142710477113724,
+          "fk_rms_m": 0.003434961776511318,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 0.17617439448217878,
+          "root_max_m": 0.007162916474044323
+        }
+      ],
+      "fixed_inputs": {
+        "changed_fsq_codes": 7,
+        "denoised_max_abs": 0.00007207691669464111,
+        "fsq_code_count": 2560,
+        "max_fsq_code_delta": 1.0,
+        "same_input_decoded_max_abs": 0.0,
+        "sampled_max_abs": 0.005070328712463379,
+        "tolerance": {
+          "decoded": 0.002,
+          "denoised": 0.002,
+          "sampled": 0.02
+        }
+      },
+      "frames_per_actor": 44,
+      "history_frames": 4,
+      "name": "partial",
+      "permutation": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "progress": [
+        0,
+        40,
+        44
+      ],
+      "serial_vs_baseline": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "throughput_speedup": 1.6233180694000091,
+      "warm_batch_seconds": [
+        0.466452244,
+        0.567921768,
+        0.58924878
+      ],
+      "warm_serial_seconds": [
+        0.886857497,
+        0.921917668,
+        0.969526053
+      ]
+    },
+    {
+      "actors": 2,
+      "batch_generated_frames_per_second": 329.2168788678984,
+      "batch_vs_baseline_diagnostic": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0007473811856471002,
+          "fk_rms_m": 0.00008881250248043594,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 0.0030387052242127565,
+          "root_max_m": 2.753352418949362e-6
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 1.7263535028178012e-6,
+          "fk_rms_m": 3.641334851239907e-7,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 3.729222130105498e-6,
+          "root_max_m": 1.297364065067086e-6
+        }
+      ],
+      "fixed_inputs": {
+        "changed_fsq_codes": 0,
+        "denoised_max_abs": 0.000011920928955078125,
+        "fsq_code_count": 2560,
+        "max_fsq_code_delta": 0.0,
+        "same_input_decoded_max_abs": 0.0,
+        "sampled_max_abs": 0.0,
+        "tolerance": {
+          "decoded": 0.002,
+          "denoised": 0.002,
+          "sampled": 0.02
+        }
+      },
+      "frames_per_actor": 80,
+      "history_frames": 0,
+      "name": "no_history",
+      "permutation": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "progress": [
+        0,
+        40,
+        80
+      ],
+      "serial_vs_baseline": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "throughput_speedup": 1.8145699160179882,
+      "warm_batch_seconds": [
+        0.44337446,
+        0.486001813,
+        0.492475457
+      ],
+      "warm_serial_seconds": [
+        0.870963936,
+        0.881884269,
+        0.908339889
+      ]
+    },
+    {
+      "actors": 4,
+      "batch_generated_frames_per_second": 507.66964453834527,
+      "batch_vs_baseline_diagnostic": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "fixed_inputs": {
+        "changed_fsq_codes": 0,
+        "denoised_max_abs": 0.00005841255187988281,
+        "fsq_code_count": 5120,
+        "max_fsq_code_delta": 0.0,
+        "same_input_decoded_max_abs": 0.0,
+        "sampled_max_abs": 0.0,
+        "tolerance": {
+          "decoded": 0.002,
+          "denoised": 0.002,
+          "sampled": 0.02
+        }
+      },
+      "frames_per_actor": 120,
+      "history_frames": 40,
+      "name": "dense_curves",
+      "permutation": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "progress": [
+        0,
+        40,
+        80,
+        120
+      ],
+      "serial_vs_baseline": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.029999999329447746,
+            0.005
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.029999999329447746,
+            0.005
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.029999999329447746,
+            0.005
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.029999999329447746,
+            0.005
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "throughput_speedup": 3.0948470608812837,
+      "warm_batch_seconds": [
+        0.929254479,
+        0.945496752,
+        0.965247328
+      ],
+      "warm_serial_seconds": [
+        2.805863248,
+        2.926167844,
+        2.939799998
+      ]
+    },
+    {
+      "actors": 2,
+      "batch_generated_frames_per_second": 263.47378044351575,
+      "batch_vs_baseline_diagnostic": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 6.664001874625056e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "fixed_inputs": {
+        "changed_fsq_codes": 0,
+        "denoised_max_abs": 0.000040650367736816406,
+        "fsq_code_count": 2560,
+        "max_fsq_code_delta": 0.0,
+        "same_input_decoded_max_abs": 0.0,
+        "sampled_max_abs": 0.0,
+        "tolerance": {
+          "decoded": 0.002,
+          "denoised": 0.002,
+          "sampled": 0.02
+        }
+      },
+      "frames_per_actor": 240,
+      "history_frames": 160,
+      "name": "sparse_long",
+      "permutation": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 6.664001874625056e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "progress": [
+        0,
+        40,
+        80,
+        120,
+        160,
+        200,
+        240
+      ],
+      "serial_vs_baseline": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.029999999329447746,
+            0.005
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.029999999329447746,
+            0.005
+          ],
+          "local_rotation_max_rad": 6.664001874625056e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "throughput_speedup": 1.5962752152874726,
+      "warm_batch_seconds": [
+        1.7951227520000002,
+        1.8218131579999999,
+        1.840951672
+      ],
+      "warm_serial_seconds": [
+        2.843570484,
+        2.9081151910000003,
+        2.930520479
+      ]
+    },
+    {
+      "actors": 8,
+      "batch_generated_frames_per_second": 1066.9924087791428,
+      "batch_vs_baseline_diagnostic": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 4.74194212074508e-6,
+          "fk_rms_m": 8.235252718735365e-7,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 6.360963455946985e-6,
+          "root_max_m": 2.3315146790992003e-6
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 4.164227902947459e-6,
+          "fk_rms_m": 1.1867862629238423e-6,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 9.251449260227026e-6,
+          "root_max_m": 2.281386741742608e-6
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 2.7767384835897246e-6,
+          "fk_rms_m": 1.2148787535250894e-6,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 5.425332508600758e-6,
+          "root_max_m": 2.656630840647267e-6
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 8.261162065537064e-7,
+          "fk_rms_m": 3.289312375412774e-7,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 3.1170151961614877e-6,
+          "root_max_m": 5.787823056380148e-7
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 6.509078957606107e-6,
+          "fk_rms_m": 2.521202868098195e-6,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 0.000016968229086027706,
+          "root_max_m": 6.509078957606107e-6
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 2.4008911623241147e-6,
+          "fk_rms_m": 9.428424184855982e-7,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 4.111208499565467e-6,
+          "root_max_m": 2.1503672087419545e-6
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.002031473210081458,
+          "fk_rms_m": 0.00021175871571554275,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 0.005379802076333091,
+          "root_max_m": 2.476642976034782e-6
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 1.9224230527470354e-6,
+          "fk_rms_m": 1.128919568799263e-6,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 2.6112345218380576e-6,
+          "root_max_m": 1.564621925354004e-6
+        }
+      ],
+      "fixed_inputs": {
+        "changed_fsq_codes": 1,
+        "denoised_max_abs": 0.00001745671033859253,
+        "fsq_code_count": 10240,
+        "max_fsq_code_delta": 1.0,
+        "same_input_decoded_max_abs": 0.0,
+        "sampled_max_abs": 0.00024265050888061523,
+        "tolerance": {
+          "decoded": 0.002,
+          "denoised": 0.002,
+          "sampled": 0.02
+        }
+      },
+      "frames_per_actor": 40,
+      "history_frames": 0,
+      "name": "eight_actors",
+      "permutation": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "progress": [
+        0,
+        40
+      ],
+      "serial_vs_baseline": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "throughput_speedup": 6.133755244138483,
+      "warm_batch_seconds": [
+        0.275618857,
+        0.299908413,
+        0.303106204
+      ],
+      "warm_serial_seconds": [
+        1.733306447,
+        1.8395648009999999,
+        1.8531000880000001
+      ]
+    },
+    {
+      "actors": 2,
+      "batch_generated_frames_per_second": 369.8301957016578,
+      "batch_vs_baseline_diagnostic": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 4.74194212074508e-6,
+          "fk_rms_m": 8.235252718735365e-7,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 6.360963455946985e-6,
+          "root_max_m": 2.3315146790992003e-6
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 4.74194212074508e-6,
+          "fk_rms_m": 8.235252718735365e-7,
+          "gate_enforced": false,
+          "limits": null,
+          "local_rotation_max_rad": 6.360963455946985e-6,
+          "root_max_m": 2.3315146790992003e-6
+        }
+      ],
+      "fixed_inputs": {
+        "changed_fsq_codes": 0,
+        "denoised_max_abs": 9.655952453613281e-6,
+        "fsq_code_count": 2560,
+        "max_fsq_code_delta": 0.0,
+        "same_input_decoded_max_abs": 0.0,
+        "sampled_max_abs": 0.000025451183319091797,
+        "tolerance": {
+          "decoded": 0.002,
+          "denoised": 0.002,
+          "sampled": 0.02
+        }
+      },
+      "frames_per_actor": 40,
+      "history_frames": 0,
+      "name": "duplicate_seed",
+      "permutation": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.00009999999747378752,
+            0.00002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "progress": [
+        0,
+        40
+      ],
+      "serial_vs_baseline": [
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        },
+        {
+          "contact_disagreements": 0,
+          "fk_max_m": 0.0,
+          "fk_rms_m": 0.0,
+          "gate_enforced": true,
+          "limits": [
+            0.009999999776482582,
+            0.002
+          ],
+          "local_rotation_max_rad": 5.960464477539063e-8,
+          "root_max_m": 0.0
+        }
+      ],
+      "throughput_speedup": 2.036057112692207,
+      "warm_batch_seconds": [
+        0.203355414,
+        0.21631549,
+        0.222299542
+      ],
+      "warm_serial_seconds": [
+        0.439146371,
+        0.440430692,
+        0.442548108
+      ]
+    }
+  ],
+  "includes_decoder": true,
+  "includes_text_encoder": false,
+  "model_manifest_sha256": "6e03294854771ca3ed6641251c77ab75bd2542d778c02886ea795d8d77655cd8",
+  "passed": true,
+  "semantic_quality": "real prompt embeddings; numerical regression, not human-rated semantic quality",
+  "suite_sha256": "2c15df002ce9db72a997ebf33fe8844f6165d1b669add72efeb39aa0931fb5a8",
+  "synchronization": "full decoded clip readback"
+}

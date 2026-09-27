@@ -1,4 +1,5 @@
 //! Mandatory real-checkpoint parity runner. Missing artifacts are errors.
+pub mod batch;
 use crate::{Ardy, representation::decode_clip};
 use anyhow::{Result, ensure};
 use burn::{

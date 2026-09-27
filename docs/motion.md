@@ -314,7 +314,7 @@ cargo test -p burn_human -p burn_human_motion -p burn_human_inference \
   -p burn_ardy -p burn_llama -p burn_soma -p burn_mhr -p burn_gemx \
   --features burn_ardy/transport,burn_soma/mhr --lib --tests
 python tool/scripts/test_soma_animation.py
-cargo check -p bevy_burn_human --target wasm32-unknown-unknown --no-default-features
+cargo check -p bevy_burn_human --target wasm32-unknown-unknown --no-default-features --features studio --bin bevy_burn_human
 ```
 
 Actual checkpoints have additional native and WebGPU tests; missing assets fail

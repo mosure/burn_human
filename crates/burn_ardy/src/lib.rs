@@ -18,3 +18,5 @@ pub use network::Ardy;
 mod constants;
 #[cfg(feature = "transport")]
 pub mod pretrained;
+
+mod batch;

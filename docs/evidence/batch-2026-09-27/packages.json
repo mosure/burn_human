@@ -1,0 +1,29 @@
+[
+  {
+    "crate": "burn_ardy",
+    "version": "0.1.3",
+    "files": 26,
+    "bytes": 73904,
+    "largest_member_bytes": 156609,
+    "dry_run": "passed",
+    "weights_included": false
+  },
+  {
+    "crate": "burn_llama",
+    "version": "0.1.1",
+    "files": 16,
+    "bytes": 55197,
+    "largest_member_bytes": 157357,
+    "dry_run": "passed",
+    "weights_included": false
+  },
+  {
+    "crate": "bevy_burn_human",
+    "version": "0.6.0",
+    "files": 21,
+    "bytes": 109071,
+    "largest_member_bytes": 243140,
+    "dry_run": "passed",
+    "weights_included": false
+  }
+]
