@@ -1,0 +1,8 @@
+{
+  "commit": "960e78c9ebb373352a6e042e85bbfd3f1e676583",
+  "features": [
+    "studio"
+  ],
+  "target": "wasm32-unknown-unknown",
+  "profile": "release"
+}
