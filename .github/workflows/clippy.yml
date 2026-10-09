@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest]
-        toolchain: [nightly]
+        toolchain: [nightly-2026-08-31]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4

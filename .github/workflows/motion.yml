@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: brndnmtthws/rust-action@v1
         with:
-          toolchain: nightly
+          toolchain: nightly-2026-08-31
       - run: cargo test -p burn_human -p burn_human_motion -p burn_human_inference -p burn_ardy -p burn_llama -p burn_soma -p burn_mhr -p burn_gemx --features burn_ardy/transport,burn_soma/mhr --lib --tests --locked
       - run: cargo clippy -p burn_human_motion -p burn_human_inference -p burn_ardy -p burn_llama -p burn_soma -p burn_mhr -p burn_gemx --all-targets --features burn_ardy/tools,burn_ardy/wgpu,burn_llama/tools,burn_soma/tools,burn_mhr/tools,burn_gemx/tools,burn_human_inference/tools,burn_human_inference/wgpu --locked -- -D warnings
       - name: Stage Bevy test assets
@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: brndnmtthws/rust-action@v1
         with:
-          toolchain: nightly
+          toolchain: nightly-2026-08-31
       - run: rustup target add wasm32-unknown-unknown
       - run: cargo check -p bevy_burn_human --target wasm32-unknown-unknown --no-default-features --lib --locked
       - run: cargo check -p bevy_burn_human --target wasm32-unknown-unknown --no-default-features --features studio --bin bevy_burn_human --locked

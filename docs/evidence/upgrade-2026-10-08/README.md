@@ -8,6 +8,10 @@ Rust on native WGPU and browser WebGPU.
 
 Qualification uses an NVIDIA RTX PRO 6000 Blackwell (96 GiB), driver 610.43.02,
 Linux, Rust nightly 1.100.0 (2026-08-30) and Chromium 153.0.8010.12.
+The repository and CI use `nightly-2026-08-31` (Rust compiler commit dated
+2026-08-30). The initial floating-nightly CI failed in upstream `branches`
+0.4.6 because a newer compiler removed `core::intrinsics::abort`; the pinned
+toolchain matches the local qualification without dependency patches.
 These results do not establish minimum-memory GPU or mobile compatibility.
 
 ## Numerical and model checks

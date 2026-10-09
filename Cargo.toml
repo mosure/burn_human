@@ -11,6 +11,7 @@ repository = "https://github.com/mosure/burn_human"
 readme = "README.md"
 exclude = [
   ".cargo",
+  "rust-toolchain.toml",
   ".gitattributes",
   ".gitignore",
   ".devcontainer",

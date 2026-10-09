@@ -26,7 +26,9 @@ parametric 3d human ([anny](https://arxiv.org/abs/2511.03589)) model, [view the 
 
 This release uses **Bevy 0.20, Burn 0.22 and WGPU 30**, from crates.io without
 dependency patches. Use Rust 1.97.1 or newer for the Bevy integration (the model
-crates require Rust 1.95). The repository validates with nightly Rust.
+crates require Rust 1.95). The repository and CI pin the tested
+`nightly-2026-08-31` toolchain; newer nightly builds currently break the
+transitive `branches` dependency used by Burn.
 
 Burn tensors and model types no longer take a backend type parameter. Select
 execution with `burn::tensor::Device::wgpu(...)` or `Device::flex()`; native

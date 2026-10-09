@@ -25,7 +25,7 @@ jobs:
       - name: setup nightly rust toolchain with caching
         uses: brndnmtthws/rust-action@v1
         with:
-          toolchain: nightly
+          toolchain: nightly-2026-08-31
           components: rustfmt, clippy
           enable-sccache: "false"
 
