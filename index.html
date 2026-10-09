@@ -24,6 +24,20 @@
         if (!navigator.gpu) throw new Error('This browser does not expose WebGPU. Open the studio in a WebGPU-enabled browser, or run the native Bevy application.');
         const { default: init } = await import('./out/bevy_burn_human.js');
         await init();
+        // A successfully instantiated module must also launch its application.
+        if (!document.querySelector('canvas')) {
+          await new Promise((resolve, reject) => {
+            const observer = new MutationObserver(() => {
+              if (document.querySelector('canvas')) {
+                clearTimeout(timer); observer.disconnect(); resolve();
+              }
+            });
+            const timer = setTimeout(() => {
+              observer.disconnect(); reject(new Error('The Bevy window did not start. Reload the studio and check the browser console.'));
+            }, 30000);
+            observer.observe(document.body, { childList: true, subtree: true });
+          });
+        }
         document.getElementById('loading').remove();
       } catch (error) {
         document.getElementById('spinner').style.display = 'none';
