@@ -7,7 +7,9 @@ WebGPU. Weights load on demand from verified, bounded Burnpack parts.
 
 `BurnHumanPlugin` provides the parametric Anny renderer.
 `motion::HumanMotionPlugin` adds the motion studio, world-space waypoints,
-SOMA controls and image-pose UI; it requires Bevy Egui and the render plugins.
+SOMA controls and image-pose UI; it uses Bevy 0.20 Feathers widgets and the built-in pan-orbit camera.
+Add Bevy’s render plugins and `DefaultPanOrbitCameraPlugins`; the studio installs
+`FeathersPlugins` itself. UI input suppresses scene navigation while editing.
 The repository's demo shows the complete plugin setup and required Anny assets.
 
 The `studio` feature is enabled by default. Applications that only
@@ -15,11 +17,11 @@ need `BurnHumanPlugin` can disable default features to omit ARDY, Llama, SOMA,
 GEM-X and the studio UI dependencies. Add `native` for native multithreading:
 
 ```toml
-bevy_burn_human = { version = "0.6.1", default-features = false, features = ["native"] }
+bevy_burn_human = { version = "0.7.0", default-features = false, features = ["native"] }
 ```
 
 Existing applications with `default-features = false` that use the motion module
-must add `features = ["studio"]` when migrating from `0.5`.
+must add `features = ["studio"]` when migrating from earlier releases.
 
 For a browser studio build, explicitly enable `studio` while disabling `native`:
 

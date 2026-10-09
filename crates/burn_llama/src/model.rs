@@ -1,9 +1,8 @@
 //! Llama 3 8B with merged LLM2Vec adapters, grouped query attention and paged vocabulary.
 use crate::tokenizer::{EncodedPrompt, PromptTokenizer, SEQUENCE};
 use anyhow::{Result, ensure};
-use burn::{
-    prelude::Backend,
-    tensor::{Tensor, TensorData, activation, module::attention, ops::AttentionModuleOptions},
+use burn::tensor::{
+    Tensor, TensorData, activation, module::attention, ops::AttentionModuleOptions,
 };
 use burn_human_inference::{
     transport::ModelSource,
@@ -95,10 +94,10 @@ fn page_name(page: usize) -> String {
     format!("model.embed_tokens.page.{page:04}")
 }
 
-pub struct TextEncoder<B: Backend> {
+pub struct TextEncoder {
     pub config: TextConfig,
     pub mode: AttentionMode,
-    weights: TensorBank<B>,
+    weights: TensorBank,
     tokenizer: PromptTokenizer,
     manifest: Manifest,
     source: ModelSource,
@@ -106,11 +105,11 @@ pub struct TextEncoder<B: Backend> {
     pages: VecDeque<(usize, Vec<u8>)>,
 }
 
-impl<B: Backend> TextEncoder<B> {
+impl TextEncoder {
     pub async fn load(
         manifest: Manifest,
         mut source: ModelSource,
-        device: &B::Device,
+        device: &burn::tensor::Device,
         mut progress: impl FnMut(usize, usize),
     ) -> Result<Self> {
         manifest.validate()?;
@@ -169,7 +168,7 @@ impl<B: Backend> TextEncoder<B> {
         self.tokenizer.encode(prompt)
     }
 
-    async fn embeddings(&mut self, tokens: &EncodedPrompt) -> Result<Tensor<B, 3>> {
+    async fn embeddings(&mut self, tokens: &EncodedPrompt) -> Result<Tensor<3>> {
         let mut values = vec![0f32; SEQUENCE * self.config.hidden];
         for (position, &id) in tokens.ids.iter().enumerate() {
             let id = id as usize;
@@ -193,7 +192,7 @@ impl<B: Backend> TextEncoder<B> {
                 if self.pages.len() == 16 {
                     self.pages.pop_front();
                 }
-                self.pages.push_back((page, data.bytes.to_vec()));
+                self.pages.push_back((page, data.bytes().to_vec()));
             }
             let bytes = &self.pages.back().unwrap().1;
             let start = (id % self.config.page_rows) * self.config.hidden * 2;
@@ -216,14 +215,14 @@ impl<B: Backend> TextEncoder<B> {
         ))
     }
 
-    fn norm(&self, name: &str, x: Tensor<B, 3>) -> Tensor<B, 3> {
+    fn norm(&self, name: &str, x: Tensor<3>) -> Tensor<3> {
         let inverse = (x.clone().square().mean_dim(2) + self.config.rms_epsilon)
             .sqrt()
             .recip();
         x * inverse * self.weights.tensor::<1>(name).unsqueeze()
     }
 
-    fn rope(&self, x: Tensor<B, 4>, cos: Tensor<B, 4>, sin: Tensor<B, 4>) -> Tensor<B, 4> {
+    fn rope(&self, x: Tensor<4>, cos: Tensor<4>, sin: Tensor<4>) -> Tensor<4> {
         let [b, h, t, d] = x.dims();
         let rotated = Tensor::cat(
             vec![
@@ -258,8 +257,8 @@ impl<B: Backend> TextEncoder<B> {
                 sin.push(theta.sin());
             }
         }
-        let cos = Tensor::<B, 4>::from_data(TensorData::new(cos, [1, 1, SEQUENCE, d]), device);
-        let sin = Tensor::<B, 4>::from_data(TensorData::new(sin, [1, 1, SEQUENCE, d]), device);
+        let cos = Tensor::<4>::from_data(TensorData::new(cos, [1, 1, SEQUENCE, d]), device);
+        let sin = Tensor::<4>::from_data(TensorData::new(sin, [1, 1, SEQUENCE, d]), device);
         let mut bias = Vec::with_capacity(SEQUENCE * SEQUENCE);
         for q in 0..SEQUENCE {
             for (k, &visible) in tokens.attention.iter().enumerate() {
@@ -273,7 +272,7 @@ impl<B: Backend> TextEncoder<B> {
             }
         }
         let bias =
-            Tensor::<B, 4>::from_data(TensorData::new(bias, [1, 1, SEQUENCE, SEQUENCE]), device);
+            Tensor::<4>::from_data(TensorData::new(bias, [1, 1, SEQUENCE, SEQUENCE]), device);
         for i in 0..self.config.layers {
             let p = format!("model.layers.{i}");
             let normalized = self.norm(&format!("{p}.input_layernorm.weight"), x.clone());
@@ -290,7 +289,7 @@ impl<B: Backend> TextEncoder<B> {
             let k = self.rope(project("k", self.config.kv_heads), cos.clone(), sin.clone());
             let v = project("v", self.config.kv_heads);
             burn_human_inference::cooperative::yield_to_browser().await;
-            let repeat = |v: Tensor<B, 4>| {
+            let repeat = |v: Tensor<4>| {
                 v.unsqueeze_dim::<5>(2)
                     .expand([
                         1,
@@ -329,7 +328,7 @@ impl<B: Backend> TextEncoder<B> {
             progress(i + 1, self.config.layers);
             burn_human_inference::cooperative::yield_to_browser().await;
         }
-        let pool = Tensor::<B, 3>::from_data(
+        let pool = Tensor::<3>::from_data(
             TensorData::new(tokens.pool.to_vec(), [1, SEQUENCE, 1]),
             device,
         );
@@ -338,7 +337,7 @@ impl<B: Backend> TextEncoder<B> {
         let values = pooled
             .into_data_async()
             .await?
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .map_err(|e| anyhow::anyhow!("embedding: {e}"))?;
         let result = TextEmbedding {
             prompt: prompt.into(),

@@ -1,7 +1,6 @@
 //! Complete-clip qualification against independently generated serial fixtures.
 use crate::Ardy;
 use anyhow::{Context, Result, ensure};
-use burn::prelude::Backend;
 use burn_human_motion::{MotionClip, MotionRequest, TextEmbedding};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -106,8 +105,8 @@ fn compare(
         "limits":limits,"gate_enforced":limits.is_some()}))
 }
 
-async fn serial<B: Backend>(
-    model: &Ardy<B>,
+async fn serial(
+    model: &Ardy,
     requests: &[MotionRequest],
     embeddings: &[TextEmbedding],
 ) -> Result<Vec<MotionClip>> {
@@ -120,7 +119,7 @@ async fn serial<B: Backend>(
 
 /// Times fully decoded, host-visible clips, excluding load and text encoding.
 /// Missing independent references are fatal, rather than silently self-comparing.
-pub async fn validate<B: Backend>(model: &Ardy<B>, suite: Suite) -> Result<Value> {
+pub async fn validate(model: &Ardy, suite: Suite) -> Result<Value> {
     ensure!(
         !suite.cases.is_empty() && !suite.baseline_commit.is_empty(),
         "missing baseline"

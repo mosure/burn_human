@@ -18,6 +18,9 @@ Bevy's GPU device, in both native WGPU and browser WebGPU. There is no hosted
 text or image inference service. The default CDN sources and manifest
 identities are already configured; custom sources live under **Advanced**.
 
+The controls use Bevy 0.20 Feathers and native editable text. Camera navigation
+uses Bevy’s built-in pan-orbit controller. Tab moves keyboard focus between controls.
+
 ## Choose a mode
 
 | Mode | Start here | Explore next |
@@ -51,9 +54,9 @@ editing, right-drag and scroll still pan and zoom. The selected waypoint is
 white; requested paths are gold and generated paths are blue.
 
 Try **Straight**, **Turn** or **Loop**, then drag the markers. Waypoint timing
-is shown in seconds. Select a point to adjust world X/Z in metres, facing
+is shown in frames at 20 FPS. Select a point to adjust world X/Z in metres, facing
 direction or root height. Adding points or changing duration distributes
-their times across the clip; subsequent timing edits remain ordered and
+their times across the clip; invalid timing edits disable generation until the points are ordered and
 inside its duration. Path constraints are soft conditions, so the generated
 trajectory may deviate. Clear the path to explore text conditioning alone.
 

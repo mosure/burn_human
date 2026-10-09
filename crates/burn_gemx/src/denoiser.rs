@@ -4,10 +4,7 @@ use crate::{
     ops::{attention, norm},
 };
 use anyhow::{Result, ensure};
-use burn::{
-    prelude::Backend,
-    tensor::{Tensor, TensorData, activation},
-};
+use burn::tensor::{Tensor, TensorData, activation};
 use burn_human_inference::{transport::ModelSource, weights::TensorBank};
 use burn_human_motion::artifacts::Manifest;
 use serde::{Deserialize, Serialize};
@@ -20,8 +17,8 @@ pub struct Decode {
     pub std: Vec<f32>,
     pub observation_joints: Vec<usize>,
 }
-pub struct GemDenoiser<B: Backend> {
-    weights: TensorBank<B>,
+pub struct GemDenoiser {
+    weights: TensorBank,
     pub decode: Decode,
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -33,9 +30,9 @@ pub struct Conditions {
     pub cameras: Vec<Camera>,
     pub angular: Vec<[f32; 6]>,
 }
-pub struct Prediction<B: Backend> {
-    pub features: Tensor<B, 3>,
-    pub camera: Tensor<B, 3>,
+pub struct Prediction {
+    pub features: Tensor<3>,
+    pub camera: Tensor<3>,
 }
 fn linear(map: &mut BTreeMap<String, Vec<usize>>, name: &str, i: usize, o: usize) {
     map.insert(format!("{name}.weight"), vec![o, i]);
@@ -74,11 +71,11 @@ impl Conditions {
         Ok(())
     }
 }
-impl<B: Backend> GemDenoiser<B> {
+impl GemDenoiser {
     pub async fn load(
         manifest: &Manifest,
         source: &mut ModelSource,
-        device: &B::Device,
+        device: &burn::tensor::Device,
         mut progress: impl FnMut(usize, usize),
     ) -> Result<Self> {
         manifest.validate()?;
@@ -182,7 +179,7 @@ impl<B: Backend> GemDenoiser<B> {
         }
         Ok(Self { weights, decode })
     }
-    fn mlp(&self, p: &str, x: Tensor<B, 3>, approx: bool) -> Tensor<B, 3> {
+    fn mlp(&self, p: &str, x: Tensor<3>, approx: bool) -> Tensor<3> {
         let x = self.weights.affine(&format!("{p}.fc1"), x);
         let x = if approx {
             let u = x.clone() + x.clone().powf_scalar(3.0) * 0.044715;
@@ -192,7 +189,7 @@ impl<B: Backend> GemDenoiser<B> {
         };
         self.weights.affine(&format!("{p}.fc2"), x)
     }
-    fn exists(&self, name: &str, x: Tensor<B, 3>) -> Tensor<B, 3> {
+    fn exists(&self, name: &str, x: Tensor<3>) -> Tensor<3> {
         let [b, l, _] = x.dims();
         let z = Tensor::cat(vec![x, Tensor::ones([b, l, 1], &self.weights.device)], 2);
         self.weights.affine(
@@ -203,7 +200,7 @@ impl<B: Backend> GemDenoiser<B> {
             ),
         )
     }
-    pub fn condition(&self, input: &Conditions, features: Tensor<B, 3>) -> Result<Tensor<B, 3>> {
+    pub fn condition(&self, input: &Conditions, features: Tensor<3>) -> Result<Tensor<3>> {
         input.validate()?;
         let (b, l) = (input.batch, input.frames);
         ensure!(
@@ -240,12 +237,12 @@ impl<B: Backend> GemDenoiser<B> {
                 angular.push((value - mean) / std);
             }
         }
-        let xy = Tensor::<B, 3>::from_data(TensorData::new(xy, [b * l, 33, 2]), device);
-        let valid = Tensor::<B, 3>::from_data(TensorData::new(valid, [b * l, 33, 1]), device);
+        let xy = Tensor::<3>::from_data(TensorData::new(xy, [b * l, 33, 2]), device);
+        let valid = Tensor::<3>::from_data(TensorData::new(valid, [b * l, 33, 1]), device);
         let embedded = w.affine("learned_pos_linear", xy) * valid.clone()
             + w.tensor::<2>("learned_pos_params").unsqueeze::<3>() * (valid.neg() + 1.0);
         let mut cond = self.mlp("embed_noisyobs", embedded.reshape([b, l, 1056]), false);
-        let cliff = Tensor::<B, 3>::from_data(TensorData::new(cliff, [b, l, 3]), device);
+        let cliff = Tensor::<3>::from_data(TensorData::new(cliff, [b, l, 3]), device);
         let cliff = w.affine(
             "cliffcam_embedder.3",
             activation::silu(w.affine("cliffcam_embedder.0", cliff)),
@@ -256,7 +253,7 @@ impl<B: Backend> GemDenoiser<B> {
             norm(w, "imgseq_embedder.0", features, 1e-5),
         );
         cond = cond + self.exists("f_imgseq", image);
-        let angular = Tensor::<B, 3>::from_data(TensorData::new(angular, [b, l, 6]), device);
+        let angular = Tensor::<3>::from_data(TensorData::new(angular, [b, l, 6]), device);
         let angular = w.affine(
             "cam_angvel_embedder.3",
             activation::silu(w.affine("cam_angvel_embedder.0", angular)),
@@ -267,10 +264,10 @@ impl<B: Backend> GemDenoiser<B> {
     /// path uses zeros at 999, exactly as the released ONNX graph does.
     pub fn denoise(
         &self,
-        condition: Tensor<B, 3>,
-        latent: Tensor<B, 3>,
+        condition: Tensor<3>,
+        latent: Tensor<3>,
         timestep: usize,
-    ) -> Result<Prediction<B>> {
+    ) -> Result<Prediction> {
         let [b, l, c] = condition.dims();
         ensure!(
             (1..=32).contains(&b)
@@ -299,10 +296,10 @@ impl<B: Backend> GemDenoiser<B> {
                 angles.push(i as f32 / 10000f32.powf((j / 2 * 2) as f32 / 64.0));
             }
         }
-        let angles = Tensor::<B, 4>::from_data(TensorData::new(angles, [1, 1, l, 64]), &w.device);
+        let angles = Tensor::<4>::from_data(TensorData::new(angles, [1, 1, l, 64]), &w.device);
         let sin = angles.clone().sin();
         let cos = angles.cos();
-        let rope = |x: Tensor<B, 4>| {
+        let rope = |x: Tensor<4>| {
             let pairs = x.clone().reshape([b, 8, l, 32, 2]);
             let a = pairs.clone().slice([0..b, 0..8, 0..l, 0..32, 0..1]);
             let z = pairs.slice([0..b, 0..8, 0..l, 0..32, 1..2]);
@@ -350,13 +347,13 @@ impl<B: Backend> GemDenoiser<B> {
             2,
         );
         let camera = self.mlp("pred_cam_head", x, false)
-            * Tensor::<B, 1>::from_data([0.1784, 0.0956, 0.0764], &w.device).unsqueeze()
-            + Tensor::<B, 1>::from_data([1.0606, -0.0027, 0.2702], &w.device).unsqueeze();
+            * Tensor::<1>::from_data([0.1784, 0.0956, 0.0764], &w.device).unsqueeze()
+            + Tensor::<1>::from_data([1.0606, -0.0027, 0.2702], &w.device).unsqueeze();
         let first = camera.clone().slice([0..b, 0..l, 0..1]).clamp_min(0.25);
         let camera = camera.slice_assign([0..b, 0..l, 0..1], first);
         Ok(Prediction { features, camera })
     }
-    pub fn predict(&self, input: &Conditions, features: Tensor<B, 3>) -> Result<Prediction<B>> {
+    pub fn predict(&self, input: &Conditions, features: Tensor<3>) -> Result<Prediction> {
         let condition = self.condition(input, features)?;
         self.denoise(
             condition,

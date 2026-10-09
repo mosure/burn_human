@@ -5,10 +5,7 @@ use crate::{
     sampler::NormalNoise,
 };
 use anyhow::{Result, ensure};
-use burn::{
-    prelude::Backend,
-    tensor::{Tensor, TensorData},
-};
+use burn::tensor::{Tensor, TensorData};
 use burn_human_motion::{MotionClip, MotionRequest, TextEmbedding};
 use std::collections::VecDeque;
 
@@ -81,12 +78,9 @@ mod tests {
     #[test]
     #[ignore = "requires a GPU and the pinned ARDY model cache/download"]
     fn full_clip_batch_preserves_actor_order_and_cancellation() {
-        type B = burn_human_inference::gpu::WgpuBackend;
         pollster::block_on(async {
-            let device = burn::backend::wgpu::WgpuDevice::default();
-            let model = Ardy::<B>::load_pretrained(&device, |_, _| {})
-                .await
-                .unwrap();
+            let device = burn::tensor::Device::wgpu(burn::tensor::DeviceKind::DefaultDevice);
+            let model = Ardy::load_pretrained(&device, |_, _| {}).await.unwrap();
             // Numerical fixture only: these synthetic pooled vectors do not
             // claim text understanding or human motion quality.
             let requests: Vec<_> = [9, 81]
@@ -168,7 +162,7 @@ mod tests {
     }
 }
 
-impl<B: Backend> Ardy<B> {
+impl Ardy {
     /// Generate 1..8 clips together. Length, history, DDIM steps and guidance must
     /// match; prompts, seeds and trajectories are independent. Histories stay on
     /// the device and are bounded to 160 frames per actor. Conditioning arrays
@@ -206,7 +200,7 @@ impl<B: Backend> Ardy<B> {
         // are converted immediately to the public clip representation.
         let mut roots = vec![VecDeque::<[f32; 5]>::new(); batch];
         let mut random: Vec<_> = requests.iter().map(|r| NormalNoise::new(r.seed)).collect();
-        let mut resident: Option<Tensor<B, 3>> = None;
+        let mut resident: Option<Tensor<3>> = None;
         for window in 0..first.frames.div_ceil(40) {
             let generated = window * 40;
             if window > 0 {
@@ -331,7 +325,7 @@ impl<B: Backend> Ardy<B> {
                 .into_data_async()
                 .await
                 .map_err(|e| anyhow::anyhow!("device read: {e}"))?
-                .to_vec::<f32>()
+                .try_to_vec::<f32>()
                 .map_err(|e| anyhow::anyhow!("{e}"))?;
             for (b, result) in results.iter_mut().enumerate() {
                 let features = &data[b * 40 * 330..(b + 1) * 40 * 330];

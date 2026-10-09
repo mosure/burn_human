@@ -1,8 +1,5 @@
 use anyhow::{Result, ensure};
-use burn::{
-    backend::Wgpu,
-    tensor::{Tensor, TensorData},
-};
+use burn::tensor::{Tensor, TensorData};
 use burn_gemx::{
     camera::{Camera, Crop},
     denoiser::{Conditions, GemDenoiser},
@@ -38,10 +35,10 @@ fn main() -> Result<()> {
         "gem-denoiser-validate BUNDLE REFERENCE_JSON OUTPUT_JSON"
     );
     pollster::block_on(async {
-        let device = Default::default();
+        let device = burn::tensor::Device::wgpu(burn::tensor::DeviceKind::DefaultDevice);
         let mut source = ModelSource::new(args[0].clone());
         let manifest = source.manifest(None).await?;
-        let model = GemDenoiser::<Wgpu>::load(&manifest, &mut source, &device, |_, _| {}).await?;
+        let model = GemDenoiser::load(&manifest, &mut source, &device, |_, _| {}).await?;
         let reference: Fixture = serde_json::from_slice(&std::fs::read(&args[1])?)?;
         let mut records = vec![];
         let mut pass = true;
@@ -77,9 +74,14 @@ fn main() -> Result<()> {
                 .features
                 .into_data_async()
                 .await?
-                .to_vec::<f32>()
+                .try_to_vec::<f32>()
                 .unwrap();
-            let c = out.camera.into_data_async().await?.to_vec::<f32>().unwrap();
+            let c = out
+                .camera
+                .into_data_async()
+                .await?
+                .try_to_vec::<f32>()
+                .unwrap();
             let feature_max = max(&x, &r.prediction);
             let camera_max = max(&c, &r.camera);
             println!(

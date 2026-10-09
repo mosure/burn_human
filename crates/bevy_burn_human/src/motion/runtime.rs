@@ -6,9 +6,8 @@ use bevy::{
         renderer::{RenderAdapter, RenderDevice, RenderInstance, RenderQueue},
     },
 };
-use burn::backend::wgpu::{WgpuDevice, WgpuSetup, init_device};
+use burn::tensor::{Device, wgpu::WgpuSetup};
 use burn_ardy::{Ardy, transport::read_bounded};
-use burn_human_inference::gpu::WgpuBackend as Wgpu;
 use burn_human_motion::{
     ImageCondition, MotionClip, MotionRequest, TextEmbedding, soma::SomaAnimation,
 };
@@ -38,9 +37,9 @@ impl MotionStatus {
 
 pub(super) struct RuntimeState {
     pub status: MotionStatus,
-    pub device: Option<WgpuDevice>,
-    pub model: Option<Ardy<Wgpu>>,
-    pub text_model: Option<TextEncoder<Wgpu>>,
+    pub device: Option<Device>,
+    pub model: Option<Ardy>,
+    pub text_model: Option<TextEncoder>,
     pub embedding: Option<TextEmbedding>,
     pub clip: Option<MotionClip>,
     pub image: Option<ImageCondition>,
@@ -70,6 +69,7 @@ impl Default for MotionRuntime {
 }
 
 pub(super) fn initialize_device(app: &mut App) {
+    burn_human_inference::initialize_browser_runtime();
     let setup = (|| -> Option<WgpuSetup> {
         let render = app.get_sub_app(RenderApp)?;
         let world = render.world();
@@ -78,10 +78,10 @@ pub(super) fn initialize_device(app: &mut App) {
         let device = world.get_resource::<RenderDevice>()?;
         let queue = world.get_resource::<RenderQueue>()?;
         Some(WgpuSetup {
-            instance: (****instance).clone(),
-            adapter: (****adapter).clone(),
+            instance: (**instance).clone(),
+            adapter: (**adapter).clone(),
             device: device.wgpu_device().clone(),
-            queue: (****queue).clone(),
+            queue: (**queue).clone(),
             backend: adapter.get_info().backend,
         })
     })();
@@ -96,7 +96,12 @@ pub(super) fn initialize_device(app: &mut App) {
         if state.adapter.is_empty() {
             state.adapter = format!("{:?}", setup.backend);
         }
-        state.device = Some(init_device(setup, Default::default()));
+        match Device::wgpu_options().setup(setup).init() {
+            Ok(device) => state.device = Some(device),
+            Err(error) => {
+                state.status = MotionStatus::Failed(format!("Shared GPU initialization: {error}"))
+            }
+        }
     } else {
         state.status = MotionStatus::Failed(
             "Bevy GPU device unavailable; motion inference requires WebGPU/WGPU".into(),

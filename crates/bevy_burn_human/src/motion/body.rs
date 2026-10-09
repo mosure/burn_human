@@ -6,7 +6,6 @@ use burn_gemx::{
     camera::{Camera, Crop},
     pipeline::{Pipeline, PipelineArtifacts},
 };
-use burn_human_inference::gpu::WgpuBackend as Wgpu;
 use burn_soma::{
     BindConvention, IdentityParameters, PreparedIdentity, Soma, SomaPose, mhr::MhrIdentity,
 };
@@ -34,9 +33,9 @@ pub(super) struct BodyState {
     pub processor: Option<Arc<SurfaceProcessor>>,
     pub soma_topology: Option<Arc<Topology>>,
     pub gem_topology: Option<Arc<Topology>>,
-    pub soma: Option<Soma<Wgpu>>,
-    pub gem: Option<Pipeline<Wgpu>>,
-    pub prepared: Option<(String, PreparedIdentity<Wgpu>)>,
+    pub soma: Option<Soma>,
+    pub gem: Option<Pipeline>,
+    pub prepared: Option<(String, PreparedIdentity)>,
     pub surface: Option<Surface>,
     pub estimate: Option<BodyEstimate>,
     pub estimate_input: Option<(u64, Crop, Camera)>,
@@ -292,8 +291,8 @@ pub(super) fn apply(runtime: &MotionRuntime, identity: BodyIdentity, pose: SomaP
     });
 }
 async fn evaluate(
-    soma: &Soma<Wgpu>,
-    id: &PreparedIdentity<Wgpu>,
+    soma: &Soma,
+    id: &PreparedIdentity,
     pose: &SomaPose,
     camera_space: bool,
     processor: &SurfaceProcessor,

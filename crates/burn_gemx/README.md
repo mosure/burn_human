@@ -1,17 +1,17 @@
 # burn_gemx
 
-GEM-X inference in Rust/Burn 0.21, with native WGPU and browser WebGPU support.
+GEM-X inference in Rust/Burn 0.22, with native WGPU and browser WebGPU support.
 
 Fast single-person, single-frame image pose inference. The crate owns DINOv3/ViTPose, SAM body features and GEM regression, and composes `burn_mhr` and `burn_soma` for reconstruction. It loads all seven required artifact bundles.
 
 ```toml
-burn_gemx = { version = "0.1.3", features = ["wgpu"] }
+burn_gemx = { version = "0.2.0", features = ["wgpu"] }
 ```
 
 The model owns its immutable CDN catalog and loading policy:
 
 ```rust,ignore
-let model = burn_gemx::pipeline::Pipeline::<burn::backend::Wgpu>::load_pretrained(
+let model = burn_gemx::pipeline::Pipeline::load_pretrained(
     &device,
     |stage, done, total| { /* progress */ },
 ).await?;

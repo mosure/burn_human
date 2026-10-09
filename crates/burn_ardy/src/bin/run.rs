@@ -1,7 +1,5 @@
 use anyhow::{Result, ensure};
-use burn::backend::wgpu::WgpuDevice;
 use burn_ardy::Ardy;
-use burn_human_inference::gpu::WgpuBackend as Wgpu;
 use burn_human_motion::{
     MotionRequest, TextEmbedding,
     artifacts::{DirectoryReader, Manifest},
@@ -21,8 +19,8 @@ async fn run() -> Result<()> {
     let manifest = Manifest::from_bytes(&std::fs::read(base.join("manifest.json"))?, None)?;
     let request: MotionRequest = serde_json::from_slice(&std::fs::read(&args[1])?)?;
     let embedding: TextEmbedding = serde_json::from_slice(&std::fs::read(&args[2])?)?;
-    let device = WgpuDevice::default();
-    let model = Ardy::<Wgpu>::load(&manifest, &mut DirectoryReader(base), &device, |i, n| {
+    let device = burn::tensor::Device::wgpu(burn::tensor::DeviceKind::DefaultDevice);
+    let model = Ardy::load(&manifest, &mut DirectoryReader(base), &device, |i, n| {
         eprintln!("loading {i}/{n}")
     })
     .await?;

@@ -1,8 +1,5 @@
 use anyhow::{Result, ensure};
-use burn::{
-    backend::Wgpu,
-    tensor::{Tensor, TensorData},
-};
+use burn::tensor::{Tensor, TensorData};
 use burn_gemx::{
     camera::{Camera, Crop},
     sam::SamBody,
@@ -45,10 +42,10 @@ fn main() -> Result<()> {
         "gem-sam-validate SAM_BUNDLE MHR_BUNDLE REFERENCE_JSON OUTPUT_JSON"
     );
     pollster::block_on(async {
-        let device = Default::default();
+        let device = burn::tensor::Device::wgpu(burn::tensor::DeviceKind::DefaultDevice);
         let mut source = ModelSource::new(args[0].clone());
         let manifest = source.manifest(None).await?;
-        let model = SamBody::<Wgpu>::load(&manifest, &mut source, &device, |_, _| {}).await?;
+        let model = SamBody::load(&manifest, &mut source, &device, |_, _| {}).await?;
         let mut source = ModelSource::new(args[1].clone());
         let mhr_manifest = source.manifest(None).await?;
         let mhr = Mhr::load(&mhr_manifest, &mut source, &device, |_, _| {}).await?;
@@ -63,7 +60,7 @@ fn main() -> Result<()> {
             .reshape([1, 1280, 32, 32])
             .into_data_async()
             .await?
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .unwrap();
         let ray_max = error(conditioned, reference.ray_embedding);
         println!("ray_max: {ray_max}");
@@ -75,7 +72,7 @@ fn main() -> Result<()> {
             .token
             .into_data_async()
             .await?
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .unwrap();
         let cold = start.elapsed().as_secs_f64();
         let max = error(token.clone(), reference.token.clone());
@@ -106,7 +103,7 @@ fn main() -> Result<()> {
             .await?
             .into_data_async()
             .await?
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .unwrap();
         let fast_token_max = error(fast_token, token);
         ensure!(

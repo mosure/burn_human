@@ -2,10 +2,7 @@
 //! and the facial Laplacian solve. MHR coefficients are never treated as SOMA PCA.
 use crate::{BindConvention, IdentityParameters, PreparedIdentity, Soma};
 use anyhow::{Result, ensure};
-use burn::{
-    prelude::Backend,
-    tensor::{IndexingUpdateOp, Int, Tensor},
-};
+use burn::tensor::{IndexingUpdateOp, Int, Tensor};
 use burn_human_inference::{
     transport::ModelSource,
     weights::{TensorBank, read_tensors},
@@ -33,15 +30,15 @@ impl Default for MhrIdentity {
         }
     }
 }
-pub struct MhrSomaTransfer<B: Backend> {
-    weights: TensorBank<B>,
-    indices: BTreeMap<String, Tensor<B, 1, Int>>,
+pub struct MhrSomaTransfer {
+    weights: TensorBank,
+    indices: BTreeMap<String, Tensor<1, Int>>,
 }
-impl<B: Backend> MhrSomaTransfer<B> {
+impl MhrSomaTransfer {
     pub async fn load(
         manifest: &Manifest,
         source: &mut ModelSource,
-        device: &B::Device,
+        device: &burn::tensor::Device,
     ) -> Result<Self> {
         manifest.validate()?;
         ensure!(
@@ -85,10 +82,10 @@ impl<B: Backend> MhrSomaTransfer<B> {
         let mut uploads = burn_human_inference::weights::UploadBudget::default();
         for object in &manifest.objects {
             for (name, data) in read_tensors(source, object).await? {
-                let bytes = data.bytes.len();
-                if data.dtype == burn::tensor::DType::I32 {
+                let bytes = data.bytes().len();
+                if data.dtype() == burn::tensor::DType::I32 {
                     let values = data
-                        .to_vec::<i32>()
+                        .try_to_vec::<i32>()
                         .map_err(|e| anyhow::anyhow!("indices: {e}"))?;
                     let limit = if name.starts_with("transfer.source.") {
                         18439
@@ -109,7 +106,7 @@ impl<B: Backend> MhrSomaTransfer<B> {
                 } else {
                     weights.insert(name, data)?;
                 }
-                uploads.record::<B>(device, bytes).await?;
+                uploads.record(device, bytes).await?;
                 burn_human_inference::cooperative::yield_to_browser().await;
             }
         }
@@ -117,7 +114,7 @@ impl<B: Backend> MhrSomaTransfer<B> {
     }
 
     /// MHR centimetres to SOMA metres; no fit-dependent coefficient is cached.
-    pub fn transfer(&self, source: Tensor<B, 3>) -> Result<Tensor<B, 3>> {
+    pub fn transfer(&self, source: Tensor<3>) -> Result<Tensor<3>> {
         let [batch, vertices, dim] = source.dims();
         ensure!(vertices == 18439 && dim == 3, "MHR source mesh shape");
         let p0 = source
@@ -129,8 +126,8 @@ impl<B: Backend> MhrSomaTransfer<B> {
         let p2 = source.select(1, self.indices["transfer.source.2"].clone());
         let a = p1.clone() - p0.clone();
         let b = p2.clone() - p0.clone();
-        let yzx = Tensor::<B, 1, Int>::from_data([1i32, 2, 0], &self.weights.device);
-        let zxy = Tensor::<B, 1, Int>::from_data([2i32, 0, 1], &self.weights.device);
+        let yzx = Tensor::<1, Int>::from_data([1i32, 2, 0], &self.weights.device);
+        let zxy = Tensor::<1, Int>::from_data([2i32, 0, 1], &self.weights.device);
         let normal = a.clone().select(2, yzx.clone()) * b.clone().select(2, zxy.clone())
             - a.select(2, zxy) * b.select(2, yzx);
         let p3 = p0.clone() + normal;
@@ -166,21 +163,21 @@ impl<B: Backend> MhrSomaTransfer<B> {
 
     pub async fn prepare_identity(
         &self,
-        model: &Mhr<B>,
-        soma: &Soma<B>,
+        model: &Mhr,
+        soma: &Soma,
         identity: &MhrIdentity,
-    ) -> Result<PreparedIdentity<B>> {
+    ) -> Result<PreparedIdentity> {
         self.prepare_identity_with_bind(model, soma, identity, BindConvention::Canonical)
             .await
     }
 
     pub async fn prepare_identity_with_bind(
         &self,
-        model: &Mhr<B>,
-        soma: &Soma<B>,
+        model: &Mhr,
+        soma: &Soma,
         identity: &MhrIdentity,
         convention: BindConvention,
-    ) -> Result<PreparedIdentity<B>> {
+    ) -> Result<PreparedIdentity> {
         ensure!(
             identity.coefficients.len() == 45 && identity.scales.len() == 68,
             "MHR identity dimensions"

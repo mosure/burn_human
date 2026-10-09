@@ -1,7 +1,6 @@
 //! Full checkpoint validation shared by the native and browser harnesses.
 use crate::{AttentionMode, TextEncoder};
 use anyhow::{Result, ensure};
-use burn::prelude::Backend;
 use serde::Deserialize;
 use std::collections::BTreeMap;
 
@@ -24,10 +23,7 @@ struct Tokens {
     embed_mask: Vec<u8>,
 }
 
-pub async fn validate<B: Backend>(
-    model: &mut TextEncoder<B>,
-    reference: Reference,
-) -> Result<serde_json::Value> {
+pub async fn validate(model: &mut TextEncoder, reference: Reference) -> Result<serde_json::Value> {
     ensure!(
         reference.model == crate::MODEL_ID && reference.revision == crate::MODEL_REVISION,
         "Reference checkpoint mismatch"

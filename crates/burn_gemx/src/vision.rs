@@ -2,12 +2,9 @@
 //! RoPE tables preserve the source export's numerical convention.
 use crate::ops::{attention, norm};
 use anyhow::{Result, ensure};
-use burn::{
-    prelude::Backend,
-    tensor::{
-        Tensor, activation, module,
-        ops::{ConvOptions, ConvTransposeOptions},
-    },
+use burn::tensor::{
+    Tensor, activation, module,
+    ops::{ConvOptions, ConvTransposeOptions},
 };
 use burn_human_inference::{transport::ModelSource, weights::TensorBank};
 use burn_human_motion::artifacts::Manifest;
@@ -25,17 +22,17 @@ pub struct VisionConfig {
     pub heads: usize,
     pub patch: usize,
 }
-pub struct Vision<B: Backend> {
-    weights: TensorBank<B>,
+pub struct Vision {
+    weights: TensorBank,
     pub config: VisionConfig,
-    rope_cos: Tensor<B, 4>,
-    rope_sin: Tensor<B, 4>,
+    rope_cos: Tensor<4>,
+    rope_sin: Tensor<4>,
 }
-impl<B: Backend> Vision<B> {
+impl Vision {
     pub async fn load(
         manifest: &Manifest,
         source: &mut ModelSource,
-        device: &B::Device,
+        device: &burn::tensor::Device,
         mut progress: impl FnMut(usize, usize),
     ) -> Result<Self> {
         manifest.validate()?;
@@ -135,7 +132,7 @@ impl<B: Backend> Vision<B> {
     }
 
     /// ImageNet-normalized RGB, with a bounded batch of up to eight images.
-    pub fn forward(&self, input: Tensor<B, 4>) -> Result<Tensor<B, 4>> {
+    pub fn forward(&self, input: Tensor<4>) -> Result<Tensor<4>> {
         let mut x = self.begin(input)?;
         for i in 0..32 {
             x = self.block(x, i);
@@ -145,7 +142,7 @@ impl<B: Backend> Vision<B> {
 
     /// Equivalent inference with cooperative browser scheduling between blocks.
     /// No tensor readback or device-completion wait is inserted.
-    pub async fn forward_async(&self, input: Tensor<B, 4>) -> Result<Tensor<B, 4>> {
+    pub async fn forward_async(&self, input: Tensor<4>) -> Result<Tensor<4>> {
         let mut x = self.begin(input)?;
         for i in 0..32 {
             x = self.block(x, i);
@@ -154,7 +151,7 @@ impl<B: Backend> Vision<B> {
         Ok(self.finish(x))
     }
 
-    fn begin(&self, input: Tensor<B, 4>) -> Result<Tensor<B, 3>> {
+    fn begin(&self, input: Tensor<4>) -> Result<Tensor<3>> {
         let [batch, c, h, w] = input.dims();
         ensure!(
             (1..=8).contains(&batch) && c == 3 && h == self.config.height && w == self.config.width,
@@ -182,11 +179,11 @@ impl<B: Backend> Vision<B> {
         Ok(x)
     }
 
-    fn block(&self, mut x: Tensor<B, 3>, i: usize) -> Tensor<B, 3> {
+    fn block(&self, mut x: Tensor<3>, i: usize) -> Tensor<3> {
         let [batch, n, _] = x.dims();
         let count = n - 5;
         let bank = &self.weights;
-        let rope = |t: Tensor<B, 4>| {
+        let rope = |t: Tensor<4>| {
             let prefix = t.clone().slice([0..batch, 0..20, 0..5, 0..64]);
             let body = t.slice([0..batch, 0..20, 5..n, 0..64]);
             let half = Tensor::cat(
@@ -230,7 +227,7 @@ impl<B: Backend> Vision<B> {
         x
     }
 
-    fn finish(&self, x: Tensor<B, 3>) -> Tensor<B, 4> {
+    fn finish(&self, x: Tensor<3>) -> Tensor<4> {
         let [batch, n, _] = x.dims();
         let (h, w) = (self.config.height / 16, self.config.width / 16);
         let bank = &self.weights;

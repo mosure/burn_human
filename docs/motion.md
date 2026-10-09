@@ -6,6 +6,14 @@ WebGPU use the same model APIs. Python, PyTorch and ONNX Runtime are used only
 for offline conversion and independent numerical reference tests. No text or
 pose inference server is required.
 
+For a custom browser entry point, call
+`burn_human_inference::initialize_browser_runtime()` before creating a Burn
+device. Bevy applications can use
+`bevy_burn_human::initialize_browser_runtime()` before `App::new()`, as in the
+README example. This guarded call initializes Burn 0.22's compiler registrations
+once rather than repeating them at every JavaScript crossing. The supplied
+studio and `web-validation` entry points initialize themselves.
+
 | Crate | Responsibility |
 |---|---|
 | `burn_human_motion` | Motion/rig/condition contracts, SOMA animation interchange, sealed artifact manifests |
@@ -56,7 +64,7 @@ See [CDN release and model-owned loading APIs](cdn.md) for the published crate n
 immutable upload tree, default URLs and cold/warm/corruption qualification commands.
 
 The model-neutral loader follows the bounded part-only strategy reviewed in
-`burn_image`. It uses the published Burn 0.21 / Bevy 0.19 dependency graph, with
+`burn_image`. It uses the published Burn 0.22 / Bevy 0.20 dependency graph, with
 one compatible wgpu version and no dependency patches.
 
 ```text

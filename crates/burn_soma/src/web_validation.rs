@@ -1,5 +1,10 @@
-use burn::backend::wgpu::{WgpuDevice, graphics::WebGpu, init_setup_async};
-use burn_human_inference::gpu::WgpuBackend as Wgpu;
+// The validation module is an explicit browser entry point. Keep startup here
+// rather than in the shared library, so downstream Rust mains still start.
+#[wasm_bindgen::prelude::wasm_bindgen(start)]
+pub fn initialize_soma_validation_runtime() {
+    burn_human_inference::initialize_browser_runtime();
+}
+
 use burn_human_inference::transport::read_bounded;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
@@ -10,12 +15,14 @@ pub async fn validate_soma_webgpu(
 ) -> Result<String, JsValue> {
     console_error_panic_hook::set_once();
     async fn run(base: String, reference: String, digest: String) -> anyhow::Result<String> {
-        let device = WgpuDevice::default();
-        let setup = init_setup_async::<WebGpu>(&device, Default::default()).await;
+        let (device, setup) = burn::tensor::Device::wgpu_options()
+            .graphics_api(burn::tensor::wgpu::WgpuBackend::WebGpu)
+            .init_with_setup_async()
+            .await?;
         let mut artifact = crate::pretrained::DEFAULT.at_base(base);
         artifact.sha256 = digest.clone();
         let start = web_time::Instant::now();
-        let soma = crate::Soma::<Wgpu>::load_artifact(&artifact, &device, |_, _| {}).await?;
+        let soma = crate::Soma::load_artifact(&artifact, &device, |_, _| {}).await?;
         let load = start.elapsed().as_secs_f64();
         let bytes = read_bounded(&reference, 32 * 1024 * 1024).await?;
         let mut report = crate::validation::validate(&soma, &bytes).await?;
@@ -43,12 +50,14 @@ pub async fn profile_soma_webgpu(base: String, digest: String) -> Result<String,
             phases.push(serde_json::json!({"name":name,"start_ms":phase_start,"end_ms":end}));
             phase_start = end;
         };
-        let device = WgpuDevice::default();
-        init_setup_async::<WebGpu>(&device, Default::default()).await;
+        let device = burn::tensor::Device::wgpu_options()
+            .graphics_api(burn::tensor::wgpu::WgpuBackend::WebGpu)
+            .init_async()
+            .await?;
         mark("device");
         let mut artifact = crate::pretrained::DEFAULT.at_base(base);
         artifact.sha256 = digest;
-        let model = crate::Soma::<Wgpu>::load_artifact(&artifact, &device, |_, _| {}).await?;
+        let model = crate::Soma::load_artifact(&artifact, &device, |_, _| {}).await?;
         mark("load");
         let identity = model.prepare_identity(Default::default()).await?;
         mark("identity");
@@ -60,7 +69,7 @@ pub async fn profile_soma_webgpu(base: String, digest: String) -> Result<String,
             let values = output.vertices.into_data_async().await?;
             timings.push(start.elapsed().as_secs_f64());
             anyhow::ensure!(
-                values.shape.as_slice() == [1, 18056, 3],
+                values.shape().as_slice() == [1, 18056, 3],
                 "Incomplete SOMA output"
             );
             burn_human_inference::weights::ensure_finite(&values)?;

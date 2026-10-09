@@ -1,14 +1,12 @@
 //! Convert pinned safetensors into immutable bounded, part-only Burnpack artifacts.
 use anyhow::{Result, ensure};
-use burn::{
-    module::ParamId,
-    tensor::{DType, TensorData},
-};
+use burn::tensor::{DType, TensorData};
 use burn_ardy::config::{ArdyConfig, MODEL_ID, MODEL_REVISION, SOURCE_REVISION, expected_tensors};
 use burn_human_motion::artifacts::{
     MAX_OBJECT_BYTES, Manifest, Object, PART_TARGET_BYTES, Part, TensorSpec, sha256,
 };
-use burn_store::{BurnpackWriter, TensorSnapshot};
+use burn_pack::Writer as BurnpackWriter;
+use burn_store::bridge::from_data as pack_tensor;
 use std::{collections::BTreeMap, path::PathBuf};
 
 struct SourceTensor {
@@ -121,15 +119,10 @@ fn main() -> Result<()> {
             let data = TensorData::from_bytes_vec(bytes, shape, DType::F32);
             // Deterministic IDs make the logical objects reproducible across conversions.
             let id = u64::from_str_radix(&sha256(name.as_bytes())[..16], 16)?;
-            snapshots.push(TensorSnapshot::from_data(
-                data,
-                name.split('.').map(str::to_string).collect(),
-                vec![],
-                ParamId::from(id),
-            ));
+            snapshots.push(pack_tensor(data, name, Some(id)));
         }
         let bytes = BurnpackWriter::new(snapshots)
-            .to_bytes()
+            .into_bytes()
             .map_err(|e| anyhow::anyhow!("{e}"))?;
         ensure!(
             bytes.len() <= MAX_OBJECT_BYTES,

@@ -1,0 +1,215 @@
+{
+  "backend": "native-wgpu-f32",
+  "load_seconds": 1.105782353,
+  "manifest": "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7",
+  "performance": [
+    {
+      "batch": 1,
+      "median_frames_per_second": 602.9301197961855,
+      "warm_seconds": [
+        0.001473965,
+        0.001635744,
+        0.001658567,
+        0.001685021,
+        0.001777097
+      ]
+    },
+    {
+      "batch": 8,
+      "median_frames_per_second": 4506.912759126358,
+      "warm_seconds": [
+        0.001707885,
+        0.001715923,
+        0.001775051,
+        0.001885549,
+        0.002091831
+      ]
+    },
+    {
+      "batch": 32,
+      "median_frames_per_second": 11057.696294842415,
+      "warm_seconds": [
+        0.002838243,
+        0.002887621,
+        0.002893912,
+        0.002905543,
+        0.003073169
+      ]
+    }
+  ],
+  "records": [
+    {
+      "bind_max": 4.76837158203125e-7,
+      "identity_seconds": 9.728514855,
+      "name": "neutral",
+      "performance": [
+        {
+          "batch": 1,
+          "median_frames_per_second": 384.6787086489622,
+          "warm_seconds": [
+            0.002127643,
+            0.00247829,
+            0.002599572,
+            0.002890531,
+            0.003013541
+          ]
+        },
+        {
+          "batch": 8,
+          "median_frames_per_second": 4346.940161651837,
+          "warm_seconds": [
+            0.001575567,
+            0.001622836,
+            0.001840375,
+            0.001972299,
+            0.002249587
+          ]
+        },
+        {
+          "batch": 32,
+          "median_frames_per_second": 9406.198449623342,
+          "warm_seconds": [
+            0.002870585,
+            0.00332595,
+            0.003402012,
+            0.003404299,
+            0.004022956
+          ]
+        }
+      ],
+      "rest_max_m": 8.344650268554688e-7,
+      "transform_max": 4.76837158203125e-7,
+      "vertex_max_m": 9.5367431640625e-7
+    },
+    {
+      "bind_max": 4.76837158203125e-7,
+      "identity_seconds": 0.004529485,
+      "name": "shape_pose",
+      "performance": [
+        {
+          "batch": 1,
+          "median_frames_per_second": 602.9301197961855,
+          "warm_seconds": [
+            0.001473965,
+            0.001635744,
+            0.001658567,
+            0.001685021,
+            0.001777097
+          ]
+        },
+        {
+          "batch": 8,
+          "median_frames_per_second": 4506.912759126358,
+          "warm_seconds": [
+            0.001707885,
+            0.001715923,
+            0.001775051,
+            0.001885549,
+            0.002091831
+          ]
+        },
+        {
+          "batch": 32,
+          "median_frames_per_second": 11057.696294842415,
+          "warm_seconds": [
+            0.002838243,
+            0.002887621,
+            0.002893912,
+            0.002905543,
+            0.003073169
+          ]
+        }
+      ],
+      "rest_max_m": 7.152557373046875e-7,
+      "transform_max": 9.5367431640625e-7,
+      "vertex_max_m": 1.430511474609375e-6
+    },
+    {
+      "bind_max": 4.76837158203125e-7,
+      "identity_seconds": 0.004502684,
+      "name": "scales_correctives",
+      "performance": [
+        {
+          "batch": 1,
+          "median_frames_per_second": 597.4393748394382,
+          "warm_seconds": [
+            0.001511499,
+            0.001648405,
+            0.00167381,
+            0.001748976,
+            0.003892824
+          ]
+        },
+        {
+          "batch": 8,
+          "median_frames_per_second": 4107.143040497457,
+          "warm_seconds": [
+            0.0017599,
+            0.001935087,
+            0.001947826,
+            0.001986433,
+            0.002033306
+          ]
+        },
+        {
+          "batch": 32,
+          "median_frames_per_second": 20710.12427368947,
+          "warm_seconds": [
+            0.001236376,
+            0.001377121,
+            0.001545138,
+            0.001553266,
+            0.002962845
+          ]
+        }
+      ],
+      "rest_max_m": 9.5367431640625e-7,
+      "transform_max": 5.960464477539062e-7,
+      "vertex_max_m": 1.0728836059570312e-6
+    },
+    {
+      "bind_max": 5.960464477539062e-7,
+      "identity_seconds": 0.004494163,
+      "name": "no_correctives",
+      "performance": [
+        {
+          "batch": 1,
+          "median_frames_per_second": 20766.275568476794,
+          "warm_seconds": [
+            0.000046308,
+            0.00004694,
+            0.000048155,
+            0.000050574,
+            0.000221011
+          ]
+        },
+        {
+          "batch": 8,
+          "median_frames_per_second": 66789.11337451996,
+          "warm_seconds": [
+            0.000092214,
+            0.000097574,
+            0.00011978,
+            0.000145151,
+            0.000344133
+          ]
+        },
+        {
+          "batch": 32,
+          "median_frames_per_second": 102252.10255885885,
+          "warm_seconds": [
+            0.000251937,
+            0.000292843,
+            0.000312952,
+            0.000317003,
+            0.001026187
+          ]
+        }
+      ],
+      "rest_max_m": 7.152557373046875e-7,
+      "transform_max": 8.344650268554688e-7,
+      "vertex_max_m": 1.0728836059570312e-6
+    }
+  ],
+  "reference": "Official SOMA-X Torch, identity fit + canonical rebind + aligned twist + sparse correctives + LBS"
+}

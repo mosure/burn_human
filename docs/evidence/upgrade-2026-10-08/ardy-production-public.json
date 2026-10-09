@@ -1,0 +1,220 @@
+{
+  "report": {
+    "actors": 1,
+    "adapter": "",
+    "backend": "browser-webgpu-f32",
+    "frames_per_actor": 40,
+    "input_sha256": "b19fcce76b8085fe9b56b18f4c102ab582640bcebe00f8fb8739887d278f5ed3",
+    "model_manifest_sha256": "6e03294854771ca3ed6641251c77ab75bd2542d778c02886ea795d8d77655cd8",
+    "passed": true,
+    "phases": [
+      {
+        "end_ms": 712.7,
+        "name": "device",
+        "start_ms": 0
+      },
+      {
+        "end_ms": 748.1,
+        "name": "input",
+        "start_ms": 712.7
+      },
+      {
+        "end_ms": 29883,
+        "name": "load",
+        "start_ms": 748.1
+      },
+      {
+        "end_ms": 31007.3,
+        "name": "cold_generation",
+        "start_ms": 29883
+      },
+      {
+        "end_ms": 31273.800000000003,
+        "name": "warm_generation",
+        "start_ms": 31007.3
+      },
+      {
+        "end_ms": 31519.100000000002,
+        "name": "warm_generation",
+        "start_ms": 31273.800000000003
+      },
+      {
+        "end_ms": 31792.100000000002,
+        "name": "warm_generation",
+        "start_ms": 31519.100000000002
+      }
+    ],
+    "request_seconds": [
+      1.1243,
+      0.2664,
+      0.2452,
+      0.273
+    ],
+    "scope": "production load and decoded clips; text encoding and WASM module startup excluded"
+  },
+  "elapsed_ms": 31830.799999952316,
+  "adapter": {
+    "vendor": "nvidia",
+    "architecture": "blackwell",
+    "fallback": false
+  },
+  "event_loop": {
+    "scope": "production load and decoded clips; text encoding and WASM module startup excluded",
+    "frames": 1338,
+    "p50_ms": 16.699999999999818,
+    "p95_ms": 83.40000000000146,
+    "p99_ms": 133.39999999999964,
+    "max_ms": 183.29999999999927,
+    "long_tasks_ms": [
+      98,
+      61,
+      67,
+      53,
+      106,
+      75,
+      79,
+      88,
+      52,
+      65,
+      93,
+      60,
+      52,
+      95,
+      66,
+      54,
+      90,
+      51,
+      93,
+      69,
+      58,
+      94,
+      59,
+      58,
+      104,
+      50,
+      87,
+      62,
+      58,
+      67,
+      61,
+      58,
+      54,
+      87,
+      54,
+      60,
+      56,
+      55,
+      75,
+      70,
+      84,
+      55,
+      58,
+      52,
+      91,
+      74,
+      52,
+      149,
+      58,
+      71,
+      98,
+      50,
+      65,
+      59,
+      132,
+      89,
+      69,
+      62,
+      71,
+      110,
+      102,
+      64,
+      69,
+      51,
+      52,
+      90,
+      67,
+      53,
+      87,
+      106,
+      76,
+      163,
+      85,
+      87
+    ]
+  },
+  "event_loop_by_phase": [
+    {
+      "end_ms": 712.7,
+      "name": "device",
+      "start_ms": 0,
+      "max_gap_ms": 16.800000000000182,
+      "p95_gap_ms": 16.799999999999727,
+      "long_task_count": 1,
+      "max_task_ms": 98
+    },
+    {
+      "end_ms": 748.1,
+      "name": "input",
+      "start_ms": 712.7,
+      "max_gap_ms": 16.700000000000273,
+      "p95_gap_ms": 16.700000000000273,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 29883,
+      "name": "load",
+      "start_ms": 748.1,
+      "max_gap_ms": 166.79999999999927,
+      "p95_gap_ms": 83.30000000000291,
+      "long_task_count": 69,
+      "max_task_ms": 149
+    },
+    {
+      "end_ms": 31007.3,
+      "name": "cold_generation",
+      "start_ms": 29883,
+      "max_gap_ms": 183.29999999999927,
+      "p95_gap_ms": 183.29999999999927,
+      "long_task_count": 4,
+      "max_task_ms": 163
+    },
+    {
+      "end_ms": 31273.800000000003,
+      "name": "warm_generation",
+      "start_ms": 31007.3,
+      "max_gap_ms": 100,
+      "p95_gap_ms": 100,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 31519.100000000002,
+      "name": "warm_generation",
+      "start_ms": 31273.800000000003,
+      "max_gap_ms": 83.40000000000146,
+      "p95_gap_ms": 83.40000000000146,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    },
+    {
+      "end_ms": 31792.100000000002,
+      "name": "warm_generation",
+      "start_ms": 31519.100000000002,
+      "max_gap_ms": 99.90000000000146,
+      "p95_gap_ms": 99.90000000000146,
+      "long_task_count": 0,
+      "max_task_ms": 0
+    }
+  ],
+  "diagnostics": null,
+  "wasm_linear_memory_peak_bytes": 127598592,
+  "browser": "153.0.8010.12",
+  "module": "http://127.0.0.1:8868/.cache/upgrade-2026-10-08/web/burn_ardy/burn_ardy.js",
+  "function": "profile_generation_webgpu",
+  "args": [
+    "https://aberration.technology/model/ardy/core-rp-20fps-h40/v1",
+    "http://127.0.0.1:8868/.cache/gaps-2026-09-27/single-profile-input.json",
+    "6e03294854771ca3ed6641251c77ab75bd2542d778c02886ea795d8d77655cd8"
+  ]
+}

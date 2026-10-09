@@ -3,7 +3,7 @@
 
 use crate::Ardy;
 use anyhow::{Result, ensure};
-use burn::{prelude::Backend, tensor::Tensor};
+use burn::tensor::Tensor;
 use burn_human_motion::{MotionClip, MotionRequest, TextEmbedding};
 
 pub fn schedule(steps: usize) -> Result<Vec<(usize, f32, f32)>> {
@@ -31,23 +31,23 @@ pub fn schedule(steps: usize) -> Result<Vec<(usize, f32, f32)>> {
         .collect())
 }
 
-struct SampleState<B: Backend> {
-    x: Tensor<B, 3>,
-    text: Tensor<B, 3>,
-    heading: Tensor<B, 2>,
-    observed: Tensor<B, 3>,
-    mask: Tensor<B, 3>,
+struct SampleState {
+    x: Tensor<3>,
+    text: Tensor<3>,
+    heading: Tensor<2>,
+    observed: Tensor<3>,
+    mask: Tensor<3>,
     history_frames: usize,
     guidance: [f32; 2],
 }
-impl<B: Backend> SampleState<B> {
+impl SampleState {
     #[allow(clippy::too_many_arguments)]
     fn new(
-        x: Tensor<B, 3>,
-        text: Tensor<B, 3>,
-        heading: Tensor<B, 2>,
-        observed: Tensor<B, 3>,
-        mask: Tensor<B, 3>,
+        x: Tensor<3>,
+        text: Tensor<3>,
+        heading: Tensor<2>,
+        observed: Tensor<3>,
+        mask: Tensor<3>,
         history_frames: usize,
         guidance: [f32; 2],
     ) -> Result<Self> {
@@ -99,7 +99,7 @@ impl<B: Backend> SampleState<B> {
     }
     async fn advance<const COOPERATIVE: bool>(
         mut self,
-        model: &Ardy<B>,
+        model: &Ardy,
         (mapped, alpha, previous): (usize, f32, f32),
     ) -> Result<Self> {
         let [batch, _, dim] = self.x.dims();
@@ -132,29 +132,29 @@ impl<B: Backend> SampleState<B> {
             .slice_assign([0..batch, start..start + 10, 0..dim], next);
         Ok(self)
     }
-    fn finish(self) -> Tensor<B, 3> {
+    fn finish(self) -> Tensor<3> {
         let [batch, _, dim] = self.x.dims();
         self.x
             .slice([0..batch, 0..self.history_frames / 4 + 10, 0..dim])
     }
 }
 
-impl<B: Backend> Ardy<B> {
+impl Ardy {
     /// Inputs already use the centered window coordinate frame. Only the next
     /// forty frames are denoised; history is retained byte-for-byte on device.
     #[allow(clippy::too_many_arguments)]
     pub fn sample_window(
         &self,
-        x: Tensor<B, 3>,
-        text: Tensor<B, 3>,
-        heading: Tensor<B, 2>,
-        observed: Tensor<B, 3>,
-        mask: Tensor<B, 3>,
+        x: Tensor<3>,
+        text: Tensor<3>,
+        heading: Tensor<2>,
+        observed: Tensor<3>,
+        mask: Tensor<3>,
         history_frames: usize,
         steps: usize,
         guidance: [f32; 2],
         mut progress: impl FnMut(usize),
-    ) -> Result<Tensor<B, 3>> {
+    ) -> Result<Tensor<3>> {
         let mut state =
             SampleState::new(x, text, heading, observed, mask, history_frames, guidance)?;
         for (i, step) in schedule(steps)?.into_iter().rev().enumerate() {
@@ -169,16 +169,16 @@ impl<B: Backend> Ardy<B> {
     #[allow(clippy::too_many_arguments)]
     pub async fn sample_window_async(
         &self,
-        x: Tensor<B, 3>,
-        text: Tensor<B, 3>,
-        heading: Tensor<B, 2>,
-        observed: Tensor<B, 3>,
-        mask: Tensor<B, 3>,
+        x: Tensor<3>,
+        text: Tensor<3>,
+        heading: Tensor<2>,
+        observed: Tensor<3>,
+        mask: Tensor<3>,
         history_frames: usize,
         steps: usize,
         guidance: [f32; 2],
         mut progress: impl FnMut(usize),
-    ) -> Result<Tensor<B, 3>> {
+    ) -> Result<Tensor<3>> {
         let mut state =
             SampleState::new(x, text, heading, observed, mask, history_frames, guidance)?;
         for (i, step) in schedule(steps)?.into_iter().rev().enumerate() {

@@ -1,7 +1,6 @@
 //! GEM-X owns its perception catalog and composes the MHR/SOMA releases.
 use crate::pipeline::{Pipeline, PipelineArtifacts};
 use anyhow::Result;
-use burn::prelude::Backend;
 use burn_human_inference::pretrained::PretrainedArtifact;
 
 pub const CDN_ROOT: &str = "https://aberration.technology/model";
@@ -43,17 +42,17 @@ impl PipelineArtifacts {
     }
 }
 
-impl<B: Backend> Pipeline<B> {
+impl Pipeline {
     /// Load the compiled-in release, including every dependency, with verified caching.
     pub async fn load_pretrained(
-        device: &B::Device,
+        device: &burn::tensor::Device,
         progress: impl FnMut(&str, usize, usize),
     ) -> Result<Self> {
         Self::load_pretrained_from(CDN_ROOT, device, progress).await
     }
     pub async fn load_pretrained_from(
         root: &str,
-        device: &B::Device,
+        device: &burn::tensor::Device,
         progress: impl FnMut(&str, usize, usize),
     ) -> Result<Self> {
         Self::load(&PipelineArtifacts::pretrained_from(root), device, progress).await

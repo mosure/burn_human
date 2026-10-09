@@ -3,7 +3,6 @@ use crate::{
     pipeline::Pipeline,
 };
 use anyhow::{Result, ensure};
-use burn::prelude::Backend;
 use burn_soma::BindConvention;
 use serde::Deserialize;
 #[derive(Deserialize)]
@@ -41,8 +40,8 @@ fn errors(a: &[[f32; 3]], b: &[[f32; 3]]) -> Result<serde_json::Value> {
         serde_json::json!({"max":max,"rmse":(sum/(a.len()*3)as f64).sqrt(),"index":index,"coordinate":coordinate,"actual":a[index],"expected":b[index]}),
     )
 }
-pub async fn validate<B: Backend>(
-    model: &Pipeline<B>,
+pub async fn validate(
+    model: &Pipeline,
     image_bytes: &[u8],
     reference: &[u8],
 ) -> Result<serde_json::Value> {
@@ -59,7 +58,7 @@ pub async fn validate<B: Backend>(
         .vertices
         .into_data_async()
         .await?
-        .to_vec::<f32>()
+        .try_to_vec::<f32>()
         .unwrap()
         .as_chunks::<3>()
         .0

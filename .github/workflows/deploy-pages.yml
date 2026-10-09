@@ -53,11 +53,22 @@ jobs:
       - name: build the WebGPU studio (explicit feature)
         run: cargo build -p bevy_burn_human --target wasm32-unknown-unknown --release --no-default-features --features studio --bin bevy_burn_human --locked
 
+      - name: prevent repeated browser runtime initialization
+        run: python3 tool/scripts/check_wasm_runtime.py target/wasm32-unknown-unknown/release/bevy_burn_human.wasm
+
       # - name: optimize wasm artifacts
       #   run: wasm-opt -O -ol 100 -s 100 -o ./target/wasm32-unknown-unknown/release/bevy_burn_human_opt.wasm ./target/wasm32-unknown-unknown/release/bevy_burn_human.wasm
 
       - name: generate bindings with wasm-bindgen
-        run: wasm-bindgen --out-dir ./crates/bevy_burn_human/www/out/ --target web ./target/wasm32-unknown-unknown/release/bevy_burn_human.wasm
+        run: wasm-bindgen --remove-name-section --remove-producers-section --out-dir ./crates/bevy_burn_human/www/out/ --target web ./target/wasm32-unknown-unknown/release/bevy_burn_human.wasm
+
+      - name: enforce deployable WASM size
+        run: |
+          python3 - <<'PYSIZE'
+          import pathlib
+          wasm = pathlib.Path('crates/bevy_burn_human/www/out/bevy_burn_human_bg.wasm')
+          assert wasm.stat().st_size < 100 * 1024 * 1024, 'WASM exceeds GitHub file size limit'
+          PYSIZE
 
       - name: record the deployed studio build
         run: |

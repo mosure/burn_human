@@ -3,23 +3,20 @@ use crate::{
     config::{ArdyConfig, Stats},
     network::position_encoding,
 };
-use burn::{
-    prelude::Backend,
-    tensor::{Tensor, TensorData},
-};
+use burn::tensor::{Tensor, TensorData};
 
-pub(crate) struct Constants<B: Backend> {
-    pub root_mean: Tensor<B, 3>,
-    pub root_scale: Tensor<B, 3>,
-    pub local_mean: Tensor<B, 3>,
-    pub local_scale: Tensor<B, 3>,
-    pub latent_mean: Tensor<B, 3>,
-    pub latent_scale: Tensor<B, 3>,
-    positions: Tensor<B, 3>,
-    codec_positions: Tensor<B, 3>,
+pub(crate) struct Constants {
+    pub root_mean: Tensor<3>,
+    pub root_scale: Tensor<3>,
+    pub local_mean: Tensor<3>,
+    pub local_scale: Tensor<3>,
+    pub latent_mean: Tensor<3>,
+    pub latent_scale: Tensor<3>,
+    positions: Tensor<3>,
+    codec_positions: Tensor<3>,
 }
-impl<B: Backend> Constants<B> {
-    pub fn new(config: &ArdyConfig, device: &B::Device) -> Self {
+impl Constants {
+    pub fn new(config: &ArdyConfig, device: &burn::tensor::Device) -> Self {
         let stats = |s: &Stats, range: std::ops::Range<usize>, scale: bool| {
             let values: Vec<f32> = range
                 .map(|i| if scale { s.scale(i) } else { s.mean[i] })
@@ -38,7 +35,7 @@ impl<B: Backend> Constants<B> {
             codec_positions: position_encoding(50, 512, 0, device),
         }
     }
-    pub fn position(&self, length: usize, dim: usize, origin: isize) -> Tensor<B, 3> {
+    pub fn position(&self, length: usize, dim: usize, origin: isize) -> Tensor<3> {
         if dim == 512 {
             assert_eq!(origin, 0);
             return self

@@ -1,5 +1,4 @@
 use anyhow::{Result, ensure};
-use burn::backend::Wgpu;
 use burn_human_inference::transport::ModelSource;
 use burn_llama::{AttentionMode, TextEncoder};
 
@@ -13,13 +12,17 @@ fn main() -> Result<()> {
         let source = ModelSource::new(args[0].clone());
         let manifest = source.manifest(None).await?;
         let start = web_time::Instant::now();
-        let mut encoder =
-            TextEncoder::<Wgpu>::load(manifest, source, &Default::default(), |i, n| {
+        let mut encoder = TextEncoder::load(
+            manifest,
+            source,
+            &burn::tensor::Device::wgpu(burn::tensor::DeviceKind::DefaultDevice),
+            |i, n| {
                 if i % 32 == 0 || i == n {
                     eprintln!("text weights {i}/{n}")
                 }
-            })
-            .await?;
+            },
+        )
+        .await?;
         if args.get(3).is_some_and(|m| m == "causal") {
             encoder.mode = AttentionMode::CausalExport;
         }

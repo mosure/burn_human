@@ -1,6 +1,5 @@
 use crate::{IdentityParameters, Soma, SomaPose};
 use anyhow::{Result, ensure};
-use burn::prelude::Backend;
 use serde::Deserialize;
 #[derive(Deserialize)]
 struct Fixture {
@@ -34,7 +33,7 @@ fn error(a: impl IntoIterator<Item = f32>, b: impl IntoIterator<Item = f32>) -> 
         })
         .fold(0.0, f32::max)
 }
-pub async fn validate<B: Backend>(soma: &Soma<B>, reference: &[u8]) -> Result<serde_json::Value> {
+pub async fn validate(soma: &Soma, reference: &[u8]) -> Result<serde_json::Value> {
     let fixture: Fixture = serde_json::from_slice(reference)?;
     ensure!(
         fixture.revision == crate::MODEL_REVISION
@@ -57,7 +56,7 @@ pub async fn validate<B: Backend>(soma: &Soma<B>, reference: &[u8]) -> Result<se
             .clone()
             .into_data_async()
             .await?
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .unwrap();
         let rest_error = error(rest, case.rest_vertices.into_iter().flatten());
         let bind_error = error(
@@ -77,7 +76,7 @@ pub async fn validate<B: Backend>(soma: &Soma<B>, reference: &[u8]) -> Result<se
             .vertices
             .into_data_async()
             .await?
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .unwrap();
         let vertex_error = error(vertices, case.vertices.into_iter().flatten());
         let transform_error = error(

@@ -1,24 +1,24 @@
 use crate::{Ardy, config::ArdyConfig};
 use anyhow::{Result, ensure};
-use burn::{prelude::Backend, tensor::Tensor};
+use burn::tensor::Tensor;
 use burn_human_motion::{MotionClip, MotionRequest, PoseFrame, rig::rotation_from_6d};
 use glam::{Quat, Vec3};
 
-impl<B: Backend> Ardy<B> {
-    pub fn unnormalize_latent(&self, x: Tensor<B, 3>) -> Tensor<B, 3> {
+impl Ardy {
+    pub fn unnormalize_latent(&self, x: Tensor<3>) -> Tensor<3> {
         x * self.weights.constants.latent_scale.clone() + self.weights.constants.latent_mean.clone()
     }
-    pub fn normalize_latent(&self, x: Tensor<B, 3>) -> Tensor<B, 3> {
+    pub fn normalize_latent(&self, x: Tensor<3>) -> Tensor<3> {
         (x - self.weights.constants.latent_mean.clone())
             / self.weights.constants.latent_scale.clone()
     }
-    pub fn unnormalize_root(&self, x: Tensor<B, 3>) -> Tensor<B, 3> {
+    pub fn unnormalize_root(&self, x: Tensor<3>) -> Tensor<3> {
         x * self.weights.constants.root_scale.clone() + self.weights.constants.root_mean.clone()
     }
-    pub fn normalize_root(&self, x: Tensor<B, 3>) -> Tensor<B, 3> {
+    pub fn normalize_root(&self, x: Tensor<3>) -> Tensor<3> {
         (x - self.weights.constants.root_mean.clone()) / self.weights.constants.root_scale.clone()
     }
-    pub fn local_root(&self, root: Tensor<B, 3>, valid_frames: usize) -> Tensor<B, 3> {
+    pub fn local_root(&self, root: Tensor<3>, valid_frames: usize) -> Tensor<3> {
         let [batch, frames, _] = root.dims();
         let root = self.unnormalize_root(root);
         let slice = |t: std::ops::Range<usize>, d: std::ops::Range<usize>| {

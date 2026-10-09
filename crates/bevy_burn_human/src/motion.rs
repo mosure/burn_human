@@ -13,7 +13,6 @@ mod ui;
 
 use crate::{BurnHumanAssets, BurnHumanInput};
 use bevy::prelude::*;
-use bevy_egui::EguiPrimaryContextPass;
 use burn_human::motion::AnnyMotionBinding;
 use burn_human_motion::{MotionClip, MotionRequest};
 pub use runtime::{MotionRuntime, MotionStatus};
@@ -23,6 +22,7 @@ pub struct HumanMotionPlugin;
 impl Plugin for HumanMotionPlugin {
     fn build(&self, app: &mut App) {
         surface::plugin(app);
+        app.add_plugins(crate::studio_ui::StudioUiPlugin);
         app.init_resource::<MotionRuntime>()
             .init_resource::<MotionUi>()
             .init_resource::<MotionPlayback>()
@@ -30,7 +30,7 @@ impl Plugin for HumanMotionPlugin {
             .init_resource::<camera::ViewControls>()
             .init_gizmo_group::<body_view::RigGizmos>()
             .add_systems(Startup, body_view::configure_gizmos)
-            .add_systems(EguiPrimaryContextPass, ui::controls)
+            .add_systems(Update, ui::controls)
             .add_systems(
                 PreUpdate,
                 (receive_clip, playback)
@@ -47,11 +47,11 @@ impl Plugin for HumanMotionPlugin {
                 ),
             )
             .add_systems(
-                PostUpdate,
+                PreUpdate,
                 (trajectory::place_waypoints, camera::update)
                     .chain()
-                    .after(bevy_egui::EguiPostUpdateSet::EndPass)
-                    .before(bevy_panorbit_camera::PanOrbitCameraSystemSet),
+                    .after(crate::studio_ui::capture_input)
+                    .before(camera::PanOrbitCamera::update_camera_positions),
             );
     }
     fn finish(&self, app: &mut App) {
@@ -301,7 +301,7 @@ fn draw_motion(
 fn frame_trajectory(
     mut player: ResMut<MotionPlayback>,
     ui: Res<MotionUi>,
-    mut cameras: Query<&mut bevy_panorbit_camera::PanOrbitCamera>,
+    mut cameras: Query<(&mut camera::PanOrbitCamera, &mut Transform)>,
 ) {
     if !player.frame_view {
         return;
@@ -318,11 +318,11 @@ fn frame_trajectory(
         low = low.min(p);
         high = high.max(p + Vec3::Y * 0.9);
     }
-    for mut camera in &mut cameras {
-        camera.target_focus = (low + high) * 0.5;
+    for (mut camera, mut transform) in &mut cameras {
+        let focus = (low + high) * 0.5;
         // Include perspective depth and room for the side panel, not only the
         // projected root path; otherwise an approaching actor can leave view.
-        camera.target_radius = ((high - low).length() * 1.8).max(4.0);
-        camera.force_update = true;
+        let distance = ((high - low).length() * 1.8).max(4.0);
+        camera::frame(&mut camera, &mut transform, focus, distance);
     }
 }

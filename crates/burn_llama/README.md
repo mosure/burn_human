@@ -1,17 +1,17 @@
 # burn_llama
 
-Llama 3 8B / LLM2Vec inference in Rust/Burn 0.21, with native WGPU and browser WebGPU support.
+Llama 3 8B / LLM2Vec inference in Rust/Burn 0.22, with native WGPU and browser WebGPU support.
 
 This release implements ARDY text conditioning with merged adapters, bidirectional attention, Q4 storage and a paged vocabulary. It is not a general-purpose chat/completion API. `AttentionMode::CausalExport` reproduces the source ONNX export for parity.
 
 ```toml
-burn_llama = { version = "0.1.2", features = ["wgpu"] }
+burn_llama = { version = "0.2.0", features = ["wgpu"] }
 ```
 
 The model owns its immutable CDN catalog and loading policy:
 
 ```rust,ignore
-let model = burn_llama::TextEncoder::<burn::backend::Wgpu>::load_pretrained(
+let model = burn_llama::TextEncoder::load_pretrained(
     &device,
     |done, total| { /* progress */ },
 ).await?;

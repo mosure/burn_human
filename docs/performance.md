@@ -1,6 +1,6 @@
 # GPU inference and rendering
 
-ARDY, GEM-X and SOMA use Burn 0.21 on native WGPU and browser WebGPU. Native
+ARDY, GEM-X and SOMA use Burn 0.22 on native WGPU and browser WebGPU. Native
 WGPU enables kernel autotuning for GEM-X and SOMA, including backend-selected attention. WebGPU
 keeps the portable kernel configuration: the tested WebGPU autotuning trial
 failed SOMA shape/pose parity.
@@ -18,15 +18,15 @@ retaining parallel GPU execution. Shader compilation still occurs on first use.
 ## Keep outputs on the device
 
 `burn_gemx::pipeline::Pipeline::estimate_resident` returns a
-`ResidentPoseEstimate<B>`. Its vertices and prepared identity remain on the
+`ResidentPoseEstimate`. Its vertices and prepared identity remain on the
 device. Use `into_host().await` only when exporting or processing vertices on
 the CPU. The existing `estimate` API still returns host vertices for callers
 that need them. Small pose parameters/keypoints remain host data because the
 procedural rig and public output formats require them.
 
-The Bevy plugin initializes Burn with Bevy's device and queue. Its explicit
-`burn_human_inference::gpu::WgpuBackend` remains the unfused Cube backend even
-if another dependency enables Burn's fusion alias. After SOMA skinning:
+The Bevy plugin initializes Burn with Bevy's device and queue. Burn 0.22 uses backend-free tensors and dispatches through `Device`. This workspace
+disables fusion. Enabling fusion through another dependency changes dispatch and
+requires fresh numerical qualification; the render bridge rejects fused primitives. After SOMA skinning:
 
 1. Export a tensor allocation lease, flushing queued compute without waiting.
 2. Compute area-weighted normals and pack resident vertices in one GPU pass.
@@ -98,6 +98,11 @@ Kernel compilation, identity fitting and necessary output reads can still add
 latency; this is not a guarantee of stall-free execution on every adapter.
 
 ## Qualification
+
+The [Bevy 0.20 / Burn 0.22 qualification](evidence/upgrade-2026-10-08/README.md)
+supersedes the earlier release measurements below for the current dependency
+graph. It includes the one-time WASM compiler initialization fix, legacy CDN
+Q4 compatibility and the strided GPU buffer regression.
 
 The [stability and startup qualification](evidence/stability-2026-09-27/README.md)
 supersedes the batch-size reproducibility limitation in the earlier

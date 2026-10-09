@@ -1,8 +1,9 @@
 [package]
 name = "burn_human"
 description = "parametric human mesh pipeline"
-version = "0.5.1"
+version = "0.6.0"
 edition = "2024"
+rust-version = "1.95"
 authors = ["mosure <mitchell@mosure.me>"]
 license = "MIT OR Apache-2.0"
 homepage = "https://github.com/mosure/burn_human"
@@ -40,9 +41,9 @@ resolver = "2"
 default = []
 
 [dependencies]
-burn_human_motion = { version = "0.1.0", path = "crates/burn_human_motion" }
-glam = "0.32"
-burn = { version = "0.21", default-features = false, features = ["std", "ndarray"], optional = true }
+burn_human_motion = { version = "0.2.0", path = "crates/burn_human_motion" }
+glam = "0.33"
+burn = { version = "0.22", default-features = false, features = ["std", "flex"], optional = true }
 safetensors = "0.7"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"

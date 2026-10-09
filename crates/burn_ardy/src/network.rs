@@ -4,22 +4,19 @@
 
 use crate::{config::ArdyConfig, weights::Weights};
 use anyhow::{Result, ensure};
-use burn::{
-    prelude::Backend,
-    tensor::{Bool, Tensor, TensorData, activation},
-};
+use burn::tensor::{Bool, Tensor, TensorData, activation};
 use burn_human_motion::artifacts::{Manifest, PartReader};
 
-pub struct Ardy<B: Backend> {
+pub struct Ardy {
     pub config: ArdyConfig,
-    pub weights: Weights<B>,
+    pub weights: Weights,
 }
 
-impl<B: Backend> Ardy<B> {
+impl Ardy {
     pub async fn load(
         manifest: &Manifest,
         reader: &mut impl PartReader,
-        device: &B::Device,
+        device: &burn::tensor::Device,
         progress: impl FnMut(usize, usize),
     ) -> Result<Self> {
         let (weights, config) = Weights::load(manifest, reader, device, progress).await?;
@@ -30,11 +27,11 @@ impl<B: Backend> Ardy<B> {
     async fn transformer<const COOPERATIVE: bool>(
         &self,
         name: &str,
-        mut x: Tensor<B, 3>,
-        padding: Option<Tensor<B, 4, Bool>>,
+        mut x: Tensor<3>,
+        padding: Option<Tensor<4, Bool>>,
         causal: bool,
         heads: usize,
-    ) -> Tensor<B, 3> {
+    ) -> Tensor<3> {
         let [batch, time, dim] = x.dims();
         for i in 0..8 {
             let p = format!("{name}.seqTransEncoder.layers.{i}");
@@ -52,7 +49,7 @@ impl<B: Backend> Ardy<B> {
                     .reshape([batch, time, heads, dim / heads])
                     .swap_dims(1, 2)
             };
-            let attended = crate::ops::attention::<B, COOPERATIVE>(
+            let attended = crate::ops::attention::<COOPERATIVE>(
                 project(0),
                 project(dim),
                 project(2 * dim),
@@ -89,13 +86,13 @@ impl<B: Backend> Ardy<B> {
     async fn backbone<const COOPERATIVE: bool>(
         &self,
         name: &str,
-        x: Tensor<B, 3>,
-        valid: Tensor<B, 2, Bool>,
-        text: Tensor<B, 3>,
+        x: Tensor<3>,
+        valid: Tensor<2, Bool>,
+        text: Tensor<3>,
         step: usize,
-        heading: Tensor<B, 2>,
+        heading: Tensor<2>,
         history_tokens: usize,
-    ) -> Tensor<B, 3> {
+    ) -> Tensor<3> {
         let [batch, time, dim] = x.dims();
         let device = &self.weights.device;
         let text = self.weights.linear(&format!("{name}.embed_text"), text);
@@ -129,7 +126,7 @@ impl<B: Backend> Ardy<B> {
             .constants
             .position(time, dim, -(history_tokens as isize));
         let input = Tensor::cat(vec![prefix, x], 1);
-        let prefix_valid = Tensor::<B, 2, Bool>::from_data(
+        let prefix_valid = Tensor::<2, Bool>::from_data(
             TensorData::new(vec![true; batch * 3], [batch, 3]),
             device,
         );
@@ -153,14 +150,14 @@ impl<B: Backend> Ardy<B> {
     #[allow(clippy::too_many_arguments)]
     pub fn denoise(
         &self,
-        x: Tensor<B, 3>,
-        text: Tensor<B, 3>,
-        heading: Tensor<B, 2>,
-        observed: Tensor<B, 3>,
-        mask: Tensor<B, 3>,
+        x: Tensor<3>,
+        text: Tensor<3>,
+        heading: Tensor<2>,
+        observed: Tensor<3>,
+        mask: Tensor<3>,
         history_frames: usize,
         step: usize,
-    ) -> Result<Tensor<B, 3>> {
+    ) -> Result<Tensor<3>> {
         crate::scheduling::immediate(self.denoise_impl::<false>(
             x,
             text,
@@ -177,14 +174,14 @@ impl<B: Backend> Ardy<B> {
     #[allow(clippy::too_many_arguments)]
     pub async fn denoise_async(
         &self,
-        x: Tensor<B, 3>,
-        text: Tensor<B, 3>,
-        heading: Tensor<B, 2>,
-        observed: Tensor<B, 3>,
-        mask: Tensor<B, 3>,
+        x: Tensor<3>,
+        text: Tensor<3>,
+        heading: Tensor<2>,
+        observed: Tensor<3>,
+        mask: Tensor<3>,
         history_frames: usize,
         step: usize,
-    ) -> Result<Tensor<B, 3>> {
+    ) -> Result<Tensor<3>> {
         self.denoise_impl::<{ crate::scheduling::COOPERATIVE }>(
             x,
             text,
@@ -200,14 +197,14 @@ impl<B: Backend> Ardy<B> {
     #[allow(clippy::too_many_arguments)]
     pub(crate) async fn denoise_impl<const COOPERATIVE: bool>(
         &self,
-        x: Tensor<B, 3>,
-        text: Tensor<B, 3>,
-        heading: Tensor<B, 2>,
-        observed: Tensor<B, 3>,
-        mask: Tensor<B, 3>,
+        x: Tensor<3>,
+        text: Tensor<3>,
+        heading: Tensor<2>,
+        observed: Tensor<3>,
+        mask: Tensor<3>,
         history_frames: usize,
         step: usize,
-    ) -> Result<Tensor<B, 3>> {
+    ) -> Result<Tensor<3>> {
         let [batch, tokens, dim] = x.dims();
         let frames = tokens * 4;
         ensure!(
@@ -229,7 +226,7 @@ impl<B: Backend> Ardy<B> {
         let device = &self.weights.device;
         let h = history_frames / 4;
         let role = |start: usize, end: usize| {
-            Tensor::<B, 3>::from_data(
+            Tensor::<3>::from_data(
                 TensorData::new(
                     (0..batch * tokens)
                         .map(|i| {
@@ -257,7 +254,7 @@ impl<B: Backend> Ardy<B> {
         if COOPERATIVE {
             burn_human_inference::cooperative::yield_to_browser().await;
         }
-        let repeat_frames = |v: Tensor<B, 3>| {
+        let repeat_frames = |v: Tensor<3>| {
             v.unsqueeze_dim::<4>(2)
                 .expand([batch, tokens, 4, 1])
                 .reshape([batch, frames, 1])
@@ -336,19 +333,16 @@ impl<B: Backend> Ardy<B> {
         ))
     }
 
-    pub fn encode(&self, motion: Tensor<B, 3>) -> Result<Tensor<B, 3>> {
+    pub fn encode(&self, motion: Tensor<3>) -> Result<Tensor<3>> {
         crate::scheduling::immediate(self.encode_impl::<false>(motion))
     }
 
-    pub async fn encode_async(&self, motion: Tensor<B, 3>) -> Result<Tensor<B, 3>> {
+    pub async fn encode_async(&self, motion: Tensor<3>) -> Result<Tensor<3>> {
         self.encode_impl::<{ crate::scheduling::COOPERATIVE }>(motion)
             .await
     }
 
-    async fn encode_impl<const COOPERATIVE: bool>(
-        &self,
-        motion: Tensor<B, 3>,
-    ) -> Result<Tensor<B, 3>> {
+    async fn encode_impl<const COOPERATIVE: bool>(&self, motion: Tensor<3>) -> Result<Tensor<3>> {
         let [batch, frames, dim] = motion.dims();
         ensure!(
             dim == 330 && frames >= 4 && frames.is_multiple_of(4) && frames <= 200,
@@ -379,19 +373,16 @@ impl<B: Backend> Ardy<B> {
         ))
     }
 
-    pub fn decode(&self, hybrid: Tensor<B, 3>) -> Result<Tensor<B, 3>> {
+    pub fn decode(&self, hybrid: Tensor<3>) -> Result<Tensor<3>> {
         crate::scheduling::immediate(self.decode_impl::<false>(hybrid))
     }
 
-    pub async fn decode_async(&self, hybrid: Tensor<B, 3>) -> Result<Tensor<B, 3>> {
+    pub async fn decode_async(&self, hybrid: Tensor<3>) -> Result<Tensor<3>> {
         self.decode_impl::<{ crate::scheduling::COOPERATIVE }>(hybrid)
             .await
     }
 
-    async fn decode_impl<const COOPERATIVE: bool>(
-        &self,
-        hybrid: Tensor<B, 3>,
-    ) -> Result<Tensor<B, 3>> {
+    async fn decode_impl<const COOPERATIVE: bool>(&self, hybrid: Tensor<3>) -> Result<Tensor<3>> {
         let [batch, tokens, dim] = hybrid.dims();
         ensure!(
             dim == 148 && tokens > 0 && tokens <= 50,
@@ -426,12 +417,12 @@ impl<B: Backend> Ardy<B> {
     }
 }
 
-pub fn position_encoding<B: Backend>(
+pub fn position_encoding(
     length: usize,
     dim: usize,
     origin: isize,
-    device: &B::Device,
-) -> Tensor<B, 3> {
+    device: &burn::tensor::Device,
+) -> Tensor<3> {
     let mut data = Vec::with_capacity(length * dim);
     for t in 0..length {
         for d in 0..dim {

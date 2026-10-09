@@ -1,10 +1,11 @@
 //! Package one verified raw tensor at a time; raw export is an offline interchange.
 use anyhow::{Result, ensure};
-use burn::{module::ParamId, tensor::TensorData};
+use burn::tensor::TensorData;
 use burn_human_motion::artifacts::{
     Asset, MAX_OBJECT_BYTES, Manifest, Object, PART_TARGET_BYTES, Part, TensorSpec, sha256,
 };
-use burn_store::{BurnpackWriter, TensorSnapshot};
+use burn_pack::Writer as BurnpackWriter;
+use burn_store::bridge::from_data as pack_tensor;
 use serde::Deserialize;
 use std::{collections::BTreeSet, path::PathBuf};
 
@@ -88,14 +89,9 @@ fn main() -> Result<()> {
         let data = TensorData::from_bytes_vec(raw, t.shape, burn_human_inference::dtype(&t.dtype)?);
         burn_human_inference::weights::ensure_finite(&data)?;
         let id = u64::from_str_radix(&sha256(t.name.as_bytes())[..16], 16)?;
-        let snapshot = TensorSnapshot::from_data(
-            data,
-            t.name.split('.').map(str::to_owned).collect(),
-            vec![],
-            ParamId::from(id),
-        );
+        let snapshot = pack_tensor(data, t.name.clone(), Some(id));
         let bytes = BurnpackWriter::new(vec![snapshot])
-            .to_bytes()
+            .into_bytes()
             .map_err(|e| anyhow::anyhow!("{e}"))?;
         ensure!(
             bytes.len() <= MAX_OBJECT_BYTES,

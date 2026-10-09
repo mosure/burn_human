@@ -1,7 +1,8 @@
 [package]
 name = "burn_llama"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2024"
+rust-version = "1.95"
 license = "Apache-2.0"
 description = "Portable Llama 3 LLM2Vec text conditioning for ARDY using Burn"
 repository = "https://github.com/mosure/burn_human"
@@ -28,16 +29,18 @@ required-features = ["tools"]
 [features]
 default = []
 wgpu = ["burn/wgpu", "burn_human_inference/wgpu"]
-ndarray = ["burn/ndarray"]
+cpu = ["burn/flex"]
+# Compatibility alias; CPU inference now uses Burn Flex.
+ndarray = ["cpu"]
 tools = ["dep:pollster", "dep:burn_ardy", "wgpu"]
 web-validation = ["wgpu", "dep:wasm-bindgen", "dep:wasm-bindgen-futures", "dep:console_error_panic_hook"]
 
 [dependencies]
 anyhow = "1"
-burn_ardy = { path = "../burn_ardy", version = "0.1.4", default-features = false, features = ["wgpu"], optional = true }
-burn = { version = "0.21", default-features = false, features = ["std"] }
-burn_human_motion = { path = "../burn_human_motion", version = "0.1.1" }
-burn_human_inference = { path = "../burn_human_inference", version = "0.1.4", features = ["transport"] }
+burn_ardy = { path = "../burn_ardy", version = "0.2.0", default-features = false, features = ["wgpu"], optional = true }
+burn = { version = "0.22", default-features = false, features = ["std"] }
+burn_human_motion = { path = "../burn_human_motion", version = "0.2.0" }
+burn_human_inference = { path = "../burn_human_inference", version = "0.2.0", features = ["transport"] }
 half = "2"
 tokenizers = { version = "0.22.2", default-features = false, features = ["fancy-regex"] }
 serde = { version = "1", features = ["derive"] }

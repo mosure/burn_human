@@ -1,5 +1,10 @@
-use burn::backend::wgpu::{WgpuDevice, graphics::WebGpu, init_setup_async};
-use burn_human_inference::gpu::WgpuBackend as Wgpu;
+// The validation module is an explicit browser entry point. Keep startup here
+// rather than in the shared library, so downstream Rust mains still start.
+#[wasm_bindgen::prelude::wasm_bindgen(start)]
+pub fn initialize_gemx_validation_runtime() {
+    burn_human_inference::initialize_browser_runtime();
+}
+
 use burn_human_inference::transport::read_bounded;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
@@ -10,12 +15,13 @@ pub async fn validate_gem_webgpu(
 ) -> Result<String, JsValue> {
     console_error_panic_hook::set_once();
     async fn run(suite: String, reference: String, image: String) -> anyhow::Result<String> {
-        let device = WgpuDevice::default();
-        let setup = init_setup_async::<WebGpu>(&device, Default::default()).await;
+        let (device, setup) = burn::tensor::Device::wgpu_options()
+            .graphics_api(burn::tensor::wgpu::WgpuBackend::WebGpu)
+            .init_with_setup_async()
+            .await?;
         let artifacts = crate::pipeline::PipelineArtifacts::from_location(&suite).await?;
         let start = web_time::Instant::now();
-        let model =
-            crate::pipeline::Pipeline::<Wgpu>::load(&artifacts, &device, |_, _, _| {}).await?;
+        let model = crate::pipeline::Pipeline::load(&artifacts, &device, |_, _, _| {}).await?;
         let load = start.elapsed().as_secs_f64();
         let reference = read_bounded(&reference, 32 * 1024 * 1024).await?;
         let image = read_bounded(&image, 32 * 1024 * 1024).await?;
@@ -62,12 +68,13 @@ pub async fn profile_gem_webgpu(
             phases.push(serde_json::json!({"name":name,"start_ms":phase_start,"end_ms":end}));
             phase_start = end;
         };
-        let device = WgpuDevice::default();
-        init_setup_async::<WebGpu>(&device, Default::default()).await;
+        let device = burn::tensor::Device::wgpu_options()
+            .graphics_api(burn::tensor::wgpu::WgpuBackend::WebGpu)
+            .init_async()
+            .await?;
         mark("device");
         let artifacts = crate::pipeline::PipelineArtifacts::from_location(&suite).await?;
-        let model =
-            crate::pipeline::Pipeline::<Wgpu>::load(&artifacts, &device, |_, _, _| {}).await?;
+        let model = crate::pipeline::Pipeline::load(&artifacts, &device, |_, _, _| {}).await?;
         mark("load");
         let bytes = read_bounded(&image, 32 * 1024 * 1024).await?;
         let image = crate::image_input::decode(&bytes)?;
@@ -81,7 +88,7 @@ pub async fn profile_gem_webgpu(
             let values = output.vertices.into_data_async().await?;
             timings.push(start.elapsed().as_secs_f64());
             anyhow::ensure!(
-                values.shape.as_slice() == [1, 18056, 3],
+                values.shape().as_slice() == [1, 18056, 3],
                 "Incomplete GEM-X output"
             );
             burn_human_inference::weights::ensure_finite(&values)?;

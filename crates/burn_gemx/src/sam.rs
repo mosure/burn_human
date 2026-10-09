@@ -6,17 +6,14 @@ use crate::{
     sam_head::Head,
 };
 use anyhow::{Result, ensure};
-use burn::{
-    prelude::Backend,
-    tensor::{Int, Tensor, TensorData, activation},
-};
+use burn::tensor::{Int, Tensor, TensorData, activation};
 use burn_human_inference::{transport::ModelSource, weights::TensorBank};
 use burn_human_motion::artifacts::Manifest;
 use burn_mhr::{Mhr, MhrInput};
 use std::collections::BTreeMap;
 
-pub struct SamBody<B: Backend> {
-    weights: TensorBank<B>,
+pub struct SamBody {
+    weights: TensorBank,
     head: Head,
 }
 #[derive(serde::Serialize)]
@@ -25,8 +22,8 @@ pub struct SamLayer {
     pub keypoints: Vec<[f32; 3]>,
     pub camera: [f32; 3],
 }
-pub struct SamOutput<B: Backend> {
-    pub token: Tensor<B, 3>,
+pub struct SamOutput {
+    pub token: Tensor<3>,
     pub layers: Vec<SamLayer>,
 }
 fn linear(map: &mut BTreeMap<String, Vec<usize>>, name: &str, input: usize, output: usize) {
@@ -41,11 +38,11 @@ fn ffn(map: &mut BTreeMap<String, Vec<usize>>, name: &str, input: usize, output:
     linear(map, &format!("{name}.layers.0.0"), input, 1024);
     linear(map, &format!("{name}.layers.1"), 1024, output);
 }
-impl<B: Backend> SamBody<B> {
+impl SamBody {
     pub async fn load(
         manifest: &Manifest,
         source: &mut ModelSource,
-        device: &B::Device,
+        device: &burn::tensor::Device,
         mut progress: impl FnMut(usize, usize),
     ) -> Result<Self> {
         manifest.validate()?;
@@ -136,7 +133,7 @@ impl<B: Backend> SamBody<B> {
         }
         Ok(Self { weights, head })
     }
-    fn mlp(&self, prefix: &str, x: Tensor<B, 3>, gelu: bool) -> Tensor<B, 3> {
+    fn mlp(&self, prefix: &str, x: Tensor<3>, gelu: bool) -> Tensor<3> {
         let x = self.weights.affine(&format!("{prefix}.layers.0.0"), x);
         let x = if gelu {
             activation::gelu(x)
@@ -145,13 +142,7 @@ impl<B: Backend> SamBody<B> {
         };
         self.weights.affine(&format!("{prefix}.layers.1"), x)
     }
-    fn attn(
-        &self,
-        prefix: &str,
-        q: Tensor<B, 3>,
-        k: Tensor<B, 3>,
-        v: Tensor<B, 3>,
-    ) -> Tensor<B, 3> {
+    fn attn(&self, prefix: &str, q: Tensor<3>, k: Tensor<3>, v: Tensor<3>) -> Tensor<3> {
         let n = q.dims()[1];
         let m = k.dims()[1];
         let w = &self.weights;
@@ -174,10 +165,10 @@ impl<B: Backend> SamBody<B> {
     }
     pub fn condition_image(
         &self,
-        embedding: Tensor<B, 4>,
+        embedding: Tensor<4>,
         crop: Crop,
         camera: Camera,
-    ) -> Result<Tensor<B, 3>> {
+    ) -> Result<Tensor<3>> {
         crop.validate()?;
         camera.validate()?;
         ensure!(
@@ -221,7 +212,7 @@ impl<B: Backend> SamBody<B> {
             }
         }
         let rays =
-            Tensor::<B, 3>::from_data(TensorData::new(rays, [1, 1024, 99]), &self.weights.device);
+            Tensor::<3>::from_data(TensorData::new(rays, [1, 1024, 99]), &self.weights.device);
         let image = embedding.reshape([1, 1280, 1024]).swap_dims(1, 2)
             + self.weights.tensor::<1>("prompt.no_mask").unsqueeze();
         let out = self.weights.linear(
@@ -233,18 +224,18 @@ impl<B: Backend> SamBody<B> {
     #[allow(clippy::too_many_arguments)]
     fn feedback(
         &self,
-        mut x: Tensor<B, 3>,
-        mut pe: Tensor<B, 3>,
-        image: Tensor<B, 3>,
-        keypoints: Tensor<B, 3>,
+        mut x: Tensor<3>,
+        mut pe: Tensor<3>,
+        image: Tensor<3>,
+        keypoints: Tensor<3>,
         cam: [f32; 3],
         crop: Crop,
         camera: Camera,
-    ) -> Result<(Tensor<B, 3>, Tensor<B, 3>)> {
+    ) -> Result<(Tensor<3>, Tensor<3>)> {
         let device = &self.weights.device;
         let vector = |v: Vec<f32>| {
             let n = v.len();
-            Tensor::<B, 3>::from_data(TensorData::new(v, [1, 1, n]), device)
+            Tensor::<3>::from_data(TensorData::new(v, [1, 1, n]), device)
         };
         let bs = -crop.size * cam[0] + 1e-8;
         ensure!(bs.is_finite() && bs.abs() > 1e-8, "Degenerate SAM camera");
@@ -318,11 +309,11 @@ impl<B: Backend> SamBody<B> {
     /// following layer's 2D/3D keypoint tokens; the sixth supplies final diagnostics.
     pub async fn forward(
         &self,
-        embedding: Tensor<B, 4>,
-        mhr: &Mhr<B>,
+        embedding: Tensor<4>,
+        mhr: &Mhr,
         crop: Crop,
         camera: Camera,
-    ) -> Result<SamOutput<B>> {
+    ) -> Result<SamOutput> {
         self.forward_impl(embedding, mhr, crop, camera, true).await
     }
 
@@ -330,11 +321,11 @@ impl<B: Backend> SamBody<B> {
     /// heads after the final decoder block (GEM-X consumes only the body token).
     pub async fn forward_token(
         &self,
-        embedding: Tensor<B, 4>,
-        mhr: &Mhr<B>,
+        embedding: Tensor<4>,
+        mhr: &Mhr,
         crop: Crop,
         camera: Camera,
-    ) -> Result<Tensor<B, 3>> {
+    ) -> Result<Tensor<3>> {
         Ok(self
             .forward_impl(embedding, mhr, crop, camera, false)
             .await?
@@ -343,12 +334,12 @@ impl<B: Backend> SamBody<B> {
 
     async fn forward_impl(
         &self,
-        embedding: Tensor<B, 4>,
-        mhr: &Mhr<B>,
+        embedding: Tensor<4>,
+        mhr: &Mhr,
         crop: Crop,
         camera: Camera,
         diagnostics: bool,
-    ) -> Result<SamOutput<B>> {
+    ) -> Result<SamOutput> {
         let w = &self.weights;
         let device = &w.device;
         let image = self.condition_image(embedding, crop, camera)?;
@@ -360,7 +351,7 @@ impl<B: Backend> SamBody<B> {
             1,
         )
         .unsqueeze::<3>();
-        let condition = Tensor::<B, 3>::from_data(
+        let condition = Tensor::<3>::from_data(
             TensorData::new(crop.condition(camera).to_vec(), [1, 1, 3]),
             device,
         );
@@ -418,7 +409,7 @@ impl<B: Backend> SamBody<B> {
             let predictions = Tensor::cat(vec![raw, cam], 2)
                 .into_data_async()
                 .await?
-                .to_vec::<f32>()
+                .try_to_vec::<f32>()
                 .map_err(|e| anyhow::anyhow!("SAM head: {e}"))?;
             let parameters = self.head.parameters(&predictions[..519])?;
             let cam: [f32; 3] = predictions[519..].try_into().unwrap();
@@ -427,7 +418,7 @@ impl<B: Backend> SamBody<B> {
                 .iter()
                 .flat_map(|m| m.w_axis.truncate().to_array())
                 .collect();
-            let joints = Tensor::<B, 3>::from_data(TensorData::new(joints, [1, 127, 3]), device);
+            let joints = Tensor::<3>::from_data(TensorData::new(joints, [1, 127, 3]), device);
             let mesh = Tensor::cat(vec![output.vertices, joints], 1) * 0.01;
             let kp = w
                 .tensor::<2>("head_pose.keypoint_mapping")
@@ -440,7 +431,7 @@ impl<B: Backend> SamBody<B> {
             let values = kp
                 .into_data_async()
                 .await?
-                .to_vec::<f32>()
+                .try_to_vec::<f32>()
                 .map_err(|e| anyhow::anyhow!("SAM keypoints: {e}"))?;
             let keypoints: Vec<[f32; 3]> = values
                 .as_chunks::<3>()
@@ -496,14 +487,13 @@ impl<B: Backend> SamBody<B> {
                         factors[j].push(if inside { weight } else { 0.0 });
                     }
                 }
-                let xy = Tensor::<B, 3>::from_data(TensorData::new(xy, [1, 70, 2]), device);
-                let valid = Tensor::<B, 3>::from_data(TensorData::new(valid, [1, 70, 1]), device);
+                let xy = Tensor::<3>::from_data(TensorData::new(xy, [1, 70, 2]), device);
+                let valid = Tensor::<3>::from_data(TensorData::new(valid, [1, 70, 1]), device);
                 let mut sampled = Tensor::zeros([1, 70, 1280], device);
                 for (indices, scale) in ij.into_iter().zip(factors) {
                     let indices =
-                        Tensor::<B, 1, Int>::from_data(TensorData::new(indices, [70]), device);
-                    let scale =
-                        Tensor::<B, 3>::from_data(TensorData::new(scale, [1, 70, 1]), device);
+                        Tensor::<1, Int>::from_data(TensorData::new(indices, [70]), device);
+                    let scale = Tensor::<3>::from_data(TensorData::new(scale, [1, 70, 1]), device);
                     sampled = sampled + image.clone().select(1, indices) * scale;
                 }
                 let old = x.clone().slice([0..1, 3..73, 0..1024]);
@@ -522,7 +512,7 @@ impl<B: Backend> SamBody<B> {
                     .flat_map(|p| (0..3).map(|j| p[j] - pelvis[j]))
                     .collect();
                 let centered =
-                    Tensor::<B, 3>::from_data(TensorData::new(centered, [1, 70, 3]), device);
+                    Tensor::<3>::from_data(TensorData::new(centered, [1, 70, 3]), device);
                 pe = pe.slice_assign(
                     [0..1, 73..143, 0..1024],
                     self.mlp("keypoint3d_posemb_linear", centered, false),

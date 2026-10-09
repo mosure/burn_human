@@ -1,0 +1,241 @@
+{
+  "components": {
+    "ardy": {
+      "artifact": {
+        "base": "https://aberration.technology/model/ardy/core-rp-20fps-h40/v1",
+        "sha256": "6e03294854771ca3ed6641251c77ab75bd2542d778c02886ea795d8d77655cd8"
+      },
+      "runs": [
+        {
+          "cache_hits": 0,
+          "downloaded_part_bytes": 765068032,
+          "run": "cold",
+          "seconds": 30.814077969
+        },
+        {
+          "cache_hits": 59,
+          "downloaded_part_bytes": 0,
+          "run": "warm",
+          "seconds": 0.598404559
+        },
+        {
+          "cache_hits": 58,
+          "downloaded_part_bytes": 8412672,
+          "run": "corrupt",
+          "seconds": 0.730370738
+        }
+      ]
+    },
+    "denoiser": {
+      "artifact": {
+        "base": "https://aberration.technology/model/gemx/v1/denoiser",
+        "sha256": "8849a57736ee9c5119a1598a5a931b8d0f6892f93eba340765553ac78b89b2f3"
+      },
+      "runs": [
+        {
+          "cache_hits": 0,
+          "downloaded_part_bytes": 178119284,
+          "run": "cold",
+          "seconds": 70.795030163
+        },
+        {
+          "cache_hits": 264,
+          "downloaded_part_bytes": 0,
+          "run": "warm",
+          "seconds": 0.993096822
+        },
+        {
+          "cache_hits": 263,
+          "downloaded_part_bytes": 2304,
+          "run": "corrupt",
+          "seconds": 0.93819608
+        }
+      ]
+    },
+    "llama": {
+      "artifact": {
+        "base": "https://aberration.technology/model/llama/ardy-llm2vec-8b/v1",
+        "sha256": "09280ebcf02184708cff1a9f982b901166b433e504ff343f02c037cc52d8ee16"
+      },
+      "runs": [
+        {
+          "cache_hits": 0,
+          "downloaded_part_bytes": 5413420032,
+          "run": "cold",
+          "seconds": 291.773045558
+        },
+        {
+          "cache_hits": 636,
+          "downloaded_part_bytes": 0,
+          "run": "warm",
+          "seconds": 9.120685466
+        },
+        {
+          "cache_hits": 635,
+          "downloaded_part_bytes": 4194560,
+          "run": "corrupt",
+          "seconds": 6.656844724
+        }
+      ]
+    },
+    "mhr": {
+      "artifact": {
+        "base": "https://aberration.technology/model/soma-x/v1/mhr",
+        "sha256": "c7d6e4fc479b8ca68ab1ba6736923bcd93d9f61252c3009ace1ebef6bb5eff65"
+      },
+      "runs": [
+        {
+          "cache_hits": 0,
+          "downloaded_part_bytes": 709453924,
+          "run": "cold",
+          "seconds": 27.178693552
+        },
+        {
+          "cache_hits": 48,
+          "downloaded_part_bytes": 0,
+          "run": "warm",
+          "seconds": 0.780746663
+        },
+        {
+          "cache_hits": 47,
+          "downloaded_part_bytes": 20971520,
+          "run": "corrupt",
+          "seconds": 1.021891852
+        }
+      ]
+    },
+    "sam_decoder": {
+      "artifact": {
+        "base": "https://aberration.technology/model/gemx/v1/sam-decoder",
+        "sha256": "35c5b33c1041f9950af97def56335e7d3929eec6a6ce6180989b8423fb3f4b3e"
+      },
+      "runs": [
+        {
+          "cache_hits": 0,
+          "downloaded_part_bytes": 209695712,
+          "run": "cold",
+          "seconds": 52.324676463
+        },
+        {
+          "cache_hits": 229,
+          "downloaded_part_bytes": 0,
+          "run": "warm",
+          "seconds": 0.296542996
+        },
+        {
+          "cache_hits": 228,
+          "downloaded_part_bytes": 4352,
+          "run": "corrupt",
+          "seconds": 0.248072636
+        }
+      ]
+    },
+    "sam_vision": {
+      "artifact": {
+        "base": "https://aberration.technology/model/gemx/v1/sam-vision",
+        "sha256": "66fc185473d361d1934fbec7d427a3be4602bc410bec6427b4a7e3d48c18c90b"
+      },
+      "runs": [
+        {
+          "cache_hits": 0,
+          "downloaded_part_bytes": 3362924288,
+          "run": "cold",
+          "seconds": 207.001370937
+        },
+        {
+          "cache_hits": 615,
+          "downloaded_part_bytes": 0,
+          "run": "warm",
+          "seconds": 2.2581906
+        },
+        {
+          "cache_hits": 614,
+          "downloaded_part_bytes": 15616,
+          "run": "corrupt",
+          "seconds": 2.27753099
+        }
+      ]
+    },
+    "soma": {
+      "artifact": {
+        "base": "https://aberration.technology/model/soma-x/v1/body",
+        "sha256": "96aefe1f999063f2b6ce434efe785f7c030deab24c35fb36d2cf4e1f05d643f7"
+      },
+      "runs": [
+        {
+          "cache_hits": 0,
+          "downloaded_part_bytes": 62159860,
+          "run": "cold",
+          "seconds": 18.704296815
+        },
+        {
+          "cache_hits": 80,
+          "downloaded_part_bytes": 0,
+          "run": "warm",
+          "seconds": 0.215429818
+        },
+        {
+          "cache_hits": 79,
+          "downloaded_part_bytes": 3504640,
+          "run": "corrupt",
+          "seconds": 0.247059443
+        }
+      ]
+    },
+    "transfer": {
+      "artifact": {
+        "base": "https://aberration.technology/model/soma-x/v1/transfer",
+        "sha256": "0eaabd1e7fd976c37c9f99e609c2d713b814f56497c2c903b854a7d1d3abb6f8"
+      },
+      "runs": [
+        {
+          "cache_hits": 0,
+          "downloaded_part_bytes": 861904,
+          "run": "cold",
+          "seconds": 2.114223008
+        },
+        {
+          "cache_hits": 8,
+          "downloaded_part_bytes": 0,
+          "run": "warm",
+          "seconds": 0.122268929
+        },
+        {
+          "cache_hits": 7,
+          "downloaded_part_bytes": 8548,
+          "run": "corrupt",
+          "seconds": 0.094370645
+        }
+      ]
+    },
+    "vitpose": {
+      "artifact": {
+        "base": "https://aberration.technology/model/gemx/v1/vitpose",
+        "sha256": "d868f3d06eb7ff2d7acf014c430b1b3a8b6bee269bc407e78a97127d77349e1d"
+      },
+      "runs": [
+        {
+          "cache_hits": 0,
+          "downloaded_part_bytes": 3387959860,
+          "run": "cold",
+          "seconds": 213.997679703
+        },
+        {
+          "cache_hits": 622,
+          "downloaded_part_bytes": 0,
+          "run": "warm",
+          "seconds": 2.199379007
+        },
+        {
+          "cache_hits": 621,
+          "downloaded_part_bytes": 15616,
+          "run": "corrupt",
+          "seconds": 2.134471663
+        }
+      ]
+    }
+  },
+  "passed": true,
+  "root": "https://aberration.technology/model",
+  "scope": "all released components, each with an isolated cold cache; metadata is reauthenticated on every load"
+}

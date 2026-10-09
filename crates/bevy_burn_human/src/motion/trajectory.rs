@@ -1,7 +1,7 @@
 //! Timed world-space trajectory editing, independent of model loading.
-use super::{MotionPlayback, MotionUi};
+use super::MotionUi;
+use crate::studio_ui::StudioInput;
 use bevy::{prelude::*, window::PrimaryWindow};
-use bevy_egui::{EguiContexts, egui};
 use burn_human_motion::{MotionRequest, Waypoint};
 
 pub(super) fn retime(request: &mut MotionRequest) {
@@ -20,7 +20,7 @@ pub(super) fn retime(request: &mut MotionRequest) {
     }
 }
 
-fn add(state: &mut MotionUi, position: Vec3) {
+pub(super) fn add(state: &mut MotionUi, position: Vec3) {
     if state.request.waypoints.len() >= state.request.frames {
         return;
     }
@@ -34,170 +34,34 @@ fn add(state: &mut MotionUi, position: Vec3) {
     state.selected_waypoint = Some(state.request.waypoints.len() - 1);
 }
 
-pub(super) fn controls(ui: &mut egui::Ui, state: &mut MotionUi, playback: &mut MotionPlayback) {
-    egui::CollapsingHeader::new("Trajectory · optional")
-        .default_open(true)
-        .show(ui, |ui| {
-            ui.horizontal(|ui| {
-                for (label, points) in [
-                    ("Straight", &[[0.0, 0.0], [0.0, 3.0]][..]),
-                    ("Turn", &[[0.0, 0.0], [0.0, 1.5], [1.5, 2.5]][..]),
-                    (
-                        "Loop",
-                        &[[0.0, 0.0], [-1.0, 1.0], [0.0, 2.0], [1.0, 1.0], [0.0, 0.0]][..],
-                    ),
-                ] {
-                    if ui.button(label).clicked() {
-                        state.request.waypoints.clear();
-                        for [x, z] in points {
-                            add(state, Vec3::new(*x, 0.02, *z));
-                        }
-                        state.selected_waypoint = None;
-                        playback.show_path = true;
-                        playback.frame_view = true;
-                    }
-                }
-            });
-            ui.toggle_value(&mut state.place_waypoints, "Edit path in scene");
-            if state.place_waypoints {
-                ui.small("Click ground to add; drag a marker to move it. Esc finishes editing.");
-            }
-            ui.small(
-                "Gold = requested path · Blue = generated path. Points are soft motion conditions.",
-            );
-            ui.checkbox(
-                &mut state.request.dense_trajectory,
-                "Follow the path between points",
-            );
-            let mut remove = None;
-            let count = state.request.waypoints.len();
-            for i in 0..count {
-                let min = if i == 0 {
-                    0
-                } else {
-                    state.request.waypoints[i - 1].frame + 1
-                };
-                let max = if i + 1 == count {
-                    state.request.frames - 1
-                } else {
-                    state.request.waypoints[i + 1].frame - 1
-                };
-                let point = &mut state.request.waypoints[i];
-                ui.push_id(i, |ui| {
-                    ui.horizontal(|ui| {
-                        if ui
-                            .selectable_label(
-                                state.selected_waypoint == Some(i),
-                                format!("Point {}", i + 1),
-                            )
-                            .clicked()
-                        {
-                            state.selected_waypoint = Some(i);
-                        }
-                        let mut seconds = point.frame as f32 / 20.0;
-                        if ui
-                            .add(
-                                egui::DragValue::new(&mut seconds)
-                                    .range(min as f32 / 20.0..=max as f32 / 20.0)
-                                    .speed(0.05)
-                                    .suffix(" s"),
-                            )
-                            .changed()
-                        {
-                            point.frame = ((seconds * 20.0).round() as usize).clamp(min, max);
-                        }
-                        if ui.small_button("Remove").clicked() {
-                            remove = Some(i);
-                        }
-                    });
-                    if state.selected_waypoint == Some(i) {
-                        ui.horizontal(|ui| {
-                            ui.add(
-                                egui::DragValue::new(&mut point.position.x)
-                                    .prefix("X ")
-                                    .suffix(" m")
-                                    .speed(0.05),
-                            );
-                            ui.add(
-                                egui::DragValue::new(&mut point.position.z)
-                                    .prefix("Z ")
-                                    .suffix(" m")
-                                    .speed(0.05),
-                            );
-                        });
-                        let mut heading = point.heading.is_some();
-                        if ui.checkbox(&mut heading, "Set facing direction").changed() {
-                            point.heading = heading.then_some(0.0);
-                        }
-                        if let Some(h) = &mut point.heading {
-                            let mut degrees = h.to_degrees();
-                            ui.add(
-                                egui::Slider::new(&mut degrees, -180.0..=180.0).text("Heading °"),
-                            );
-                            *h = degrees.to_radians();
-                        }
-                        ui.checkbox(&mut point.constrain_height, "Set root height");
-                        if point.constrain_height {
-                            ui.add(
-                                egui::DragValue::new(&mut point.position.y)
-                                    .prefix("Y ")
-                                    .suffix(" m")
-                                    .speed(0.02),
-                            );
-                        }
-                    }
-                });
-            }
-            if let Some(i) = remove {
-                state.request.waypoints.remove(i);
-                state.selected_waypoint = None;
-            }
-            ui.horizontal(|ui| {
-                if ui
-                    .add_enabled(count < state.request.frames, egui::Button::new("Add point"))
-                    .clicked()
-                {
-                    add(state, Vec3::new(0.0, 0.02, 0.0));
-                }
-                if ui.button("Clear path").clicked() {
-                    state.request.waypoints.clear();
-                    state.selected_waypoint = None;
-                }
-                if ui.button("Frame path").clicked() {
-                    playback.frame_view = true;
-                }
-            });
-            ui.checkbox(&mut playback.show_path, "Show paths and ground grid");
-        });
-}
-
 pub(super) fn place_waypoints(
     mut state: ResMut<MotionUi>,
     buttons: Res<ButtonInput<MouseButton>>,
     keys: Res<ButtonInput<KeyCode>>,
     windows: Query<&Window, With<PrimaryWindow>>,
     cameras: Query<(&Camera, &GlobalTransform), With<Camera3d>>,
-    mut contexts: EguiContexts,
+    input: Res<StudioInput>,
 ) {
     if !state.is_motion_tab() || !state.place_waypoints {
         state.dragging_waypoint = false;
         return;
     }
-    let Ok(ctx) = contexts.ctx_mut() else { return };
-    if ctx.egui_wants_keyboard_input() {
+    if input.keyboard {
         return;
     }
     if keys.just_pressed(KeyCode::Delete)
         && let Some(index) = state.selected_waypoint.take()
+        && index < state.request.waypoints.len()
     {
         state.request.waypoints.remove(index);
+        retime(&mut state.request);
         state.dragging_waypoint = false;
     }
     if !buttons.pressed(MouseButton::Left) {
         state.dragging_waypoint = false;
         return;
     }
-    if ctx.is_pointer_over_egui() || ctx.egui_wants_pointer_input() {
+    if input.pointer {
         return;
     }
     let Ok(window) = windows.single() else { return };

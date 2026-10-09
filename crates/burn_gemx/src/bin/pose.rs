@@ -1,5 +1,4 @@
 use anyhow::{Result, ensure};
-use burn::backend::Wgpu;
 use burn_gemx::{
     camera::{Camera, Crop},
     image_input,
@@ -21,11 +20,15 @@ fn main() -> Result<()> {
         let request: Request = serde_json::from_slice(&std::fs::read(&args[2])?)?;
         let image = image_input::decode(&std::fs::read(&args[1])?)?;
         let start = web_time::Instant::now();
-        let model = Pipeline::<Wgpu>::load(&artifacts, &Default::default(), |s, i, n| {
-            if i == n || i % 100 == 0 {
-                println!("{s} {i}/{n}");
-            }
-        })
+        let model = Pipeline::load(
+            &artifacts,
+            &burn::tensor::Device::wgpu(burn::tensor::DeviceKind::DefaultDevice),
+            |s, i, n| {
+                if i == n || i % 100 == 0 {
+                    println!("{s} {i}/{n}");
+                }
+            },
+        )
         .await?;
         let load_seconds = start.elapsed().as_secs_f64();
         let pose = model

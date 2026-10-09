@@ -2,10 +2,7 @@
 pub mod batch;
 use crate::{Ardy, representation::decode_clip};
 use anyhow::{Result, ensure};
-use burn::{
-    prelude::Backend,
-    tensor::{Tensor, TensorData},
-};
+use burn::tensor::{Tensor, TensorData};
 use burn_human_motion::artifacts::Manifest;
 use serde_json::json;
 use web_time::Instant;
@@ -28,19 +25,19 @@ impl Fixture {
             v.shape().to_vec(),
         ))
     }
-    fn tensor<B: Backend, const D: usize>(
+    fn tensor<const D: usize>(
         &self,
         name: &str,
-        device: &B::Device,
-    ) -> Result<Tensor<B, D>> {
+        device: &burn::tensor::Device,
+    ) -> Result<Tensor<D>> {
         let (data, shape) = self.values(name)?;
         Ok(Tensor::from_data(TensorData::new(data, shape), device))
     }
 }
 
-async fn compare<B: Backend, const D: usize>(
+async fn compare<const D: usize>(
     name: &str,
-    tensor: Tensor<B, D>,
+    tensor: Tensor<D>,
     fixture: &Fixture,
     tolerance: f32,
 ) -> Result<serde_json::Value> {
@@ -48,10 +45,12 @@ async fn compare<B: Backend, const D: usize>(
         .into_data_async()
         .await
         .map_err(|e| anyhow::anyhow!("{e}"))?;
-    let actual = data.to_vec::<f32>().map_err(|e| anyhow::anyhow!("{e}"))?;
+    let actual = data
+        .try_to_vec::<f32>()
+        .map_err(|e| anyhow::anyhow!("{e}"))?;
     let (expected, shape) = fixture.values(name)?;
     ensure!(
-        data.shape.as_slice() == shape && actual.iter().all(|v| v.is_finite()),
+        data.shape().as_slice() == shape && actual.iter().all(|v| v.is_finite()),
         "{name} shape/non-finite output"
     );
     let max = actual
@@ -74,8 +73,8 @@ async fn compare<B: Backend, const D: usize>(
     Ok(json!({"hook":name,"max_abs":max,"rmse":rmse,"max_abs_tolerance":tolerance}))
 }
 
-pub async fn validate<B: Backend>(
-    model: &Ardy<B>,
+pub async fn validate(
+    model: &Ardy,
     manifest: &Manifest,
     fixture: Fixture,
     backend: &str,
@@ -84,7 +83,7 @@ pub async fn validate<B: Backend>(
 ) -> Result<serde_json::Value> {
     let device = model.weights.device.clone();
     let mut hooks = Vec::new();
-    let x: Tensor<B, 3> = fixture.tensor("x", &device)?;
+    let x: Tensor<3> = fixture.tensor("x", &device)?;
     hooks.push(
         compare(
             "local_root",
@@ -186,10 +185,10 @@ pub async fn validate<B: Backend>(
     timings.sort_by(f64::total_cmp);
     let mut batch_report = serde_json::Value::Null;
     if benchmark_batch {
-        let text: Tensor<B, 3> = fixture.tensor("text", &device)?;
-        let heading: Tensor<B, 2> = fixture.tensor("heading", &device)?;
-        let observed: Tensor<B, 3> = fixture.tensor("observed", &device)?;
-        let mask: Tensor<B, 3> = fixture.tensor("mask", &device)?;
+        let text: Tensor<3> = fixture.tensor("text", &device)?;
+        let heading: Tensor<2> = fixture.tensor("heading", &device)?;
+        let observed: Tensor<3> = fixture.tensor("observed", &device)?;
+        let mask: Tensor<3> = fixture.tensor("mask", &device)?;
         let batch_x = Tensor::cat(vec![x.clone(); 4], 0);
         let text = Tensor::cat(vec![text; 4], 0);
         let heading = Tensor::cat(vec![heading; 4], 0);

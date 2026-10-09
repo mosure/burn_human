@@ -1,5 +1,4 @@
 use anyhow::{Result, ensure};
-use burn::backend::Wgpu;
 use burn_human_inference::transport::{ModelSource, read_bounded};
 use burn_soma::{Soma, validation};
 fn main() -> Result<()> {
@@ -15,7 +14,12 @@ fn main() -> Result<()> {
         let mut artifact = burn_soma::pretrained::DEFAULT.at_base(args[0].clone());
         artifact.sha256 = digest.clone();
         let start = web_time::Instant::now();
-        let soma = Soma::<Wgpu>::load_artifact(&artifact, &Default::default(), |_, _| {}).await?;
+        let soma = Soma::load_artifact(
+            &artifact,
+            &burn::tensor::Device::wgpu(burn::tensor::DeviceKind::DefaultDevice),
+            |_, _| {},
+        )
+        .await?;
         let load = start.elapsed().as_secs_f64();
         let bytes = read_bounded(&args[1], 32 * 1024 * 1024).await?;
         let mut report = validation::validate(&soma, &bytes).await?;

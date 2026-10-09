@@ -1,5 +1,4 @@
 use anyhow::{Result, ensure};
-use burn::backend::Wgpu;
 use burn_human_inference::transport::{ModelSource, read_bounded};
 use burn_mhr::{Mhr, MhrInput, state_to_matrix};
 use serde::Deserialize;
@@ -26,8 +25,13 @@ fn main() -> Result<()> {
     pollster::block_on(async {
         let mut source = ModelSource::new(a[0].clone());
         let manifest = source.manifest(None).await?;
-        let model =
-            Mhr::<Wgpu>::load(&manifest, &mut source, &Default::default(), |_, _| {}).await?;
+        let model = Mhr::load(
+            &manifest,
+            &mut source,
+            &burn::tensor::Device::wgpu(burn::tensor::DeviceKind::DefaultDevice),
+            |_, _| {},
+        )
+        .await?;
         let fixture: Fixture =
             serde_json::from_slice(&read_bounded(&a[1], 32 * 1024 * 1024).await?)?;
         ensure!(
@@ -47,7 +51,7 @@ fn main() -> Result<()> {
                 .vertices
                 .into_data_async()
                 .await?
-                .to_vec::<f32>()
+                .try_to_vec::<f32>()
                 .unwrap();
             let vertex_error = vertices
                 .iter()

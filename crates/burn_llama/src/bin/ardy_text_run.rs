@@ -1,7 +1,6 @@
 //! Text and motion inference in one native process, using the same portable APIs as Bevy.
 use anyhow::{Result, ensure};
 use burn_ardy::Ardy;
-use burn_human_inference::gpu::WgpuBackend as Wgpu;
 use burn_human_inference::transport::{ModelSource, read_bounded};
 use burn_human_motion::MotionRequest;
 use burn_llama::TextEncoder;
@@ -29,15 +28,14 @@ fn main() -> Result<()> {
         }
         let out = Path::new(&args[3]);
         std::fs::create_dir(out)?;
-        let device = Default::default();
+        let device = burn::tensor::Device::wgpu(burn::tensor::DeviceKind::DefaultDevice);
         let source = ModelSource::cached(args[0].clone());
         let text_manifest = source.manifest(None).await?;
         let text_digest = text_manifest.content_sha256.clone();
-        let mut encoder =
-            TextEncoder::<Wgpu>::load(text_manifest, source, &device, |_, _| {}).await?;
+        let mut encoder = TextEncoder::load(text_manifest, source, &device, |_, _| {}).await?;
         let mut source = ModelSource::cached(args[1].clone());
         let motion_manifest = source.manifest(None).await?;
-        let model = Ardy::<Wgpu>::load(&motion_manifest, &mut source, &device, |_, _| {}).await?;
+        let model = Ardy::load(&motion_manifest, &mut source, &device, |_, _| {}).await?;
         let mut records = Vec::new();
         for (label, request) in requests {
             let start = web_time::Instant::now();

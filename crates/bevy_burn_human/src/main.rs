@@ -1,13 +1,15 @@
 use bevy::app::AppExit;
+use bevy::camera_controller::pan_orbit_camera::prelude::{
+    DefaultPanOrbitCameraPlugins, PanOrbitCamera,
+};
 use bevy::input::{ButtonInput, keyboard::KeyCode};
 use bevy::prelude::*;
 use bevy::prelude::{MessageReader, MessageWriter};
 use bevy_burn_human::motion::{HumanMotionPlugin, MotionActor, MotionPlayback, MotionUi};
+use bevy_burn_human::studio_ui::{ControlEvent, Forms, Row, StudioInput, Value};
 use bevy_burn_human::{
     BurnHumanAssets, BurnHumanInput, BurnHumanMeshMode, BurnHumanPlugin, BurnHumanRenderMode,
 };
-use bevy_egui::{EguiContexts, EguiPlugin, EguiPrimaryContextPass, egui};
-use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use noise::{NoiseFn, OpenSimplex};
 
 #[derive(Component)]
@@ -45,7 +47,14 @@ struct NoiseRig {
 #[derive(Resource, Default)]
 struct SceneSpawned(bool);
 
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen::prelude::wasm_bindgen(start)]
+pub fn start_human_studio() {
+    main();
+}
+
 pub fn main() {
+    burn_human_inference::initialize_browser_runtime();
     #[cfg(target_arch = "wasm32")]
     console_error_panic_hook::set_once();
 
@@ -83,8 +92,7 @@ fn run_app(burn_plugin: BurnHumanPlugin) {
             }),
             ..default()
         }))
-        .add_plugins(EguiPlugin::default())
-        .add_plugins(PanOrbitCameraPlugin)
+        .add_plugins(DefaultPanOrbitCameraPlugins)
         .add_plugins(burn_plugin)
         .add_plugins(HumanMotionPlugin)
         .add_systems(Startup, setup_stage)
@@ -97,6 +105,9 @@ fn run_app(burn_plugin: BurnHumanPlugin) {
                     .run_if(manual_pose),
                 drive_noise
                     .run_if(manual_pose)
+                    .run_if(|state: Option<Res<DemoState>>| {
+                        state.is_some_and(|state| state.noise_enabled || state.is_changed())
+                    })
                     .run_if(resource_exists::<NoiseRig>)
                     .run_if(resource_exists::<DemoState>),
             )
@@ -107,9 +118,8 @@ fn run_app(burn_plugin: BurnHumanPlugin) {
             setup_scene_once.run_if(resource_exists::<BurnHumanAssets>),
         )
         .add_systems(
-            EguiPrimaryContextPass,
+            Update,
             ui_controls
-                .run_if(|motion: Res<MotionUi>| motion.is_manual_tab())
                 .run_if(resource_exists::<BurnHumanAssets>)
                 .run_if(resource_exists::<DemoState>),
         )
@@ -248,7 +258,7 @@ fn setup_stage(mut commands: Commands) {
         Camera3d::default(),
         Transform::from_xyz(2.8, 1.6, 4.0).looking_at(Vec3::new(0.0, 1.0, 0.0), Vec3::Y),
         PanOrbitCamera {
-            focus: Vec3::new(0.0, 1.0, 0.0),
+            last_anchor_depth: -4.5,
             ..default()
         },
     ));
@@ -264,219 +274,249 @@ fn setup_noise(mut commands: Commands, has_noise: Option<Res<NoiseRig>>) {
 
 fn ui_controls(
     mut commands: Commands,
-    mut contexts: EguiContexts,
+    mut events: MessageReader<ControlEvent>,
     assets: Res<BurnHumanAssets>,
     mut state: ResMut<DemoState>,
-    mut query: Query<
-        (
-            Entity,
-            &mut BurnHumanInput,
-            Option<&mut BurnHumanRenderMode>,
-            &mut Transform,
-        ),
-        With<HumanTag>,
-    >,
+    motion: Res<MotionUi>,
+    mut forms: ResMut<Forms>,
+    mut query: Query<(Entity, Option<&BurnHumanRenderMode>, &mut Transform), With<HumanTag>>,
 ) {
-    let (entity, mut input, render_mode, mut transform) = if let Ok(i) = query.single_mut() {
-        i
-    } else {
+    if !motion.is_manual_tab() {
+        forms.0.insert("anny", vec![]);
+        return;
+    }
+    let Ok((entity, render_mode, mut transform)) = query.single_mut() else {
         return;
     };
-
-    let Ok(ctx) = contexts.ctx_mut() else { return };
-    transform.translation = Vec3::Y;
-    transform.scale = Vec3::splat(1.15);
-
-    egui::Window::new("Anny body & pose")
-        .default_pos([12.0, 226.0])
-        .default_width(360.0)
-        .max_height((ctx.content_rect().height() - 250.0).max(160.0))
-        .vscroll(true)
-        .show(ctx, |ui| {
-            ui.label("Shape and pose the bundled Anny body. Press R to try a random pose.");
-            ui.separator();
-            let current_mode = render_mode
-                .as_ref()
-                .map(|m| m.0)
-                .unwrap_or(BurnHumanMeshMode::SkinnedMesh);
-            let mut selected_mode = current_mode;
-            ui.horizontal(|ui| {
-                ui.label("Render mode");
-                egui::ComboBox::from_id_salt("burn_human_render_mode")
-                    .selected_text(match selected_mode {
-                        BurnHumanMeshMode::SkinnedMesh => "Skinned (GPU)",
-                        BurnHumanMeshMode::BakedMesh => "Baked (CPU)",
-                    })
-                    .show_ui(ui, |ui| {
-                        ui.selectable_value(
-                            &mut selected_mode,
-                            BurnHumanMeshMode::SkinnedMesh,
-                            "Skinned (GPU)",
-                        );
-                        ui.selectable_value(
-                            &mut selected_mode,
-                            BurnHumanMeshMode::BakedMesh,
-                            "Baked (CPU)",
-                        );
-                    });
-            });
-            if selected_mode != current_mode {
-                if let Some(mut mode) = render_mode {
-                    mode.0 = selected_mode;
+    let mut mode = render_mode
+        .as_ref()
+        .map(|m| m.0)
+        .unwrap_or(BurnHumanMeshMode::SkinnedMesh);
+    for event in events.read() {
+        if !event.id.starts_with("anny.") {
+            continue;
+        }
+        let id = &event.id[5..];
+        match (&event.value, id) {
+            (Value::Choice(value), "mode") => {
+                mode = if *value == 0 {
+                    BurnHumanMeshMode::SkinnedMesh
                 } else {
-                    commands
-                        .entity(entity)
-                        .insert(BurnHumanRenderMode(selected_mode));
+                    BurnHumanMeshMode::BakedMesh
                 }
             }
-            ui.separator();
-            ui.checkbox(&mut state.use_reference_case, "Use bundled reference pose");
-            if state.use_reference_case {
-                if let Some((idx, name)) = pick_single_sample_case(&mut state, &assets) {
-                    state.selected_case = idx;
-                    ui.label(format!("Reference case: {name}"));
-                    input.case_name = Some(name);
-                } else {
-                    ui.label("No single-sample reference case available");
-                    input.case_name = None;
+            (Value::Choice(value), "bone") => state.selected_bone = *value,
+            (Value::Choice(value), "case") => state.selected_case = *value,
+            (Value::Toggle(value), "reference") => state.use_reference_case = *value,
+            (Value::Toggle(value), "noise") => {
+                if *value && !state.noise_enabled {
+                    state.phenotype_noise_baseline = state.phenotype_values.clone();
+                    state.bone_noise_baseline = state.bone_euler_deg.clone();
                 }
-                input.phenotype_inputs = None;
-                input.blendshape_weights = None;
-                input.blendshape_delta = None;
-            } else {
-                input.case_name = None;
-                ui.label("Body shape");
-                for idx in 0..state.phenotype_values.len() {
-                    let label = state.phenotype_labels.get(idx).cloned().unwrap_or_default();
-                    if let Some(value) = state.phenotype_values.get_mut(idx) {
-                        ui.add(egui::Slider::new(value, 0.0..=1.0).text(label));
-                    }
-                }
-                if ui.button("Reset phenotype").clicked() {
-                    for v in state.phenotype_values.iter_mut() {
-                        *v = 0.5;
-                    }
-                }
-                input.phenotype_inputs = Some(state.phenotype_values.clone());
+                state.noise_enabled = *value;
             }
-
-            ui.separator();
-            ui.label(format!(
-                "Blendshapes: {} · Bones: {}",
-                assets.body.metadata().static_data.blendshapes.shape[0],
-                assets.body.metadata().metadata.bone_labels.len()
-            ));
-            ui.label(format!(
-                "Reference cases available: {}",
-                assets.body.metadata().metadata.case_names.len()
-            ));
-            ui.separator();
-            let was_noise = state.noise_enabled;
-            ui.checkbox(&mut state.noise_enabled, "Procedural motion");
-            if state.noise_enabled && !was_noise {
-                state.phenotype_noise_baseline = state.phenotype_values.clone();
-                state.bone_noise_baseline = state.bone_euler_deg.clone();
+            (Value::Action, "reset_shape") => state.phenotype_values.fill(0.5),
+            (Value::Action, "reset_bone") => {
+                let i = state.selected_bone;
+                if let Some(bone) = state.bone_euler_deg.get_mut(i) {
+                    *bone = [0.; 3];
+                }
             }
-            ui.collapsing("Procedural motion settings", |ui| {
-                ui.add(
-                    egui::Slider::new(&mut state.noise_amp, 0.0..=2.0)
-                        .text("global noise")
-                        .logarithmic(false),
-                );
-                ui.add(
-                    egui::Slider::new(&mut state.phenotype_noise_amp, 0.0..=4.0)
-                        .text("phenotype noise")
-                        .logarithmic(false),
-                );
-                ui.separator();
-                ui.label("Pose noise (deg, per group)");
-                ui.add(
-                    egui::Slider::new(&mut state.upper_leg_noise_amp, 0.0..=50.0)
-                        .text("upper leg")
-                        .logarithmic(false),
-                );
-                ui.add(
-                    egui::Slider::new(&mut state.lower_leg_noise_amp, 0.0..=50.0)
-                        .text("lower leg")
-                        .logarithmic(false),
-                );
-                ui.add(
-                    egui::Slider::new(&mut state.upper_arm_noise_amp, 0.0..=50.0)
-                        .text("upper arm")
-                        .logarithmic(false),
-                );
-                ui.add(
-                    egui::Slider::new(&mut state.lower_arm_noise_amp, 0.0..=50.0)
-                        .text("lower arm")
-                        .logarithmic(false),
-                );
-                ui.add(
-                    egui::Slider::new(&mut state.wrist_noise_amp, 0.0..=50.0)
-                        .text("wrist")
-                        .logarithmic(false),
-                );
-                ui.add(
-                    egui::Slider::new(&mut state.hand_noise_amp, 0.0..=50.0)
-                        .text("hand/fingers")
-                        .logarithmic(false),
-                );
-                ui.add(
-                    egui::Slider::new(&mut state.spine_noise_amp, 0.0..=50.0)
-                        .text("spine")
-                        .logarithmic(false),
-                );
-                ui.add(
-                    egui::Slider::new(&mut state.other_pose_noise_amp, 0.0..=50.0)
-                        .text("other pose")
-                        .logarithmic(false),
-                );
-                ui.add(
-                    egui::Slider::new(&mut state.time_scale, 0.25..=3.0)
-                        .text("time scale")
-                        .logarithmic(false),
-                );
-            });
-            ui.separator();
-            ui.label("Bone orientation (degrees)");
-            egui::ComboBox::from_id_salt("bone_select")
-                .selected_text(
-                    assets
-                        .body
-                        .metadata()
-                        .metadata
-                        .bone_labels
-                        .get(state.selected_bone)
-                        .cloned()
-                        .unwrap_or_else(|| "bone".to_string()),
-                )
-                .show_ui(ui, |ui| {
-                    for (idx, name) in assets
-                        .body
-                        .metadata()
-                        .metadata
-                        .bone_labels
-                        .iter()
-                        .enumerate()
+            (Value::Number(value), _) if value.is_finite() => match id {
+                "noise_amp" => state.noise_amp = *value,
+                "phenotype_noise_amp" => state.phenotype_noise_amp = *value,
+                "upper_leg_noise_amp" => state.upper_leg_noise_amp = *value,
+                "lower_leg_noise_amp" => state.lower_leg_noise_amp = *value,
+                "upper_arm_noise_amp" => state.upper_arm_noise_amp = *value,
+                "lower_arm_noise_amp" => state.lower_arm_noise_amp = *value,
+                "wrist_noise_amp" => state.wrist_noise_amp = *value,
+                "hand_noise_amp" => state.hand_noise_amp = *value,
+                "spine_noise_amp" => state.spine_noise_amp = *value,
+                "other_pose_noise_amp" => state.other_pose_noise_amp = *value,
+                "time_scale" => state.time_scale = *value,
+                _ if id.starts_with("shape_") => {
+                    if let Ok(i) = id[6..].parse::<usize>()
+                        && let Some(slot) = state.phenotype_values.get_mut(i)
                     {
-                        ui.selectable_value(&mut state.selected_bone, idx, name);
+                        *slot = *value as f64;
                     }
-                });
-            let selected_bone = state.selected_bone;
-            let mut euler = state
-                .bone_euler_deg
-                .get(selected_bone)
-                .copied()
-                .unwrap_or([0.0; 3]);
-            ui.add(egui::Slider::new(&mut euler[0], -90.0..=90.0).text("X"));
-            ui.add(egui::Slider::new(&mut euler[1], -90.0..=90.0).text("Y"));
-            ui.add(egui::Slider::new(&mut euler[2], -90.0..=90.0).text("Z"));
-            if ui.button("Reset bone").clicked() {
-                euler = [0.0; 3];
-            }
-            if let Some(slot) = state.bone_euler_deg.get_mut(selected_bone) {
-                *slot = euler;
-            }
-        });
+                }
+                _ if id.starts_with("rotation_") => {
+                    if let Ok(i) = id[9..].parse::<usize>()
+                        && i < 3
+                    {
+                        let selected = state.selected_bone;
+                        if let Some(bone) = state.bone_euler_deg.get_mut(selected) {
+                            bone[i] = *value;
+                        }
+                    }
+                }
+                _ => {}
+            },
+            _ => {}
+        }
+    }
+    if render_mode
+        .as_ref()
+        .is_none_or(|previous| previous.0 != mode)
+    {
+        commands.entity(entity).insert(BurnHumanRenderMode(mode));
+    }
+    let posed = Transform {
+        translation: Vec3::Y,
+        scale: Vec3::splat(1.15),
+        ..*transform
+    };
+    transform.set_if_neq(posed);
+
+    let mut rows = vec![
+        Row::Label("Anny body & pose · R: random pose".into()),
+        Row::select(
+            "anny.mode",
+            "Render mode",
+            vec!["Skinned (GPU)".into(), "Baked (CPU)".into()],
+            usize::from(mode == BurnHumanMeshMode::BakedMesh),
+        ),
+        Row::toggle(
+            "anny.reference",
+            "Use bundled reference pose",
+            state.use_reference_case,
+        ),
+    ];
+    if state.use_reference_case {
+        rows.push(Row::select(
+            "anny.case",
+            "Reference pose",
+            assets.body.metadata().metadata.case_names.clone(),
+            state.selected_case,
+        ));
+    } else {
+        for (i, value) in state.phenotype_values.iter().enumerate() {
+            rows.push(Row::slider(
+                &format!("anny.shape_{i}"),
+                &state.phenotype_labels[i],
+                *value as f32,
+                0.,
+                1.,
+                0.01,
+            ));
+        }
+        rows.push(Row::button("anny.reset_shape", "Reset body shape", true));
+    }
+    rows.push(Row::toggle(
+        "anny.noise",
+        "Procedural motion",
+        state.noise_enabled,
+    ));
+    for (id, title, value, min, max) in [
+        ("noise_amp", "Global noise", state.noise_amp, 0., 2.),
+        (
+            "phenotype_noise_amp",
+            "Body shape noise",
+            state.phenotype_noise_amp,
+            0.,
+            4.,
+        ),
+        (
+            "upper_leg_noise_amp",
+            "Upper leg noise (degrees)",
+            state.upper_leg_noise_amp,
+            0.,
+            50.,
+        ),
+        (
+            "lower_leg_noise_amp",
+            "Lower leg noise (degrees)",
+            state.lower_leg_noise_amp,
+            0.,
+            50.,
+        ),
+        (
+            "upper_arm_noise_amp",
+            "Upper arm noise (degrees)",
+            state.upper_arm_noise_amp,
+            0.,
+            50.,
+        ),
+        (
+            "lower_arm_noise_amp",
+            "Lower arm noise (degrees)",
+            state.lower_arm_noise_amp,
+            0.,
+            50.,
+        ),
+        (
+            "wrist_noise_amp",
+            "Wrist noise (degrees)",
+            state.wrist_noise_amp,
+            0.,
+            50.,
+        ),
+        (
+            "hand_noise_amp",
+            "Hand noise (degrees)",
+            state.hand_noise_amp,
+            0.,
+            50.,
+        ),
+        (
+            "spine_noise_amp",
+            "Spine noise (degrees)",
+            state.spine_noise_amp,
+            0.,
+            50.,
+        ),
+        (
+            "other_pose_noise_amp",
+            "Other pose noise (degrees)",
+            state.other_pose_noise_amp,
+            0.,
+            50.,
+        ),
+        (
+            "time_scale",
+            "Procedural time scale",
+            state.time_scale,
+            0.25,
+            3.,
+        ),
+    ] {
+        rows.push(Row::slider(
+            &format!("anny.{id}"),
+            title,
+            value,
+            min,
+            max,
+            0.05,
+        ));
+    }
+    rows.push(Row::select(
+        "anny.bone",
+        "Bone orientation",
+        assets.body.metadata().metadata.bone_labels.clone(),
+        state.selected_bone,
+    ));
+    if let Some(bone) = state.bone_euler_deg.get(state.selected_bone) {
+        for (i, title) in [
+            "Euler X (degrees)",
+            "Euler Y (degrees)",
+            "Euler Z (degrees)",
+        ]
+        .iter()
+        .enumerate()
+        {
+            rows.push(Row::slider(
+                &format!("anny.rotation_{i}"),
+                title,
+                bone[i],
+                -90.,
+                90.,
+                1.,
+            ));
+        }
+    }
+    rows.push(Row::button("anny.reset_bone", "Reset bone", true));
+    forms.0.insert("anny", rows);
 }
 
 fn manual_pose(playback: Res<MotionPlayback>, motion: Res<MotionUi>) -> bool {
@@ -485,7 +525,7 @@ fn manual_pose(playback: Res<MotionPlayback>, motion: Res<MotionUi>) -> bool {
 
 fn apply_random_pose_on_key(
     keys: Res<ButtonInput<KeyCode>>,
-    mut contexts: EguiContexts,
+    ui_input: Res<StudioInput>,
     assets: Res<BurnHumanAssets>,
     mut state: ResMut<DemoState>,
     mut query: Query<&mut BurnHumanInput, With<HumanTag>>,
@@ -493,10 +533,7 @@ fn apply_random_pose_on_key(
     if !keys.just_pressed(KeyCode::KeyR) {
         return;
     }
-    if contexts
-        .ctx_mut()
-        .is_ok_and(|ctx| ctx.egui_wants_keyboard_input())
-    {
+    if ui_input.keyboard {
         return;
     }
     let mut rng = fastrand::Rng::new();
@@ -696,20 +733,8 @@ fn pose_noise_scale_for_bone(name: &str, scales: &PoseNoiseScales) -> f32 {
     }
 }
 
-fn pick_single_sample_case(
-    state: &mut DemoState,
-    assets: &BurnHumanAssets,
-) -> Option<(usize, String)> {
-    let cases = &assets.body.metadata().cases;
+fn pick_single_sample_case(state: &DemoState, assets: &BurnHumanAssets) -> Option<(usize, String)> {
     let names = &assets.body.metadata().metadata.case_names;
-    if let Some((idx, _)) = cases
-        .iter()
-        .enumerate()
-        .find(|(_, c)| c.pose_parameters.shape[0] == 1)
-    {
-        state.selected_case = idx;
-        return names.get(idx).cloned().map(|n| (idx, n));
-    }
     names
         .get(state.selected_case)
         .cloned()
@@ -731,7 +756,7 @@ fn drive_noise(
 
     if !state.noise_enabled {
         input.case_name = if state.use_reference_case {
-            pick_single_sample_case(&mut state, &assets).map(|(_, n)| n)
+            pick_single_sample_case(&state, &assets).map(|(_, n)| n)
         } else {
             None
         };

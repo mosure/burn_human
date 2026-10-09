@@ -1,17 +1,17 @@
 # burn_mhr
 
-MHR inference in Rust/Burn 0.21, with native WGPU and browser WebGPU support.
+MHR inference in Rust/Burn 0.22, with native WGPU and browser WebGPU support.
 
 Momentum Human Rig identity, expression, articulation, correctives and skinning; used by the GEM-X pipeline.
 
 ```toml
-burn_mhr = { version = "0.1.2", features = ["wgpu"] }
+burn_mhr = { version = "0.2.0", features = ["wgpu"] }
 ```
 
 The model owns its immutable CDN catalog and loading policy:
 
 ```rust,ignore
-let model = burn_mhr::Mhr::<burn::backend::Wgpu>::load_pretrained(
+let model = burn_mhr::Mhr::load_pretrained(
     &device,
     |done, total| { /* progress */ },
 ).await?;

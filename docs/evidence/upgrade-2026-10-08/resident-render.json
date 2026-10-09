@@ -1,0 +1,6 @@
+{
+  "hardware_webgpu": true,
+  "shader_errors": [],
+  "console_errors": [],
+  "scope": "Bevy 0.20 WESL extended material; real SOMA on the Bevy/Burn shared device; default forward renderer"
+}

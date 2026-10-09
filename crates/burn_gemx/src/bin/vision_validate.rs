@@ -1,8 +1,5 @@
 use anyhow::{Result, ensure};
-use burn::{
-    backend::Wgpu,
-    tensor::{Tensor, TensorData},
-};
+use burn::tensor::{Tensor, TensorData};
 use burn_gemx::vision::Vision;
 use burn_human_inference::transport::ModelSource;
 use serde::Deserialize;
@@ -20,11 +17,11 @@ fn main() -> Result<()> {
         "gem-vision-validate BUNDLE REFERENCE_JSON OUTPUT_JSON"
     );
     pollster::block_on(async {
-        let device = Default::default();
+        let device = burn::tensor::Device::wgpu(burn::tensor::DeviceKind::DefaultDevice);
         let mut source = ModelSource::new(args[0].clone());
         let manifest = source.manifest(None).await?;
         let start = web_time::Instant::now();
-        let model = Vision::<Wgpu>::load(&manifest, &mut source, &device, |i, n| {
+        let model = Vision::load(&manifest, &mut source, &device, |i, n| {
             if i % 100 == 0 {
                 println!("{i}/{n}");
             }
@@ -39,7 +36,7 @@ fn main() -> Result<()> {
             out.dims() == reference.output_shape,
             "Output shape mismatch"
         );
-        let values = out.into_data_async().await?.to_vec::<f32>().unwrap();
+        let values = out.into_data_async().await?.try_to_vec::<f32>().unwrap();
         let cold = start.elapsed().as_secs_f64();
         let mut max = 0f64;
         let mut square = 0.0;

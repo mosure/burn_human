@@ -2,10 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 use crate::{geometry::*, rig::RigData};
 use anyhow::{Result, ensure};
-use burn::{
-    prelude::Backend,
-    tensor::{IndexingUpdateOp, Int, Tensor, TensorData, activation},
-};
+use burn::tensor::{IndexingUpdateOp, Int, Tensor, TensorData, activation};
 use burn_human_inference::{
     transport::ModelSource,
     weights::{TensorBank, read_tensors},
@@ -78,15 +75,15 @@ impl Default for SomaPose {
     }
 }
 
-pub struct PreparedIdentity<B: Backend> {
-    pub rest_vertices: Tensor<B, 2>,
+pub struct PreparedIdentity {
+    pub rest_vertices: Tensor<2>,
     pub bind_world: Vec<Mat4>,
     public_local: Vec<Mat4>,
     target_local: Vec<Mat4>,
     pub parameters: IdentityParameters,
 }
-pub struct SomaOutput<B: Backend> {
-    pub vertices: Tensor<B, 3>,
+pub struct SomaOutput {
+    pub vertices: Tensor<3>,
     /// Includes the virtual root, in public SOMA order; one list per batch item.
     pub transforms: Vec<Vec<Mat4>>,
 }
@@ -98,19 +95,19 @@ pub enum BindConvention {
     Fitted,
 }
 
-pub struct Soma<B: Backend> {
+pub struct Soma {
     pub rig: RigData,
-    weights: TensorBank<B>,
+    weights: TensorBank,
     template: Vec<Vec3>,
-    corrective_indices: BTreeMap<usize, Tensor<B, 1, Int>>,
+    corrective_indices: BTreeMap<usize, Tensor<1, Int>>,
     pub faces: Vec<[u32; 3]>,
 }
 
-impl<B: Backend> Soma<B> {
+impl Soma {
     pub async fn load(
         manifest: &Manifest,
         source: &mut ModelSource,
-        device: &B::Device,
+        device: &burn::tensor::Device,
         mut progress: impl FnMut(usize, usize),
     ) -> Result<Self> {
         manifest.validate()?;
@@ -184,10 +181,10 @@ impl<B: Backend> Soma<B> {
         let mut uploads = burn_human_inference::weights::UploadBudget::default();
         for (i, object) in manifest.objects.iter().enumerate() {
             for (name, data) in read_tensors(source, object).await? {
-                let bytes = data.bytes.len();
+                let bytes = data.bytes().len();
                 if name == "fit.vertices" {
                     let flat = data
-                        .to_vec::<f32>()
+                        .try_to_vec::<f32>()
                         .map_err(|e| anyhow::anyhow!("vertices: {e}"))?;
                     template = flat
                         .as_chunks::<3>()
@@ -197,7 +194,7 @@ impl<B: Backend> Soma<B> {
                         .collect();
                 } else if name == "mesh.faces" {
                     let flat = data
-                        .to_vec::<i32>()
+                        .try_to_vec::<i32>()
                         .map_err(|e| anyhow::anyhow!("indices: {e}"))?;
                     ensure!(
                         flat.iter().all(|v| *v >= 0 && *v < 18056),
@@ -212,7 +209,7 @@ impl<B: Backend> Soma<B> {
                 } else if name.ends_with(".indices") {
                     let joint = name.split('.').nth(2).unwrap().parse()?;
                     let indices = data
-                        .to_vec::<i32>()
+                        .try_to_vec::<i32>()
                         .map_err(|e| anyhow::anyhow!("indices: {e}"))?;
                     ensure!(
                         indices.iter().all(|v| *v >= 0 && *v < 54168)
@@ -223,7 +220,7 @@ impl<B: Backend> Soma<B> {
                 } else {
                     weights.insert(name, data)?;
                 }
-                uploads.record::<B>(device, bytes).await?;
+                uploads.record(device, bytes).await?;
                 burn_human_inference::cooperative::yield_to_browser().await;
             }
             progress(i + 1, manifest.objects.len());
@@ -241,9 +238,9 @@ impl<B: Backend> Soma<B> {
     pub async fn prepare_identity(
         &self,
         parameters: IdentityParameters,
-    ) -> Result<PreparedIdentity<B>> {
+    ) -> Result<PreparedIdentity> {
         parameters.validate()?;
-        let coeff = Tensor::<B, 2>::from_data(
+        let coeff = Tensor::<2>::from_data(
             TensorData::new(parameters.coefficients.clone(), [1, 128]),
             &self.weights.device,
         );
@@ -258,9 +255,9 @@ impl<B: Backend> Soma<B> {
     /// Fit and bind a SOMA-topology rest mesh, also used by the MHR identity adapter.
     pub async fn prepare_rest_shape(
         &self,
-        vertices: Tensor<B, 2>,
+        vertices: Tensor<2>,
         parameters: IdentityParameters,
-    ) -> Result<PreparedIdentity<B>> {
+    ) -> Result<PreparedIdentity> {
         self.prepare_rest_shape_with_bind(vertices, parameters, BindConvention::Canonical)
             .await
     }
@@ -269,10 +266,10 @@ impl<B: Backend> Soma<B> {
     /// Native SOMA controls use the canonical bind convention by default.
     pub async fn prepare_rest_shape_with_bind(
         &self,
-        vertices: Tensor<B, 2>,
+        vertices: Tensor<2>,
         parameters: IdentityParameters,
         convention: BindConvention,
-    ) -> Result<PreparedIdentity<B>> {
+    ) -> Result<PreparedIdentity> {
         parameters.validate()?;
         ensure!(
             vertices.dims() == [18056, 3],
@@ -285,13 +282,13 @@ impl<B: Backend> Soma<B> {
         let pos = positions
             .into_data_async()
             .await?
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .map_err(|e| anyhow::anyhow!("joint positions: {e}"))?;
         let host = vertices
             .clone()
             .into_data_async()
             .await?
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .map_err(|e| anyhow::anyhow!("rest vertices: {e}"))?;
         ensure!(
             host.iter().all(|v| v.is_finite()),
@@ -364,11 +361,11 @@ impl<B: Backend> Soma<B> {
 
     fn skin(
         &self,
-        vertices: Tensor<B, 3>,
+        vertices: Tensor<3>,
         transforms: &[Vec<Mat4>],
         bind: &[Mat4],
         weights: &str,
-    ) -> Tensor<B, 3> {
+    ) -> Tensor<3> {
         let batch = transforms.len();
         let joints = bind.len();
         let mut flat = Vec::with_capacity(batch * joints * 12);
@@ -379,7 +376,7 @@ impl<B: Backend> Soma<B> {
                 flat.extend_from_slice(&rows[..12]);
             }
         }
-        let delta = Tensor::<B, 3>::from_data(
+        let delta = Tensor::<3>::from_data(
             TensorData::new(flat, [batch, joints, 12]),
             &self.weights.device,
         );
@@ -406,9 +403,9 @@ impl<B: Backend> Soma<B> {
     /// Evaluate a batch of poses using GPU correctives and GPU linear blend skinning.
     pub fn pose_batch(
         &self,
-        identity: &PreparedIdentity<B>,
+        identity: &PreparedIdentity,
         poses: &[SomaPose],
-    ) -> Result<SomaOutput<B>> {
+    ) -> Result<SomaOutput> {
         identity.parameters.validate()?;
         ensure!(
             !poses.is_empty() && poses.len() <= 256,
@@ -491,7 +488,7 @@ impl<B: Backend> Soma<B> {
             .unsqueeze::<3>()
             .expand([batch, 18056, 3]);
         if poses.iter().any(|p| p.apply_correctives) {
-            let input = Tensor::<B, 2>::from_data(
+            let input = Tensor::<2>::from_data(
                 TensorData::new(corrective_input, [batch, 468]),
                 &self.weights.device,
             );
@@ -502,7 +499,7 @@ impl<B: Backend> Soma<B> {
             // Scatter along the leading coordinate dimension so each unique
             // sparse coordinate is independent. select_assign on [batch, xyz]
             // serializes the entire sparse list in one GPU thread per pose.
-            let mut offsets = Tensor::<B, 2>::zeros([54168, batch], &self.weights.device);
+            let mut offsets = Tensor::<2>::zeros([54168, batch], &self.weights.device);
             for group in &self.rig.corrective_groups {
                 let start = group.joint * 24;
                 let values = self.weights.linear(

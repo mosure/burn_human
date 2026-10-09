@@ -1,6 +1,6 @@
 #![recursion_limit = "256"]
 
-use anyhow::{Context, Result, anyhow, bail};
+use anyhow::{Result, anyhow, bail};
 use bevy::asset::{AssetLoader, LoadContext, RenderAssetUsages, io::Reader};
 use bevy::log::warn;
 use bevy::mesh::{
@@ -16,6 +16,13 @@ use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 use std::path::PathBuf;
 use std::sync::Arc;
+
+/// Initialize browser compiler registrations before constructing a Bevy app.
+/// Native calls and builds without the studio feature are harmless.
+pub fn initialize_browser_runtime() {
+    #[cfg(feature = "studio")]
+    burn_human_inference::initialize_browser_runtime();
+}
 
 /// How to load the reference data used by the Bevy plugin.
 #[derive(Clone)]
@@ -237,7 +244,7 @@ impl AssetLoader for ReferenceAssetLoader {
             let tensor_bytes: Vec<u8> = load_context
                 .read_asset_bytes(tensor_path.clone())
                 .await
-                .with_context(|| format!("reading companion {:?}", tensor_path))?;
+                .map_err(|e| anyhow!("reading companion {:?}: {e}", tensor_path))?;
             let body = AnnyBody::from_reference_bytes(&tensor_bytes, &meta_bytes)?;
             Ok(BurnHumanReferenceAsset(Arc::new(body)))
         }
@@ -604,7 +611,7 @@ fn resolve_input(assets: &BurnHumanAssets, input: &BurnHumanInput) -> Result<Res
                 .cases
                 .iter()
                 .find(|c| c.name == name)
-                .context("reference case not found")?,
+                .ok_or_else(|| anyhow!("reference case not found"))?,
         ),
         None => None,
     };
@@ -1223,3 +1230,6 @@ mod tests {
 }
 #[cfg(feature = "studio")]
 pub mod motion;
+
+#[cfg(feature = "studio")]
+pub mod studio_ui;

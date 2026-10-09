@@ -1,17 +1,17 @@
 # burn_soma
 
-SOMA-X inference in Rust/Burn 0.21, with native WGPU and browser WebGPU support.
+SOMA-X inference in Rust/Burn 0.22, with native WGPU and browser WebGPU support.
 
 PCA identity, procedural rig, pose correctives and GPU skinning. The optional `mhr` feature provides MHR-to-SOMA identity transfer.
 
 ```toml
-burn_soma = { version = "0.1.3", features = ["wgpu"] }
+burn_soma = { version = "0.2.0", features = ["wgpu"] }
 ```
 
 The model owns its immutable CDN catalog and loading policy:
 
 ```rust,ignore
-let model = burn_soma::Soma::<burn::backend::Wgpu>::load_pretrained(
+let model = burn_soma::Soma::load_pretrained(
     &device,
     |done, total| { /* progress */ },
 ).await?;

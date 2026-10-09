@@ -56,7 +56,14 @@ pub(super) fn update(
     mut materials: ResMut<Assets<BodyMaterial>>,
     mut actors: Query<(&mut Visibility, &mut Transform, &mut Aabb, &mut Mesh3d), With<SomaActor>>,
     mut anny: Query<&mut Visibility, (With<MotionActor>, Without<SomaActor>)>,
-    mut cameras: Query<(&mut bevy_panorbit_camera::PanOrbitCamera, &Projection)>,
+    mut cameras: Query<
+        (
+            &mut super::camera::PanOrbitCamera,
+            &mut Transform,
+            &Projection,
+        ),
+        Without<SomaActor>,
+    >,
 ) {
     let pending = runtime.0.lock().unwrap().body.surface.take();
     if let Some(surface) = pending {
@@ -142,11 +149,10 @@ pub(super) fn update(
     }
     if display.frame_view {
         display.frame_view = false;
-        for (mut camera, projection) in &mut cameras {
-            camera.target_focus = display.center;
+        for (mut camera, mut transform, projection) in &mut cameras {
             // Fit the evaluated body after scale, identity or pose changes.
             let radius = display.radius * 1.12;
-            camera.target_radius = match projection {
+            let distance = match projection {
                 Projection::Perspective(p) => {
                     let vertical = p.fov * 0.5;
                     let horizontal = (vertical.tan() * p.aspect_ratio).atan();
@@ -156,9 +162,9 @@ pub(super) fn update(
                     // PanOrbit uses radius as the orthographic projection scale.
                     2.0 * radius * p.scale / p.area.size().min_element().max(0.01)
                 }
-                _ => camera.target_radius,
+                _ => camera.last_anchor_depth().abs() as f32,
             };
-            camera.force_update = true;
+            super::camera::frame(&mut camera, &mut transform, display.center, distance);
         }
     }
 }

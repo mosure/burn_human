@@ -19,7 +19,7 @@ jobs:
         run: |
           mkdir -p ./crates/bevy_burn_human/assets
           cp -R ./assets/. ./crates/bevy_burn_human/assets/
-      - run: cargo test -p bevy_burn_human --no-default-features --lib --locked
+      - run: cargo test -p bevy_burn_human --no-default-features --features studio --lib --locked
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -35,5 +35,6 @@ jobs:
       - run: rustup target add wasm32-unknown-unknown
       - run: cargo check -p bevy_burn_human --target wasm32-unknown-unknown --no-default-features --lib --locked
       - run: cargo check -p bevy_burn_human --target wasm32-unknown-unknown --no-default-features --features studio --bin bevy_burn_human --locked
-      - run: cargo check -p burn_ardy --target wasm32-unknown-unknown --no-default-features --features web-validation --lib --locked
+      - run: cargo build -p burn_ardy --target wasm32-unknown-unknown --no-default-features --features web-validation --lib --release --locked
+      - run: python3 tool/scripts/check_wasm_runtime.py target/wasm32-unknown-unknown/release/burn_ardy.wasm
       - run: cargo check -p burn_llama -p burn_soma -p burn_gemx --target wasm32-unknown-unknown --no-default-features --features burn_llama/web-validation,burn_soma/web-validation,burn_gemx/web-validation --lib --locked

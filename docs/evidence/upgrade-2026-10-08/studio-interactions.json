@@ -1,0 +1,224 @@
+{
+  "browser": "153.0.8010.12",
+  "errors": [],
+  "console_errors": [],
+  "actions": [
+    {
+      "action": "click",
+      "x": 325,
+      "y": 65,
+      "name": "studio-mode-menu"
+    },
+    {
+      "action": "click",
+      "x": 110,
+      "y": 118,
+      "name": "studio-soma"
+    },
+    {
+      "action": "click",
+      "x": 180,
+      "y": 252,
+      "name": "studio-soma-loaded",
+      "wait_ms": 16000
+    },
+    {
+      "action": "click",
+      "x": 170,
+      "y": 385,
+      "name": "studio-soma-wave",
+      "wait_ms": 1500
+    },
+    {
+      "action": "click",
+      "x": 100,
+      "y": 737,
+      "name": "studio-joint-filter"
+    },
+    {
+      "action": "type",
+      "text": "hand",
+      "name": "studio-joint-filter-hand",
+      "wait_ms": 500
+    },
+    {
+      "action": "click",
+      "x": 230,
+      "y": 458,
+      "name": "studio-soma-scale",
+      "wait_ms": 1000
+    },
+    {
+      "action": "click",
+      "x": 146,
+      "y": 95,
+      "name": "studio-camera-side"
+    },
+    {
+      "action": "click",
+      "x": 180,
+      "y": 355,
+      "name": "studio-frame-body"
+    },
+    {
+      "action": "click",
+      "x": 325,
+      "y": 65,
+      "name": "studio-mode-menu"
+    },
+    {
+      "action": "click",
+      "x": 110,
+      "y": 143,
+      "name": "studio-gemx"
+    },
+    {
+      "action": "upload",
+      "x": 180,
+      "y": 282,
+      "path": "/media/mosure/hyper1/repos/burn_human/.cache/gem-real-reference.png",
+      "name": "studio-image-input",
+      "wait_ms": 1000
+    },
+    {
+      "action": "click",
+      "x": 180,
+      "y": 252,
+      "name": "studio-gem-loaded",
+      "wait_ms": 60000
+    },
+    {
+      "action": "drag",
+      "from": [
+        160,
+        530
+      ],
+      "to": [
+        180,
+        545
+      ],
+      "name": "studio-image-crop"
+    },
+    {
+      "action": "click",
+      "x": 180,
+      "y": 862,
+      "name": "studio-image-crop-reset"
+    },
+    {
+      "action": "click",
+      "x": 180,
+      "y": 892,
+      "name": "studio-gem-estimate",
+      "wait_ms": 20000
+    },
+    {
+      "action": "click",
+      "x": 92,
+      "y": 95,
+      "name": "studio-gem-front"
+    },
+    {
+      "action": "click",
+      "x": 180,
+      "y": 125,
+      "name": "studio-gem-frame"
+    },
+    {
+      "action": "click",
+      "x": 325,
+      "y": 65,
+      "name": "studio-mode-menu"
+    },
+    {
+      "action": "click",
+      "x": 110,
+      "y": 94,
+      "name": "studio-motion"
+    },
+    {
+      "action": "click",
+      "x": 180,
+      "y": 252,
+      "name": "studio-motion-models-loaded",
+      "wait_ms": 60000
+    },
+    {
+      "action": "key",
+      "key": "F",
+      "name": "studio-motion-loading",
+      "wait_ms": 30000
+    },
+    {
+      "action": "click",
+      "x": 100,
+      "y": 315,
+      "name": "studio-motion-prompt-focus"
+    },
+    {
+      "action": "key",
+      "key": "Control+a",
+      "name": "studio-motion-prompt-select"
+    },
+    {
+      "action": "type",
+      "text": "A person walks around a corner.",
+      "name": "studio-motion-prompt-text"
+    },
+    {
+      "action": "click",
+      "x": 105,
+      "y": 564,
+      "name": "studio-motion-turn"
+    },
+    {
+      "action": "click",
+      "x": 13,
+      "y": 451,
+      "name": "studio-motion-duration"
+    },
+    {
+      "action": "click",
+      "x": 180,
+      "y": 403,
+      "name": "studio-motion-encoded",
+      "wait_ms": 5000
+    },
+    {
+      "action": "click",
+      "x": 180,
+      "y": 482,
+      "name": "studio-motion-generated",
+      "wait_ms": 10000
+    },
+    {
+      "action": "click",
+      "x": 180,
+      "y": 684,
+      "name": "studio-motion-restart"
+    },
+    {
+      "action": "click",
+      "x": 20,
+      "y": 585,
+      "name": "studio-motion-play",
+      "wait_ms": 3000
+    },
+    {
+      "action": "drag",
+      "from": [
+        880,
+        460
+      ],
+      "to": [
+        1000,
+        490
+      ],
+      "button": "left",
+      "name": "studio-motion-orbit"
+    },
+    {
+      "action": "close"
+    }
+  ]
+}

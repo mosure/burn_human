@@ -1,5 +1,4 @@
 use anyhow::{Result, ensure};
-use burn::backend::Wgpu;
 use burn_gemx::{
     pipeline::{Pipeline, PipelineArtifacts},
     validation,
@@ -12,11 +11,15 @@ fn main() -> Result<()> {
     );
     pollster::block_on(async {
         let artifacts = PipelineArtifacts::from_location(&args[0]).await?;
-        let model = Pipeline::<Wgpu>::load(&artifacts, &Default::default(), |s, i, n| {
-            if i == n {
-                println!("{s} loaded");
-            }
-        })
+        let model = Pipeline::load(
+            &artifacts,
+            &burn::tensor::Device::wgpu(burn::tensor::DeviceKind::DefaultDevice),
+            |s, i, n| {
+                if i == n {
+                    println!("{s} loaded");
+                }
+            },
+        )
         .await?;
         let report =
             validation::validate(&model, &std::fs::read(&args[1])?, &std::fs::read(&args[2])?)

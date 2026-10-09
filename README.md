@@ -15,28 +15,47 @@ parametric 3d human ([anny](https://arxiv.org/abs/2511.03589)) model, [view the 
 - [x] parametric 3dmm forward
 - [x] bevy plugin
 - [x] morphs, skeleton, skinning
-- [x] human motion model
-- [x] fitting
+- [x] ARDY motion generation and local Llama text conditioning
+- [x] SOMA identity, rig, correctives and GPU skinning
+- [x] GEM-X image-to-pose inference
+- [x] native / WebGPU studio with text, image and trajectory controls
+- [x] single-image fitting (GEM-X)
 
+
+## compatibility
+
+This release uses **Bevy 0.20, Burn 0.22 and WGPU 30**, from crates.io without
+dependency patches. Use Rust 1.97.1 or newer for the Bevy integration (the model
+crates require Rust 1.95). The repository validates with nightly Rust.
+
+Burn tensors and model types no longer take a backend type parameter. Select
+execution with `burn::tensor::Device::wgpu(...)` or `Device::flex()`; native
+CPU inference uses Burn Flex. Browser initialization is asynchronous through
+`Device::wgpu_options().init_async().await`. Model loading retains the existing
+authenticated CDN catalog, including its Burn 0.21 block-Q4 packs.
+
+The studio uses Bevy’s Feathers UI and built-in pan-orbit camera controller.
+
+The [upgrade qualification](docs/evidence/upgrade-2026-10-08/README.md) records
+native/WebGPU numerical checks, batch consistency, CDN cache recovery and
+measured cold/warm behavior.
 
 ## usage
 
 ```rust
-use bevy::prelude::*;
+use bevy::{prelude::*, ecs::schedule::common_conditions::run_once};
 use bevy_burn_human::{BurnHumanAssets, BurnHumanInput, BurnHumanPlugin};
 
 fn main() {
+    bevy_burn_human::initialize_browser_runtime();
     App::new()
         .add_plugins((DefaultPlugins, BurnHumanPlugin::default()))
-        .add_systems(Startup, setup)
+        .add_systems(Startup, setup_view)
+        .add_systems(Update, setup_body.run_if(resource_exists::<BurnHumanAssets>.and_then(run_once)))
         .run();
 }
 
-fn setup(
-    mut commands: Commands,
-    mut mats: ResMut<Assets<StandardMaterial>>,
-    assets: Res<BurnHumanAssets>,
-) {
+fn setup_view(mut commands: Commands) {
     commands.spawn((
         Camera3d::default(),
         Transform::from_xyz(0.0, 1.5, 4.0).looking_at(Vec3::Y, Vec3::Y),
@@ -46,6 +65,13 @@ fn setup(
         Transform::from_xyz(2.0, 4.0, 2.0).looking_at(Vec3::Y, Vec3::Y),
     ));
 
+}
+
+fn setup_body(
+    mut commands: Commands,
+    mut mats: ResMut<Assets<StandardMaterial>>,
+    assets: Res<BurnHumanAssets>,
+) {
     let n = assets.body.metadata().metadata.phenotype_labels.len();
     commands.spawn((
         BurnHumanInput {

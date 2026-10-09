@@ -2,19 +2,19 @@
 
 | Crate | Release | Responsibility |
 | --- | --- | --- |
-| `burn_ardy` | 0.1.4 | Batched ARDY Core27 motion, trajectory conditioning, checkpoint loading |
-| `burn_llama` | 0.1.2 | Llama 3 8B / LLM2Vec text conditioning, paged vocabulary |
-| `burn_soma` | 0.1.3 | SOMA-X identity, rig, correctives, skinning and optional MHR transfer |
-| `burn_gemx` | 0.1.3 | GEM-X image inference and composition of seven component releases |
-| `burn_mhr` | 0.1.2 | MHR evaluation and its independent checkpoint |
-| `burn_human_inference` | 0.1.4 | Model-neutral transport, bounded cache, Burnpack/tensor verification |
+| `burn_ardy` | 0.2.0 | Batched ARDY Core27 motion, trajectory conditioning, checkpoint loading |
+| `burn_llama` | 0.2.0 | Llama 3 8B / LLM2Vec text conditioning, paged vocabulary |
+| `burn_soma` | 0.2.0 | SOMA-X identity, rig, correctives, skinning and optional MHR transfer |
+| `burn_gemx` | 0.2.0 | GEM-X image inference and composition of seven component releases |
+| `burn_mhr` | 0.2.0 | MHR evaluation and its independent checkpoint |
+| `burn_human_inference` | 0.2.0 | Model-neutral transport, bounded cache, Burnpack/tensor verification |
 
 `burn_llama` replaces `burn_ardy_text` 0.1.0; `burn_gemx` replaces `burn_gem`
 0.1.0. Their implementations live in the newly named crates. The previously
-published packages remain available. `burn_human` 0.5.1 supplies Anny;
-`bevy_burn_human` 0.6.1 integrates the model crates with its default `studio`
-feature. All use published Burn 0.21 / Bevy 0.19 dependencies
-and the same wgpu 29 version, without patches.
+published packages remain available. `burn_human` 0.6.0 supplies Anny;
+`bevy_burn_human` 0.7.0 integrates the model crates with its default `studio`
+feature. All use published Burn 0.22 / Bevy 0.20 dependencies
+and the same wgpu 30 version, without patches.
 
 ## Loading
 
@@ -23,10 +23,10 @@ compiled-in manifest SHA-256 identities. `burn_human_inference` has no model
 catalog or CDN policy. The default root is `https://aberration.technology/model`.
 
 ```rust,ignore
-let ardy = burn_ardy::Ardy::<B>::load_pretrained(&device, |done, total| {}).await?;
-let llama = burn_llama::TextEncoder::<B>::load_pretrained(&device, |done, total| {}).await?;
-let soma = burn_soma::Soma::<B>::load_pretrained(&device, |done, total| {}).await?;
-let gem = burn_gemx::pipeline::Pipeline::<B>::load_pretrained(
+let ardy = burn_ardy::Ardy::load_pretrained(&device, |done, total| {}).await?;
+let llama = burn_llama::TextEncoder::load_pretrained(&device, |done, total| {}).await?;
+let soma = burn_soma::Soma::load_pretrained(&device, |done, total| {}).await?;
+let gem = burn_gemx::pipeline::Pipeline::load_pretrained(
     &device, |stage, done, total| {},
 ).await?;
 ```
@@ -46,6 +46,11 @@ only when requested by the user; fetching a crate does not download weights.
 `burn_llama` currently provides the ARDY LLM2Vec encoder, not chat generation.
 GEM-X currently provides fast single-person, single-frame regression. See
 [motion.md](motion.md) for model scope, controls and measured numerical quality.
+
+Burn 0.22 also reads the pinned Burn 0.21 Q4F/F32/block-32 exports. The loader
+normalizes that exact legacy quantization descriptor after authentication,
+without copying or rewriting tensor payloads. Unsupported legacy layouts are
+rejected. The uploaded bundles and their hashes remain unchanged.
 
 ## Transport and cache
 

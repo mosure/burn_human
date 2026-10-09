@@ -1,10 +1,15 @@
+// The validation module is an explicit browser entry point. Keep startup here
+// rather than in the shared library, so downstream Rust mains still start.
+#[wasm_bindgen::prelude::wasm_bindgen(start)]
+pub fn initialize_ardy_validation_runtime() {
+    burn_human_inference::initialize_browser_runtime();
+}
+
 use crate::{
     Ardy,
     transport::{ModelSource, read_bounded},
     validation::{Fixture, validate},
 };
-use burn::backend::wgpu::{WgpuDevice, graphics::WebGpu, init_setup_async};
-use burn_human_inference::gpu::WgpuBackend as Wgpu;
 use wasm_bindgen::prelude::*;
 
 /// Profile the production load/generate path without synchronous parity hooks.
@@ -25,8 +30,10 @@ pub async fn profile_generation_webgpu(
             phases.push(serde_json::json!({"name":name,"start_ms":phase_start,"end_ms":end}));
             phase_start = end;
         };
-        let device = WgpuDevice::default();
-        let setup = init_setup_async::<WebGpu>(&device, Default::default()).await;
+        let (device, setup) = burn::tensor::Device::wgpu_options()
+            .graphics_api(burn::tensor::wgpu::WgpuBackend::WebGpu)
+            .init_with_setup_async()
+            .await?;
         mark("device");
         let bytes = read_bounded(&input, 4 * 1024 * 1024).await?;
         let suite: crate::validation::batch::Suite = serde_json::from_slice(&bytes)?;
@@ -49,7 +56,7 @@ pub async fn profile_generation_webgpu(
         mark("input");
         let mut artifact = crate::pretrained::DEFAULT.at_base(base);
         artifact.sha256 = digest;
-        let model = Ardy::<Wgpu>::load_artifact(&artifact, &device, |_, _| {}).await?;
+        let model = Ardy::load_artifact(&artifact, &device, |_, _| {}).await?;
         mark("load");
         let mut timings = Vec::new();
         for i in 0..4 {
@@ -91,11 +98,13 @@ pub async fn validate_batch_webgpu(
 ) -> Result<String, JsValue> {
     console_error_panic_hook::set_once();
     async fn run(base: String, reference: String, digest: String) -> anyhow::Result<String> {
-        let device = WgpuDevice::default();
-        let setup = init_setup_async::<WebGpu>(&device, Default::default()).await;
+        let (device, setup) = burn::tensor::Device::wgpu_options()
+            .graphics_api(burn::tensor::wgpu::WgpuBackend::WebGpu)
+            .init_with_setup_async()
+            .await?;
         let mut artifact = crate::pretrained::DEFAULT.at_base(base);
         artifact.sha256 = digest;
-        let model = Ardy::<Wgpu>::load_artifact(&artifact, &device, |_, _| {}).await?;
+        let model = Ardy::load_artifact(&artifact, &device, |_, _| {}).await?;
         let bytes = read_bounded(&reference, 32 * 1024 * 1024).await?;
         let mut report =
             crate::validation::batch::validate(&model, serde_json::from_slice(&bytes)?).await?;
@@ -119,14 +128,16 @@ pub async fn validate_webgpu(
 ) -> Result<String, JsValue> {
     console_error_panic_hook::set_once();
     async fn run(base: String, reference: String, digest: String) -> anyhow::Result<String> {
-        let device = WgpuDevice::default();
-        let setup = init_setup_async::<WebGpu>(&device, Default::default()).await;
+        let (device, setup) = burn::tensor::Device::wgpu_options()
+            .graphics_api(burn::tensor::wgpu::WgpuBackend::WebGpu)
+            .init_with_setup_async()
+            .await?;
         let source = ModelSource::new(base.clone());
         let manifest = source.manifest(Some(&digest)).await?;
         let start = web_time::Instant::now();
         let mut artifact = crate::pretrained::DEFAULT.at_base(base);
         artifact.sha256 = digest;
-        let model = Ardy::<Wgpu>::load_artifact(&artifact, &device, |_, _| {}).await?;
+        let model = Ardy::load_artifact(&artifact, &device, |_, _| {}).await?;
         let load_seconds = start.elapsed().as_secs_f64();
         let fixture = Fixture {
             data: read_bounded(&reference, 4 * 1024 * 1024).await?,

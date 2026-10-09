@@ -1,0 +1,132 @@
+{
+  "report": {
+    "adapter": "",
+    "backend": "browser-webgpu-f32",
+    "execution": "Packed Q4F weights; per-matrix expansion on GPU before matmul; F32 activations",
+    "load_seconds": 42.5929,
+    "manifest": "09280ebcf02184708cff1a9f982b901166b433e504ff343f02c037cc52d8ee16",
+    "performance": {
+      "warm_prompt_seconds": [
+        0.4229,
+        0.418,
+        0.4222,
+        0.415,
+        0.4293
+      ]
+    },
+    "pooling": "mean, excluding instruction header, including EOT",
+    "records": [
+      {
+        "cosine": 0.9999986485007131,
+        "max_abs": 0.041088104248046875,
+        "mode": "causal_export",
+        "prompt": "walk forward calmly",
+        "rmse": 0.0032881148606131562,
+        "seconds": 0.9788
+      },
+      {
+        "cosine": 0.9999989488330432,
+        "max_abs": 0.03649425506591797,
+        "mode": "causal_export",
+        "prompt": "walk forward confidently with long energetic strides",
+        "rmse": 0.0028581274180475473,
+        "seconds": 0.5868
+      },
+      {
+        "cosine": 0.9999984140133155,
+        "max_abs": 0.04284477233886719,
+        "mode": "causal_export",
+        "prompt": "sneak forward cautiously",
+        "rmse": 0.0032616735698598152,
+        "seconds": 0.4636
+      },
+      {
+        "cosine": 0.9999989188952966,
+        "max_abs": 0.03308296203613281,
+        "mode": "causal_export",
+        "prompt": "wave with the right hand while standing",
+        "rmse": 0.0028091169193477632,
+        "seconds": 0.5068
+      },
+      {
+        "cosine": 0.9999984336573672,
+        "max_abs": 0.03899383544921875,
+        "mode": "causal_export",
+        "prompt": "jog forward quickly",
+        "rmse": 0.0034156653828759194,
+        "seconds": 0.4768
+      },
+      {
+        "cosine": 0.9999992046303606,
+        "max_abs": 0.013217449188232422,
+        "mode": "bidirectional",
+        "prompt": "walk forward calmly",
+        "rmse": 0.002674827093203152,
+        "seconds": 0.4292
+      },
+      {
+        "cosine": 0.9999994273656483,
+        "max_abs": 0.00919198989868164,
+        "mode": "bidirectional",
+        "prompt": "walk forward confidently with long energetic strides",
+        "rmse": 0.002270681376761236,
+        "seconds": 0.4173
+      },
+      {
+        "cosine": 0.9999991647485101,
+        "max_abs": 0.017452239990234375,
+        "mode": "bidirectional",
+        "prompt": "sneak forward cautiously",
+        "rmse": 0.0027282988031812044,
+        "seconds": 0.4087
+      },
+      {
+        "cosine": 0.9999991992096062,
+        "max_abs": 0.009500443935394287,
+        "mode": "bidirectional",
+        "prompt": "wave with the right hand while standing",
+        "rmse": 0.002650030619850829,
+        "seconds": 0.4067
+      },
+      {
+        "cosine": 0.9999991034347497,
+        "max_abs": 0.012020111083984375,
+        "mode": "bidirectional",
+        "prompt": "jog forward quickly",
+        "rmse": 0.002794203113178182,
+        "seconds": 0.4156
+      }
+    ],
+    "reference": "Pinned ORT INT4/FP16 export, plus mask-only bidirectional variant",
+    "vocabulary_host_cache_limit_bytes": 67108864
+  },
+  "elapsed_ms": 50050.09999990463,
+  "adapter": {
+    "vendor": "nvidia",
+    "architecture": "blackwell",
+    "fallback": false
+  },
+  "event_loop": {
+    "scope": "load, cold compilation, parity, warm inference",
+    "frames": 2388,
+    "p50_ms": 16.69999999999891,
+    "p95_ms": 50,
+    "p99_ms": 66.59999999999854,
+    "max_ms": 133.29999999999563,
+    "long_tasks_ms": [
+      141,
+      76
+    ]
+  },
+  "event_loop_by_phase": null,
+  "diagnostics": null,
+  "wasm_linear_memory_peak_bytes": 113180672,
+  "browser": "153.0.8010.12",
+  "module": "http://127.0.0.1:8868/.cache/upgrade-2026-10-08/web/burn_llama/burn_llama.js",
+  "function": "validate_text_webgpu",
+  "args": [
+    "http://127.0.0.1:8868/.artifacts/cdn-upload-human-v1/aberration.technology/model/llama/ardy-llm2vec-8b/v1",
+    "http://127.0.0.1:8868/.cache/text-reference.json",
+    "09280ebcf02184708cff1a9f982b901166b433e504ff343f02c037cc52d8ee16"
+  ]
+}

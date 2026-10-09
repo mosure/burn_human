@@ -1,10 +1,6 @@
 use anyhow::{Result, ensure};
-use burn::{
-    prelude::Backend,
-    tensor::{AllocationProperty, Bytes, DType, Tensor, TensorData},
-};
+use burn::tensor::{AllocationProperty, Bytes, DType, Tensor, TensorData};
 use burn_human_motion::artifacts::{Object, PartReader, read_object};
-use burn_store::{BurnpackStore, ModuleStore};
 use std::collections::{BTreeMap, BTreeSet};
 
 /// Authenticate one object and its exact tensor inventory before uploading it.
@@ -16,37 +12,34 @@ pub async fn read_tensors(
     crate::cooperative::yield_to_browser().await;
     // Each tensor borrows its authenticated object's allocation. The reader
     // and tensor data retain it through shared ownership until upload completes.
-    let mut pack = BurnpackStore::from_bytes(Some(Bytes::from_shared(
+    let legacy = crate::legacy_quant::normalize(&bytes)?;
+    let snapshots = burn_pack::Reader::from_bytes(Bytes::from_shared(
         bytes::Bytes::from(bytes),
         AllocationProperty::Native,
-    )))
-    .zero_copy(true);
-    let snapshots = pack
-        .get_all_snapshots()
-        .map_err(|e| anyhow::anyhow!("Burnpack: {e}"))?;
+    ))
+    .and_then(burn_pack::Reader::into_tensors)
+    .map_err(|e| anyhow::anyhow!("Burnpack: {e}"))?;
     crate::cooperative::yield_to_browser().await;
     let mut seen = BTreeSet::new();
     let mut tensors = BTreeMap::new();
-    for snapshot in snapshots.values() {
-        let name = snapshot
-            .path_stack
-            .as_ref()
-            .ok_or_else(|| anyhow::anyhow!("unnamed tensor"))?
-            .join(".");
+    for mut snapshot in snapshots {
+        if let Some(dtype) = legacy.get(&snapshot.name) {
+            snapshot.dtype = *dtype;
+        }
+        let name = snapshot.name.clone();
         let spec = object
             .tensors
             .iter()
             .find(|t| t.name == name)
             .ok_or_else(|| anyhow::anyhow!("unknown tensor {name}"))?;
         ensure!(seen.insert(name.clone()), "duplicate tensor {name}");
-        let data = snapshot
-            .to_data()
-            .map_err(|e| anyhow::anyhow!("tensor: {e}"))?;
+        let data =
+            burn_store::bridge::into_data(snapshot).map_err(|e| anyhow::anyhow!("tensor: {e}"))?;
         ensure!(
-            data.dtype == crate::dtype(&spec.dtype)?
-                && data.shape.as_slice() == spec.shape
-                && Some(data.bytes.len()) == spec.byte_len()
-                && reader.digest(&data.bytes).await? == spec.sha256,
+            data.dtype() == crate::dtype(&spec.dtype)?
+                && data.shape().as_slice() == spec.shape
+                && Some(data.bytes().len()) == spec.byte_len()
+                && reader.digest(data.bytes()).await? == spec.sha256,
             "tensor shape/dtype/digest mismatch: {name}"
         );
         ensure_finite_async(&data).await?;
@@ -67,20 +60,20 @@ pub fn ensure_finite(data: &TensorData) -> Result<()> {
 }
 
 fn finite_values(data: &TensorData) -> Result<(&[u8], DType)> {
-    if matches!(data.dtype, DType::QFloat(_)) {
+    if matches!(data.dtype(), DType::QFloat(_)) {
         let n = data
-            .shape
+            .shape()
             .iter()
             .try_fold(1usize, |n, d| n.checked_mul(*d))
             .ok_or_else(|| anyhow::anyhow!("quantized shape overflow"))?;
         Ok((
-            data.bytes
+            data.bytes()
                 .get(n / 2..)
                 .ok_or_else(|| anyhow::anyhow!("truncated quantized scales"))?,
             DType::F32,
         ))
     } else {
-        Ok((&data.bytes, data.dtype))
+        Ok((data.bytes(), data.dtype()))
     }
 }
 
@@ -128,18 +121,18 @@ pub struct UploadBudget {
 }
 
 impl UploadBudget {
-    pub async fn record<B: Backend>(&mut self, device: &B::Device, bytes: usize) -> Result<()> {
+    pub async fn record(&mut self, device: &burn::tensor::Device, bytes: usize) -> Result<()> {
         #[cfg(all(target_arch = "wasm32", feature = "wgpu"))]
         {
-            use burn::{
-                backend::wgpu::{WgpuDevice, WgpuRuntime},
-                cubecl::Runtime,
-            };
-            use std::any::Any;
+            use burn::backend::DispatchDevice;
+            use burn::cubecl::Device as CubeDevice;
             self.pending += bytes;
             if self.pending >= 32 * 1024 * 1024 {
-                if let Some(device) = (device as &dyn Any).downcast_ref::<WgpuDevice>() {
-                    WgpuRuntime::client(device)
+                if let DispatchDevice::Cube(device) = device.as_dispatch()
+                    && matches!(device, CubeDevice::Wgpu(_))
+                {
+                    device
+                        .client()
                         .sync()
                         .await
                         .map_err(|e| anyhow::anyhow!("GPU upload completion: {e}"))?;
@@ -153,15 +146,15 @@ impl UploadBudget {
     }
 }
 
-pub struct TensorBank<B: Backend> {
-    floats: BTreeMap<String, (Tensor<B, 1>, Vec<usize>)>,
-    quantized: BTreeMap<String, Tensor<B, 2>>,
-    pub device: B::Device,
+pub struct TensorBank {
+    floats: BTreeMap<String, (Tensor<1>, Vec<usize>)>,
+    quantized: BTreeMap<String, Tensor<2>>,
+    pub device: burn::tensor::Device,
     uploads: UploadBudget,
 }
 
-impl<B: Backend> TensorBank<B> {
-    pub fn new(device: &B::Device) -> Self {
+impl TensorBank {
+    pub fn new(device: &burn::tensor::Device) -> Self {
         Self {
             floats: BTreeMap::new(),
             quantized: BTreeMap::new(),
@@ -172,16 +165,17 @@ impl<B: Backend> TensorBank<B> {
 
     pub fn insert(&mut self, name: String, data: TensorData) -> Result<()> {
         ensure!(!self.contains(&name), "duplicate tensor {name}");
-        match data.dtype {
+        match data.dtype() {
             DType::QFloat(_) => {
-                ensure!(data.shape.len() == 2, "quantized matrix rank");
+                ensure!(data.shape().len() == 2, "quantized matrix rank");
                 self.quantized
                     .insert(name, Tensor::from_data(data, &self.device));
             }
             DType::F32 | DType::F16 => {
-                let shape = data.shape.to_vec();
+                let dtype = data.dtype();
+                let shape = data.shape().to_vec();
                 let count: usize = shape.iter().product();
-                let flat = TensorData::from_bytes(data.bytes, [count], data.dtype);
+                let flat = TensorData::try_from_bytes(data.into_bytes(), [count], dtype)?;
                 self.floats
                     .insert(name, (Tensor::from_data(flat, &self.device), shape));
             }
@@ -204,16 +198,16 @@ impl<B: Backend> TensorBank<B> {
 
     /// Upload a verified tensor with bounded pending browser transfers.
     pub async fn insert_async(&mut self, name: String, data: TensorData) -> Result<()> {
-        let bytes = data.bytes.len();
+        let bytes = data.bytes().len();
         self.insert(name, data)?;
-        self.uploads.record::<B>(&self.device, bytes).await
+        self.uploads.record(&self.device, bytes).await
     }
 
     pub fn contains(&self, name: &str) -> bool {
         self.floats.contains_key(name) || self.quantized.contains_key(name)
     }
 
-    pub fn tensor<const D: usize>(&self, name: &str) -> Tensor<B, D> {
+    pub fn tensor<const D: usize>(&self, name: &str) -> Tensor<D> {
         let (data, shape) = &self.floats[name];
         let dims: [usize; D] = shape
             .as_slice()
@@ -226,7 +220,7 @@ impl<B: Backend> TensorBank<B> {
     /// between calls; one matrix is expanded on-device for portable matmul.
     /// Burn 0.21's packed block transpose/mixed matmul fails the independent
     /// Q4F parity probe, so dequantize BEFORE transposing. No dependency patch.
-    pub fn linear<const D: usize>(&self, name: &str, input: Tensor<B, D>) -> Tensor<B, D> {
+    pub fn linear<const D: usize>(&self, name: &str, input: Tensor<D>) -> Tensor<D> {
         let dims = input.dims();
         let k = dims[D - 1];
         let rows = dims.iter().product::<usize>() / k;
@@ -243,7 +237,7 @@ impl<B: Backend> TensorBank<B> {
         output.reshape(shape)
     }
 
-    pub fn affine(&self, prefix: &str, input: Tensor<B, 3>) -> Tensor<B, 3> {
+    pub fn affine(&self, prefix: &str, input: Tensor<3>) -> Tensor<3> {
         self.linear(&format!("{prefix}.weight"), input)
             + self.tensor::<1>(&format!("{prefix}.bias")).unsqueeze()
     }

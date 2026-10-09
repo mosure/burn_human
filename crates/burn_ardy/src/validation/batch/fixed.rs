@@ -1,18 +1,15 @@
 use crate::Ardy;
 use anyhow::{Result, ensure};
-use burn::{
-    prelude::Backend,
-    tensor::{Tensor, TensorData},
-};
+use burn::tensor::{Tensor, TensorData};
 use burn_human_motion::{MotionRequest, TextEmbedding};
 use serde_json::{Value, json};
 
-async fn values<B: Backend>(tensor: Tensor<B, 3>) -> Result<Vec<f32>> {
+async fn values(tensor: Tensor<3>) -> Result<Vec<f32>> {
     let data = tensor
         .into_data_async()
         .await
         .map_err(|e| anyhow::anyhow!("{e}"))?
-        .to_vec::<f32>()
+        .try_to_vec::<f32>()
         .map_err(|e| anyhow::anyhow!("{e}"))?;
     ensure!(
         data.iter().all(|v| v.is_finite()),
@@ -23,8 +20,8 @@ async fn values<B: Backend>(tensor: Tensor<B, 3>) -> Result<Vec<f32>> {
 
 // Gate continuous values and discrete FSQ codes independently. Decoder parity
 // uses identical hybrids so its inputs cannot diverge before the comparison.
-pub(super) async fn validate<B: Backend>(
-    model: &Ardy<B>,
+pub(super) async fn validate(
+    model: &Ardy,
     requests: &[MotionRequest],
     embeddings: &[TextEmbedding],
 ) -> Result<Value> {

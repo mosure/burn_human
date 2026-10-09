@@ -1,14 +1,15 @@
 //! Same-device tensor handoff without a host readback or GPU completion wait.
 use anyhow::{Result, ensure};
 use burn::{
-    backend::wgpu::{CubeBackend, WgpuRuntime},
+    backend::wgpu::{AutoCompiler, CubeBackend},
     tensor::{DType, Tensor},
 };
 use std::{num::NonZeroU64, sync::Arc};
 
-/// Explicit backend keeps the render bridge stable when another dependency
-/// enables Burn's optional fusion wrapper through Cargo feature unification.
-pub type WgpuBackend = CubeBackend<WgpuRuntime, f32, i32, u32>;
+/// Raw CubeCL primitive type used by the unfused WGPU render bridge.
+/// Burn 0.22 selects frontend dispatch through `Device`; enabling fusion changes
+/// that dispatch and causes this bridge to reject the resulting fused primitive.
+pub type WgpuBackend = CubeBackend;
 
 /// A buffer view and its allocator lease. Keep this value alive until every
 /// external GPU command using the view has completed; a raw buffer clone alone
@@ -33,18 +34,23 @@ impl TensorBuffer {
     }
 }
 
-pub fn export<const D: usize>(tensor: Tensor<WgpuBackend, D>) -> Result<TensorBuffer> {
+pub fn export<const D: usize>(tensor: Tensor<D>) -> Result<TensorBuffer> {
     ensure!(
         tensor.dtype() == DType::F32,
         "Render buffers require f32 tensors"
     );
     let bytes = tensor.dims().iter().product::<usize>() as u64 * 4;
     ensure!(bytes > 0, "Cannot export an empty tensor");
-    let mut primitive = tensor.into_primitive().tensor();
-    if !primitive.is_contiguous() {
-        primitive = primitive.copy();
-    }
-    let resource = primitive.client.get_resource(primitive.handle.clone())?;
+    let primitive = tensor
+        .try_into_primitive::<CubeBackend>()
+        .map_err(|e| anyhow::anyhow!("Render handoff needs an unfused CubeCL tensor: {e:?}"))?;
+    // Elementwise copy can preserve pitched/permuted storage in Burn 0.22.
+    // Export a row-major view, including untile when the backend used tiled
+    // storage. Already-contiguous tensors retain their original allocation.
+    let primitive = burn_cubecl::kernel::into_contiguous(primitive);
+    let resource = primitive
+        .client
+        .get_resource::<burn::cubecl::wgpu::WgpuServer<AutoCompiler>>(primitive.handle.clone())?;
     // Submits inference before a renderer uses this view on the shared queue.
     // flush is deliberately not sync: it never waits for GPU completion.
     primitive.client.flush()?;

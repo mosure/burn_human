@@ -12,13 +12,13 @@ use bevy::{
     shader::ShaderRef,
 };
 use burn::tensor::Tensor;
-use burn_human_inference::gpu::{self, WgpuBackend};
+use burn_human_inference::gpu::{self};
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
 pub(super) const VERTEX_INDEX: MeshVertexAttribute =
     MeshVertexAttribute::new("SurfaceIndex", 1_305_191_502, VertexFormat::Uint32);
-const SHADER_PATH: &str = "embedded://bevy_burn_human/motion/surface_vertex.wgsl";
+const SHADER_PATH: &str = "embedded://bevy_burn_human/motion/surface_vertex.wesl";
 
 #[derive(Asset, AsBindGroup, TypePath, Debug, Clone)]
 pub(super) struct SurfaceMaterial {
@@ -48,7 +48,7 @@ impl MaterialExtension for SurfaceMaterial {
     }
 }
 pub(super) fn plugin(app: &mut App) {
-    bevy::asset::embedded_asset!(app, "surface_vertex.wgsl");
+    bevy::asset::embedded_asset!(app, "surface_vertex.wesl");
     app.add_plugins(MaterialPlugin::<BodyMaterial>::default());
 }
 
@@ -163,7 +163,7 @@ impl SurfaceProcessor {
     }
     pub async fn prepare(
         &self,
-        positions: Tensor<WgpuBackend, 3>,
+        positions: Tensor<3>,
         topology: Arc<Topology>,
     ) -> Result<GpuSurface> {
         ensure!(
@@ -222,7 +222,7 @@ impl SurfaceProcessor {
         let data = bounds
             .into_data_async()
             .await?
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .map_err(|e| anyhow::anyhow!("Surface bounds: {e}"))?;
         ensure!(
             data.iter().all(|v| v.is_finite()),
@@ -275,12 +275,10 @@ mod tests {
     #[test]
     #[ignore = "requires a hardware WGPU adapter"]
     fn gpu_handoff_preserves_positions_normals_and_bounds() {
-        use burn::{
-            backend::wgpu::{graphics::AutoGraphicsApi, init_setup},
-            tensor::TensorData,
-        };
-        let device = Default::default();
-        let setup = init_setup::<AutoGraphicsApi>(&device, Default::default());
+        use burn::tensor::TensorData;
+        let (device, setup) = burn::tensor::Device::wgpu_options()
+            .init_with_setup()
+            .unwrap();
         let processor = SurfaceProcessor::new(setup.device.clone(), setup.queue.clone());
         let topology = processor.topology(4, &[[0, 1, 2]]).unwrap();
         // Millimetre triangles, an isolated vertex, a sliced allocation and a
@@ -288,18 +286,14 @@ mod tests {
         let values = vec![
             0.0, 0.0, 0.0, 0.001, 0.0, 0.0, 0.0, 0.001, 0.0, 1.0, 1.0, 1.0,
         ];
-        let plain = Tensor::<WgpuBackend, 3>::from_data(
-            TensorData::new(values.clone(), [1, 4, 3]),
-            &device,
-        );
+        let plain = Tensor::<3>::from_data(TensorData::new(values.clone(), [1, 4, 3]), &device);
         let sliced = Tensor::cat(vec![Tensor::zeros([1, 4, 3], &device), plain.clone()], 1)
             .slice([0..1, 4..8, 0..3]);
         let transposed: Vec<_> = (0..3)
             .flat_map(|axis| values.as_chunks::<3>().0.iter().map(move |v| v[axis]))
             .collect();
         let strided =
-            Tensor::<WgpuBackend, 3>::from_data(TensorData::new(transposed, [1, 3, 4]), &device)
-                .swap_dims(1, 2);
+            Tensor::<3>::from_data(TensorData::new(transposed, [1, 3, 4]), &device).swap_dims(1, 2);
         for tensor in [plain, sliced, strided] {
             let surface = pollster::block_on(processor.prepare(tensor, topology.clone())).unwrap();
             assert_eq!(surface.low, Vec3::ZERO);
@@ -322,7 +316,7 @@ mod tests {
                 .poll(wgpu::PollType::wait_indefinitely())
                 .unwrap();
             rx.recv().unwrap().unwrap();
-            let mapped = staging.slice(..).get_mapped_range();
+            let mapped = staging.slice(..).get_mapped_range().unwrap();
             let data: &[f32] = bytemuck::cast_slice(&mapped);
             for (i, vertex) in data.as_chunks::<8>().0.iter().enumerate() {
                 assert_eq!(&vertex[..3], &values[i * 3..i * 3 + 3]);

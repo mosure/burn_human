@@ -1,10 +1,7 @@
 //! Momentum Human Rig evaluation on Burn, using the public SOMA-X LOD1 checkpoint.
 //! Native MHR coordinates are centimetres, +Y up. SOMA adapters convert at their boundary.
 use anyhow::{Result, ensure};
-use burn::{
-    prelude::Backend,
-    tensor::{Tensor, TensorData, activation},
-};
+use burn::tensor::{Tensor, TensorData, activation};
 use burn_human_inference::{
     transport::ModelSource,
     weights::{TensorBank, read_tensors},
@@ -72,22 +69,22 @@ pub fn state_to_matrix(state: [f32; 8]) -> Mat4 {
         Vec3::new(state[0], state[1], state[2]),
     )
 }
-pub struct MhrOutput<B: Backend> {
-    pub vertices: Tensor<B, 3>,
+pub struct MhrOutput {
+    pub vertices: Tensor<3>,
     pub skeleton_world: Vec<Vec<Mat4>>,
 }
-pub struct Mhr<B: Backend> {
-    weights: TensorBank<B>,
+pub struct Mhr {
+    weights: TensorBank,
     rig: Rig,
     parameters: Vec<f32>,
     inverse_bind: Vec<Mat4>,
     pub faces: Vec<[u32; 3]>,
 }
-impl<B: Backend> Mhr<B> {
+impl Mhr {
     pub async fn load(
         manifest: &Manifest,
         source: &mut ModelSource,
-        device: &B::Device,
+        device: &burn::tensor::Device,
         mut progress: impl FnMut(usize, usize),
     ) -> Result<Self> {
         manifest.validate()?;
@@ -168,11 +165,11 @@ impl<B: Backend> Mhr<B> {
             for (name, data) in read_tensors(source, object).await? {
                 if name == "joint.parameters" {
                     parameters = data
-                        .to_vec::<f32>()
+                        .try_to_vec::<f32>()
                         .map_err(|e| anyhow::anyhow!("parameters: {e}"))?;
                 } else if name == "mesh.faces" {
                     let values = data
-                        .to_vec::<i32>()
+                        .try_to_vec::<i32>()
                         .map_err(|e| anyhow::anyhow!("faces: {e}"))?;
                     ensure!(
                         values.iter().all(|i| *i >= 0 && *i < 18439),
@@ -205,7 +202,7 @@ impl<B: Backend> Mhr<B> {
         })
     }
 
-    pub fn evaluate(&self, inputs: &[MhrInput]) -> Result<MhrOutput<B>> {
+    pub fn evaluate(&self, inputs: &[MhrInput]) -> Result<MhrOutput> {
         ensure!(
             !inputs.is_empty() && inputs.len() <= 128,
             "MHR batch must contain 1..128 subjects"
@@ -215,7 +212,7 @@ impl<B: Backend> Mhr<B> {
         }
         let batch = inputs.len();
         let device = &self.weights.device;
-        let identity = Tensor::<B, 2>::from_data(
+        let identity = Tensor::<2>::from_data(
             TensorData::new(
                 inputs
                     .iter()
@@ -225,7 +222,7 @@ impl<B: Backend> Mhr<B> {
             ),
             device,
         );
-        let expressions = Tensor::<B, 2>::from_data(
+        let expressions = Tensor::<2>::from_data(
             TensorData::new(
                 inputs
                     .iter()
@@ -287,7 +284,7 @@ impl<B: Backend> Mhr<B> {
             skeleton_world.push(world);
         }
         if inputs.iter().any(|p| p.correctives) {
-            let input = Tensor::<B, 2>::from_data(TensorData::new(features, [batch, 750]), device);
+            let input = Tensor::<2>::from_data(TensorData::new(features, [batch, 750]), device);
             let z = activation::relu(self.weights.linear("corrective.input.weight", input));
             let chunks = (0..14)
                 .map(|i| {
@@ -298,7 +295,7 @@ impl<B: Backend> Mhr<B> {
             vertices = vertices + Tensor::cat(chunks, 1);
         }
         let vertices = vertices.reshape([batch, 18439, 3]);
-        let skin = Tensor::<B, 3>::from_data(TensorData::new(skin, [batch, 127, 12]), device);
+        let skin = Tensor::<3>::from_data(TensorData::new(skin, [batch, 127, 12]), device);
         let blended = self
             .weights
             .tensor::<2>("skin.weights")

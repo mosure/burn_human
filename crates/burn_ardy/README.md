@@ -1,6 +1,6 @@
 # burn_ardy
 
-ARDY Core RP 20 FPS / Horizon40 inference in Rust/Burn 0.21, with native WGPU and browser WebGPU support.
+ARDY Core RP 20 FPS / Horizon40 inference in Rust/Burn 0.22, with native WGPU and browser WebGPU support.
 
 The model emits Core27 motion and accepts text embeddings, history and world-space waypoints. Enable `transport` when disabling default features.
 
@@ -15,19 +15,19 @@ windows. Text embeddings can be cached and reused; text encoding is separate.
 The unfused WGPU backend pins matmul and reduction strategies to keep motion
 codes stable as actor count changes. Qualification gates both continuous values
 and discrete codes, then compares complete serial/batch clips and actor order.
-Use `burn_human_inference::gpu::WgpuBackend` for this path; other backends and
+Use a WGPU `Device` without enabling Burn fusion for this path; other backends and
 adapters require their own numerical qualification. Seeds are not a promise of
 bitwise equivalence across different devices or software versions.
 
 ```toml
-burn_ardy = { version = "0.1.4", features = ["wgpu"] }
-burn_human_inference = { version = "0.1.4", features = ["wgpu"] }
+burn_ardy = { version = "0.2.0", features = ["wgpu"] }
+burn_human_inference = { version = "0.2.0", features = ["wgpu"] }
 ```
 
 The model owns its immutable CDN catalog and loading policy:
 
 ```rust,ignore
-let model = burn_ardy::Ardy::<burn_human_inference::gpu::WgpuBackend>::load_pretrained(
+let model = burn_ardy::Ardy::load_pretrained(
     &device,
     |done, total| { /* progress */ },
 ).await?;

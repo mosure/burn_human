@@ -1,12 +1,9 @@
 use anyhow::{Result, ensure};
-use burn::{
-    backend::Wgpu,
-    tensor::{DType, Tensor, TensorData},
-};
+use burn::tensor::{DType, Tensor, TensorData};
 
 fn main() -> Result<()> {
     pollster::block_on(async {
-        let device = Default::default();
+        let device = burn::tensor::Device::wgpu(burn::tensor::DeviceKind::DefaultDevice);
         // ONNX has an implicit zero-point of 8; XOR maps both nibbles to signed Q4F.
         let mut bytes = vec![];
         let mut dense = vec![];
@@ -26,7 +23,7 @@ fn main() -> Result<()> {
                 );
             }
         }
-        let q: Tensor<Wgpu, 2> = Tensor::from_data(
+        let q: Tensor<2> = Tensor::from_data(
             TensorData::from_bytes_vec(bytes, [64, 64], burn_human_inference::dtype("q4f32")?),
             &device,
         );
@@ -34,9 +31,8 @@ fn main() -> Result<()> {
             matches!(q.dtype(), DType::QFloat(_)),
             "quantized weights were widened during loading"
         );
-        let expected: Tensor<Wgpu, 2> =
-            Tensor::from_data(TensorData::new(dense, [64, 64]), &device);
-        let input: Tensor<Wgpu, 2> = Tensor::from_data(
+        let expected: Tensor<2> = Tensor::from_data(TensorData::new(dense, [64, 64]), &device);
+        let input: Tensor<2> = Tensor::from_data(
             TensorData::new(
                 (0..64 * 64)
                     .map(|i| (i % 29) as f32 * 0.03)
@@ -51,7 +47,7 @@ fn main() -> Result<()> {
             .max()
             .into_data_async()
             .await?
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .unwrap()[0];
         ensure!(
             dequant_error == 0.0,
@@ -63,7 +59,7 @@ fn main() -> Result<()> {
             .max()
             .into_data_async()
             .await?
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .unwrap()[0];
         println!("Q4F32 packed storage / per-matrix GPU expansion max error {error}");
         ensure!(error < 0.002, "quantized matmul parity failed");
